@@ -1,9 +1,19 @@
+- [Project Dependencies](#project-dependencies)
 - [Development](#development)
 - [Compile Released Version](#compile-released-version)
 - [Running Executive Binary File](#running-executive-binary-file)
   - [First Running](#first-running)
   - [Second Running](#second-running)
 - [Work Flow](#work-flow)
+
+## Project Dependencies
+
+- Rust
+- Rocket
+- diesel
+- dotenvy
+- serde_json
+- chrono
 
 ## Development
 
