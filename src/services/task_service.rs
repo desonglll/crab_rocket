@@ -1,7 +1,8 @@
-use crate::models::task::Task;
+use crate::models::task::{NewTask, PutTask, Task};
 
 pub trait GetTask {
-    fn get_task_by_id(id: u64) -> Option<Task>;
-    fn get_all_tasks() -> Option<Vec<Task>>;
-    fn insert_single_task(task: Task) -> Result<Task, ()>;
+    fn insert_single_task(task: NewTask) -> Task;
+    fn get_all_tasks() -> Vec<Task>;
+    fn get_task_by_id(t_id: i32) -> Task;
+    fn update_task_by_id(t_id: i32, task: PutTask) -> Task;
 }

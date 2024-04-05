@@ -4,8 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+chrono = { version = "0.4.19", features = ["serde"] }
 rocket = { version = "0.5.0", features = ["json"] }
-rusqlite = "0.31.0"
+diesel = { version = "2.1.0", features = ["postgres", "chrono"] }
+dotenvy = "0.15"
+serde_json = "1.0.115"
+chrono-tz = "0.5"
 
 [profile.dev]
 opt-level = 0
