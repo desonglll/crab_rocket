@@ -11,7 +11,9 @@ fn rocket() -> _ {
             task_route::insert_single_task,
             task_route::get_all_tasks,
             task_route::get_task_by_id,
-            task_route::update_task_by_id
+            task_route::update_task_by_id,
+            task_route::delete_task_by_id,
+            task_route::put_task
         ],
     )
 }

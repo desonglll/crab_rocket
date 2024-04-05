@@ -1,4 +1,5 @@
 - [Project Dependencies](#project-dependencies)
+- [Requirement](#requirement)
 - [Development](#development)
 - [Compile Released Version](#compile-released-version)
 - [Running Executive Binary File](#running-executive-binary-file)
@@ -14,6 +15,11 @@
 - dotenvy
 - serde_json
 - chrono
+
+## Requirement
+
+- Rust environment
+- Postgres
 
 ## Development
 

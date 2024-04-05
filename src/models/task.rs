@@ -3,7 +3,8 @@ use rocket::serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 use crate::utils::time::get_e8_time;
-#[derive(Debug, Serialize, Deserialize)]
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::tasks)]
@@ -76,19 +77,19 @@ impl NewTask {
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crate::schema::tasks)]
-pub struct PutTask {
+pub struct PatchTask {
     pub title: String,
     pub content: Option<String>,
     pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
-impl PutTask {
+impl PatchTask {
     pub fn new(
         title: String,
         content: Option<String>,
         updated_at: Option<chrono::NaiveDateTime>,
     ) -> Self {
-        PutTask {
+        PatchTask {
             title,
             content,
             updated_at,
@@ -96,8 +97,26 @@ impl PutTask {
     }
 }
 
+impl Into<PatchTask> for Task {
+    fn into(self) -> PatchTask {
+        PatchTask {
+            title: self.title,
+            content: self.content,
+            updated_at: self.updated_at,
+        }
+    }
+}
+impl Into<NewTask> for Task {
+    fn into(self) -> NewTask {
+        NewTask {
+            title: self.title,
+            content: self.content,
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
+        }
+    }
+}
 mod test {
-
     #[test]
     fn test_task_new() {
         let task = super::Task::new(1, "title".to_string(), "content".to_string().into());

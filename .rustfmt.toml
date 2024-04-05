@@ -1,8 +1,9 @@
 # Rustfmt configuration options
-
+# https://rust-lang.github.io/rustfmt/?version=v1.6.0&search=
 # Control how wide lines can be before they are automatically wrapped.
 max_width = 100
-
+wrap_comments = true
+comment_width = 80
 # Remove trailing whitespace.
 trim_trailing_whitespace = true
 
