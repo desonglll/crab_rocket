@@ -1,6 +1,6 @@
+use crate::controllers::task_controller;
 use crate::models::task::{NewTask, PutTask, Task};
 use crate::services::task_service::GetTask;
-use crate::utils::time::get_e8_time;
 use rocket::serde::json::Json;
 use rocket::{get, post, put};
 
@@ -16,7 +16,6 @@ pub fn get_task_by_id(id: i32) -> Json<Task> {
 
 #[put("/task/<id>", data = "<task>")]
 pub fn update_task_by_id(id: i32, task: Json<PutTask>) -> Json<Task> {
-    // let raw_task = task.clone().into_inner();
     let updated_task = Task::update_task_by_id(id, task.into_inner());
     Json(updated_task)
 }
@@ -28,18 +27,11 @@ pub fn get_all_tasks() -> Json<Vec<Task>> {
 }
 
 #[post("/task", data = "<task>")]
-pub fn insert_single_task(task: Json<NewTask>) {
-    let mut raw_task: NewTask = task.clone().into_inner();
-    // TODO: Move to controller in the future.
-    // Handle None date time
-    if raw_task.created_at == None {
-        raw_task.created_at = Some(get_e8_time());
-    }
-    if raw_task.updated_at == None {
-        raw_task.updated_at = Some(get_e8_time());
-    }
-    let result_task = Task::insert_single_task(raw_task.into());
+pub fn insert_single_task(task: Json<NewTask>) -> Json<Task> {
+    let mut raw_task: NewTask = task.into_inner();
+    let result_task: Task = task_controller::insert_single_task_controller(&mut raw_task);
     println!("{result_task:?}");
+    Json(result_task)
 }
 
 #[get("/")]

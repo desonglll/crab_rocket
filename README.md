@@ -18,6 +18,8 @@
 ## Development
 
 ```shell
+diesel migration redo
+diesel migration run
 cargo run
 ```
 
@@ -32,7 +34,8 @@ cargo build --release
 ### First Running
 
 ```shell
-./hello_rocket init
+diesel migration redo
+diesel migration run
 ```
 
 ### Second Running
