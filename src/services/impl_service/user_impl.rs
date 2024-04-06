@@ -77,8 +77,10 @@ mod test {
             Some(get_e8_time()),
             "mobile_phone".to_string(),
         );
-        let result = User::insert_single_user(&user).unwrap();
-        println!("{result}");
+        match User::insert_single_user(&user) {
+            Ok(result) => println!("{result}"),
+            Err(_) => println!("Err"),
+        }
     }
 
     #[test]

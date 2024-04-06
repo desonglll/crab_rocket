@@ -15,3 +15,7 @@
     - Finish `CRUD` for `User`
   - `12eb9752c308816175737f4221b869cfe7df01cd`
     - Finish `Post` structure and make test more strong.
+  - `b57067207387523b6153bf880075f1c5c52bb568`
+    - Make `establish_pg_connection` more stronger.
+  - `
+    - Fix `test_insert_single_user` for `cargo run` in github workflow.
