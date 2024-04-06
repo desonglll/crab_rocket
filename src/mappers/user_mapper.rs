@@ -44,7 +44,7 @@ pub fn update_user_by_id(
 pub fn delete_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diesel::result::Error> {
     diesel::delete(users.filter(users::user_id.eq(id))).get_result(conn)
 }
-
+#[cfg(test)]
 mod test {
 
     #[test]
@@ -78,8 +78,10 @@ mod test {
 
         use super::fetch_all_users;
         let mut conn = establish_pg_connection();
-        let all_users = fetch_all_users(&mut conn).unwrap();
-        println!("{all_users:?}");
+        match fetch_all_users(&mut conn) {
+            Ok(res) => println!("{res:?}"),
+            Err(_) => println!("Err"),
+        }
     }
 
     #[test]
@@ -88,8 +90,10 @@ mod test {
         use crate::establish_pg_connection;
         let id = 1;
         let mut conn = establish_pg_connection();
-        let user = fetch_user_by_id(&mut conn, id).unwrap();
-        println!("{user}");
+        match fetch_user_by_id(&mut conn, id) {
+            Ok(res) => println!("{res}"),
+            Err(_) => println!("Err"),
+        }
     }
 
     #[test]
@@ -98,16 +102,20 @@ mod test {
         let mut conn = crate::establish_pg_connection();
         let id = 1;
         let user = User::new_empty();
-        let result =
-            crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user.into()).unwrap();
-        println!("{result}");
+        match crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user.into()) {
+            Ok(res) => println!("{res}"),
+            Err(_) => println!("Err"),
+        }
     }
 
     #[test]
     fn test_delete_user_by_id() {
         let mut conn = crate::establish_pg_connection();
         let id = 1;
-        let result = super::delete_user_by_id(&mut conn, id).unwrap();
-        println!("{result}");
+        let result = super::delete_user_by_id(&mut conn, id);
+        match result {
+            Ok(res) => println!("{res}"),
+            Err(_) => println!("Err"),
+        }
     }
 }

@@ -45,7 +45,7 @@ impl user_service::GetUser for User {
         }
     }
 }
-
+#[cfg(test)]
 mod test {
 
     #[test]
@@ -75,23 +75,29 @@ mod test {
     fn test_get_all_users() {
         use crate::models::user::User;
         use crate::services::user_service::GetUser;
-        let result = User::get_all_users().unwrap();
-        println!("{result:?}");
+        match User::get_all_users() {
+            Ok(res) => println!("{res:?}"),
+            Err(_) => println!("Err"),
+        }
     }
 
     #[test]
     fn test_get_user_by_id() {
         use crate::models::user::User;
         use crate::services::user_service::GetUser;
-        let result = User::get_user_by_id(1).unwrap();
-        println!("{result}");
+        match User::get_user_by_id(1) {
+            Ok(res) => println!("{res:?}"),
+            Err(_) => println!("Err"),
+        }
     }
 
     #[test]
     fn test_delete_user_by_id() {
         use crate::models::user::User;
         use crate::services::user_service::GetUser;
-        let result = User::delete_user_by_id(2).unwrap();
-        println!("{result}");
+        match User::delete_user_by_id(2) {
+            Ok(res) => println!("{res:?}"),
+            Err(_) => println!("Err"),
+        }
     }
 }

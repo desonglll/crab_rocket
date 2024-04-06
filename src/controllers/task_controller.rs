@@ -34,7 +34,6 @@ pub fn get_task_by_id_controller(id: i32) -> (i32, &'static str, Task) {
 }
 
 pub fn insert_single_task_controller(raw_task: &mut NewTask) -> (i32, &'static str, Task) {
-    // TODO: Move to controller in the future.
     // Handle None date time
     if raw_task.created_at == None {
         raw_task.created_at = Some(get_e8_time());

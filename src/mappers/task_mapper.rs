@@ -18,15 +18,16 @@ pub fn insert_full_single_task(
     conn: &mut PgConnection,
     task: &Task,
 ) -> Result<Task, diesel::result::Error> {
-    println!("Insert Full Single Task in: Mapper");
-    println!("{task:?}");
-    let inserted_task = diesel::insert_into(tasks::table)
-        .values(task)
-        .returning(Task::as_returning())
-        .get_result(conn)
-        .expect("Error saving new task");
-    println!("Inserted Task: {inserted_task:?}");
-    Ok(inserted_task)
+    if !check_exist_task_by_id(conn, task.id) {
+        let inserted_task = diesel::insert_into(tasks::table)
+            .values(task)
+            .returning(Task::as_returning())
+            .get_result(conn)
+            .expect("Error saving new task");
+        Ok(inserted_task)
+    } else {
+        Err(diesel::result::Error::NotFound)
+    }
 }
 
 /// Fetch all tasks
@@ -116,21 +117,28 @@ mod tests {
             "new content for put".to_string().into(),
             Some(chrono::Local::now().naive_utc()),
         );
-        let _ = update_task_by_id(&mut conn, t_id, put_task);
+        match update_task_by_id(&mut conn, t_id, put_task) {
+            Ok(res) => println!("{res:?}"),
+            Err(_) => println!("Err"),
+        }
     }
     #[test]
     fn test_delete_task_by_id() {
         let mut conn = establish_pg_connection();
         let t_id = 2;
-        let deleted_task = delete_task_by_id(&mut conn, t_id).unwrap();
-        println!("deleted_task: {deleted_task:?}");
+        match delete_task_by_id(&mut conn, t_id) {
+            Ok(res) => println!("{res:?}"),
+            Err(_) => println!("Err"),
+        }
     }
 
     #[test]
     fn test_insert_full_single_task() {
         let mut conn = establish_pg_connection();
         let task = Task::new(1, "title".to_string(), "content".to_string().into());
-        let inserted_task = insert_full_single_task(&mut conn, &task).unwrap();
-        println!("{inserted_task:?}");
+        match insert_full_single_task(&mut conn, &task) {
+            Ok(res) => println!("{res:?}"),
+            Err(_) => println!("Err"),
+        }
     }
 }

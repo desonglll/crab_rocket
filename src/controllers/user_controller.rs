@@ -37,7 +37,7 @@ pub fn delete_user_by_id_controller(id: i32) -> (i32, &'static str, User) {
         Err(_) => (204, "DELETE USER ERROR", User::new_empty()),
     }
 }
-
+#[cfg(test)]
 mod test {
 
     #[test]

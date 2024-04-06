@@ -228,7 +228,7 @@ impl PatchUser {
         }
     }
 }
-
+#[cfg(test)]
 mod test {
 
     #[test]

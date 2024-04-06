@@ -193,7 +193,7 @@ impl Into<Task> for PutTask {
         }
     }
 }
-
+#[cfg(test)]
 mod test {
     #[test]
     fn test_task_new() {
