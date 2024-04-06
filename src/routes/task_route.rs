@@ -1,8 +1,9 @@
 use crate::controllers::task_controller;
-use crate::models::task::{NewTask, PatchTask, Task};
+use crate::models::task::{NewTask, PatchTask, PutTask, Task};
 use crate::services::task_service::GetTask;
 use rocket::serde::json::Json;
-use rocket::{delete, get, patch, post, put};
+use rocket::{delete, get, patch, post, put, response};
+use serde_json::json;
 
 /// # Note
 /// 若业务逻辑复杂则启用controller层
@@ -14,42 +15,101 @@ use rocket::{delete, get, patch, post, put};
 /// PUT必須包含items/1的所有屬性資料。
 
 #[get("/task/<id>")]
-pub fn get_task_by_id(id: i32) -> Json<Task> {
-    let task = Task::get_task_by_id(id);
-    Json(task)
+pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
+    let (code, message, task) = task_controller::get_task_by_id_controller(id);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":task
+    }))
+    .unwrap();
+    Json(response)
 }
 
 #[patch("/task/<id>", data = "<task>")]
-pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<Task> {
-    let updated_task = Task::update_task_by_id(id, task.into_inner());
-    Json(updated_task)
+pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
+    let (code, message, patched_task) =
+        task_controller::update_task_by_id_controller(id, task.into_inner());
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":patched_task
+    }))
+    .unwrap();
+    Json(response)
 }
-#[put("/task", data = "<task>")]
-pub fn put_task(task: Json<Task>) -> Json<Task> {
-    let mut raw_task: Task = task.clone().into_inner();
-    let task = task_controller::put_task(&mut raw_task);
-    Json(task)
+#[put("/task/<id>", data = "<task>")]
+pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
+    //Convert a patch task json to a put task json which include `id`.
+    let put_task = PutTask {
+        id: id,
+        title: task.title.clone(),
+        content: task.content.clone(),
+        updated_at: task.updated_at,
+    };
+    let (code, message, task) = task_controller::put_task_by_id_controller(id, put_task.into());
+    println!("{task:?}");
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":task
+    }))
+    .unwrap();
+    Json(response)
 }
 
 #[delete("/task/<id>")]
-pub fn delete_task_by_id(id: i32) -> Json<Task> {
-    let deleted_task = Task::delete_task_by_id(id);
-    Json(deleted_task)
+pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
+    let (code, message, deleted_task) = task_controller::delete_task_by_id_controller(id);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "date":deleted_task
+    }))
+    .unwrap();
+    Json(response)
 }
 
 #[get("/task")]
-pub fn get_all_tasks() -> Json<Vec<Task>> {
-    let tasks = Task::get_all_tasks();
-    Json(tasks)
+pub fn get_all_tasks() -> Json<serde_json::Value> {
+    let (code, message, tasks) = task_controller::get_all_tasks_controller();
+    let response = json!({
+        "code":code,
+        "message": message,
+        "data":tasks
+    });
+    Json(serde_json::from_value(response).unwrap())
 }
 
 #[post("/task", data = "<task>")]
-pub fn insert_single_task(task: Json<NewTask>) -> Json<Task> {
+pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
     let mut raw_task: NewTask = task.into_inner();
-    let result_task: Task = task_controller::insert_single_task_controller(&mut raw_task);
-    println!("{result_task:?}");
-    Json(result_task)
+    let (code, message, result_task): (i32, &'static str, Task) =
+        task_controller::insert_single_task_controller(&mut raw_task);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":result_task
+    }))
+    .unwrap();
+    Json(response)
 }
 
 #[get("/")]
 pub fn index() -> &'static str { "hello world!" }
+
+#[get("/test")]
+pub fn demo() -> Json<serde_json::Value> {
+    let j = json!({
+        "code": 200,
+        "message": "success",
+        "data": {
+            "user": {
+              "id": 123,
+              "name": "John Doe",
+              "email": "john@example.com"
+            }
+          }
+    });
+    Json(serde_json::from_value(j).unwrap())
+}

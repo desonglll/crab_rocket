@@ -37,6 +37,9 @@ cargo build --release
 
 ## Running Executive Binary File
 
+Setting environment variable.
+`export DATABASE_URL=postgres://@localhost/hello_rocket`
+
 ### First Running
 
 ```shell

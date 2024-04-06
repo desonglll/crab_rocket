@@ -1,8 +1,0 @@
--- Your SQL goes here
-CREATE TABLE IF NOT EXISTS tasks(
-    id   SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    content TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);

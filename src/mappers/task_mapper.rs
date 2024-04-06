@@ -18,11 +18,14 @@ pub fn insert_full_single_task(
     conn: &mut PgConnection,
     task: &Task,
 ) -> Result<Task, diesel::result::Error> {
+    println!("Insert Full Single Task in: Mapper");
+    println!("{task:?}");
     let inserted_task = diesel::insert_into(tasks::table)
         .values(task)
         .returning(Task::as_returning())
         .get_result(conn)
         .expect("Error saving new task");
+    println!("Inserted Task: {inserted_task:?}");
     Ok(inserted_task)
 }
 

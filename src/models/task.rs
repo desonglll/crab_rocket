@@ -39,6 +39,15 @@ impl Task {
             // updated_at: Some(chrono::Local::now().with_timezone(&Shanghai).naive_utc()),
         }
     }
+    pub fn new_empty() -> Self {
+        Task {
+            id: -1,
+            title: String::new(),
+            content: String::new().into(),
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
+        }
+    }
 
     pub fn get_title(&self) -> String { self.title.clone() }
     pub fn get_content(&self) -> Option<String> { self.content.clone() }
@@ -116,6 +125,75 @@ impl Into<NewTask> for Task {
         }
     }
 }
+
+#[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+#[diesel(table_name = crate::schema::tasks)]
+pub struct PutTask {
+    pub id: i32,
+    pub title: String,
+    pub content: Option<String>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
+}
+
+impl PutTask {
+    pub fn new(
+        id: i32,
+        title: String,
+        content: Option<String>,
+        updated_at: Option<chrono::NaiveDateTime>,
+    ) -> Self {
+        PutTask {
+            id,
+            title,
+            content,
+            updated_at,
+        }
+    }
+}
+
+impl Into<PutTask> for Task {
+    fn into(self) -> PutTask {
+        PutTask {
+            id: self.id,
+            title: self.title,
+            content: self.content,
+            updated_at: self.updated_at,
+        }
+    }
+}
+impl Into<PatchTask> for PutTask {
+    fn into(self) -> PatchTask {
+        PatchTask {
+            title: self.title,
+            content: self.content,
+            updated_at: self.updated_at,
+        }
+    }
+}
+impl Into<NewTask> for PutTask {
+    fn into(self) -> NewTask {
+        NewTask {
+            title: self.title,
+            content: self.content,
+            created_at: Some(get_e8_time()),
+            updated_at: self.updated_at,
+        }
+    }
+}
+
+impl Into<Task> for PutTask {
+    fn into(self) -> Task {
+        Task {
+            id: self.id,
+            title: self.title,
+            content: self.content,
+            created_at: Some(get_e8_time()),
+            updated_at: self.updated_at,
+        }
+    }
+}
+
 mod test {
     #[test]
     fn test_task_new() {

@@ -1,6 +1,91 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    department_table (department_id) {
+        department_id -> Int4,
+        #[max_length = 255]
+        department_name -> Varchar,
+        manager_id -> Nullable<Int4>,
+        #[max_length = 255]
+        location -> Nullable<Varchar>,
+        creation_date -> Nullable<Timestamp>,
+        last_update -> Nullable<Timestamp>,
+        #[max_length = 255]
+        description -> Nullable<Varchar>,
+        #[max_length = 255]
+        budget -> Nullable<Varchar>,
+        number_of_employees -> Nullable<Int4>,
+        parent_department_id -> Nullable<Int4>,
+        #[max_length = 255]
+        email -> Nullable<Varchar>,
+        phone_number -> Nullable<Int4>,
+        #[max_length = 255]
+        address -> Nullable<Varchar>,
+        #[max_length = 255]
+        city -> Nullable<Varchar>,
+        #[max_length = 255]
+        state -> Nullable<Varchar>,
+        #[max_length = 255]
+        postal_code -> Nullable<Varchar>,
+    }
+}
+
+diesel::table! {
+    employee_table (employee_id) {
+        employee_id -> Int4,
+        #[max_length = 255]
+        first_name -> Varchar,
+        #[max_length = 255]
+        last_name -> Varchar,
+        #[max_length = 1]
+        gender -> Nullable<Bpchar>,
+        date_of_birth -> Nullable<Timestamp>,
+        hire_date -> Nullable<Timestamp>,
+        #[max_length = 255]
+        email -> Nullable<Varchar>,
+        phone_number -> Nullable<Int4>,
+        department_id -> Nullable<Int4>,
+        #[max_length = 255]
+        job_title -> Nullable<Varchar>,
+        salary -> Nullable<Numeric>,
+        manager_id -> Nullable<Int4>,
+        #[max_length = 255]
+        address -> Nullable<Varchar>,
+        #[max_length = 255]
+        city -> Nullable<Varchar>,
+        #[max_length = 255]
+        state -> Nullable<Varchar>,
+        #[max_length = 255]
+        postal_code -> Nullable<Varchar>,
+        valid -> Nullable<Bool>,
+        last_update -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    follows (follow_id) {
+        following_user_id -> Nullable<Int4>,
+        followed_user_id -> Nullable<Int4>,
+        created_at -> Nullable<Timestamp>,
+        follow_id -> Int4,
+    }
+}
+
+diesel::table! {
+    posts (post_id) {
+        post_id -> Int4,
+        #[max_length = 255]
+        title -> Nullable<Varchar>,
+        body -> Nullable<Text>,
+        user_id -> Nullable<Int4>,
+        #[max_length = 255]
+        status -> Nullable<Varchar>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     tasks (id) {
         id -> Int4,
         title -> Text,
@@ -9,3 +94,37 @@ diesel::table! {
         updated_at -> Nullable<Timestamp>,
     }
 }
+
+diesel::table! {
+    users (user_id) {
+        user_id -> Int4,
+        #[max_length = 255]
+        username -> Varchar,
+        #[max_length = 255]
+        role -> Nullable<Varchar>,
+        created_at -> Nullable<Timestamp>,
+        #[max_length = 255]
+        email -> Nullable<Varchar>,
+        #[max_length = 255]
+        password -> Varchar,
+        #[max_length = 255]
+        fullname -> Nullable<Varchar>,
+        #[max_length = 255]
+        avatar_url -> Nullable<Varchar>,
+        bio -> Nullable<Text>,
+        updated_at -> Nullable<Timestamp>,
+        #[max_length = 255]
+        mobile_phone -> Varchar,
+    }
+}
+
+diesel::joinable!(posts -> users (user_id));
+
+diesel::allow_tables_to_appear_in_same_query!(
+    department_table,
+    employee_table,
+    follows,
+    posts,
+    tasks,
+    users,
+);

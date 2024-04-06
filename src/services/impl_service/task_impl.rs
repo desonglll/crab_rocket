@@ -10,39 +10,51 @@ impl task_service::GetTask for Task {
             Err(e) => panic!("oWo! {e:?}"),
         }
     }
-    fn get_all_tasks() -> Vec<Task> {
+    fn get_all_tasks() -> Result<Vec<Task>, diesel::result::Error> {
         let mut conn = establish_pg_connection();
         match task_mapper::fetch_all_tasks(&mut conn) {
-            Ok(all_tasks) => all_tasks,
-            Err(_) => panic!("oWo! Please add task first!"),
+            Ok(all_tasks) => {
+                if all_tasks.len() != 0 {
+                    Ok(all_tasks)
+                } else {
+                    Err(diesel::result::Error::NotFound)
+                }
+            }
+            Err(e) => {
+                // panic!("oWo! Please add task first!");
+                Err(e)
+            }
         }
     }
-    fn get_task_by_id(t_id: i32) -> Task {
+    fn get_task_by_id(t_id: i32) -> Result<Task, diesel::result::Error> {
         let mut conn = establish_pg_connection();
         match task_mapper::fetch_task_by_id(&mut conn, t_id) {
-            Ok(task) => task,
-            Err(e) => panic!("oWo! Error! {e:?}"),
+            Ok(task) => Ok(task),
+            Err(e) => Err(e),
         }
     }
-    fn update_task_by_id(t_id: i32, task: crate::models::task::PatchTask) -> Task {
+    fn update_task_by_id(
+        t_id: i32,
+        task: crate::models::task::PatchTask,
+    ) -> Result<Task, diesel::result::Error> {
         let mut conn = establish_pg_connection();
         match task_mapper::update_task_by_id(&mut conn, t_id, task) {
-            Ok(task) => task,
-            Err(e) => panic!("oWo! Error! {e:?}"),
+            Ok(task) => Ok(task),
+            Err(e) => Err(e),
         }
     }
-    fn delete_task_by_id(t_id: i32) -> Task {
+    fn delete_task_by_id(t_id: i32) -> Result<Task, diesel::result::Error> {
         let mut conn = establish_pg_connection();
         match task_mapper::delete_task_by_id(&mut conn, t_id) {
-            Ok(deleted_task) => deleted_task,
-            Err(e) => panic!("oWo! Error! {e:?}"),
+            Ok(deleted_task) => Ok(deleted_task),
+            Err(e) => Err(e),
         }
     }
-    fn insert_full_single_task(task: Task) -> Task {
+    fn insert_full_single_task(task: Task) -> Result<Task, diesel::result::Error> {
         let mut conn = establish_pg_connection();
         match task_mapper::insert_full_single_task(&mut conn, &task) {
-            Ok(inserted_full_task) => inserted_full_task,
-            Err(e) => panic!("oWo! {e:?}"),
+            Ok(inserted_full_task) => Ok(inserted_full_task),
+            Err(e) => Err(e),
         }
     }
 }
