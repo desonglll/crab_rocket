@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["department_table","employee_table","follows","posts","tasks","users"]};

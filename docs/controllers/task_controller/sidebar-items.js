@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["delete_task_by_id_controller","get_all_tasks_controller","get_task_by_id_controller","insert_single_task_controller","put_task_by_id_controller","update_task_by_id_controller"]};

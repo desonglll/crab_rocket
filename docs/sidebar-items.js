@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["establish_pg_connection"],"mod":["controllers","mappers","models","routes","schema","services","utils"]};

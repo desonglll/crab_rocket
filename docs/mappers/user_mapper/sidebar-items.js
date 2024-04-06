@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["fetch_all_users","insert_user"]};

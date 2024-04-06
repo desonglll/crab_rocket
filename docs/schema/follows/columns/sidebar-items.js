@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["created_at","follow_id","followed_user_id","following_user_id","star"]};

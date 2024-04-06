@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["check_exist_task_by_id","delete_task_by_id","fetch_all_tasks","fetch_task_by_id","insert_full_single_task","insert_task","update_task_by_id"]};
