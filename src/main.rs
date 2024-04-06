@@ -33,7 +33,10 @@ fn rocket() -> _ {
                 task_route::delete_task_by_id,
                 task_route::put_task,
                 user_route::insert_single_user,
-                user_route::get_all_users
+                user_route::get_all_users,
+                user_route::get_user_by_id,
+                user_route::update_user_by_id,
+                user_route::delete_user_by_id
             ],
         )
         .attach(cors)

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["delete_task_by_id","demo","get_all_tasks","get_task_by_id","index","insert_single_task","put_task","update_task_by_id"]};

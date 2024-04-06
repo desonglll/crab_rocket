@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["task_impl","user_impl"]};

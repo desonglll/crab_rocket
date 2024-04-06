@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["impl_service","task_service","user_service"]};

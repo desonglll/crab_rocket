@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["NewTask","PatchTask","PutTask","Task"]};

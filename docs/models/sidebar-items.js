@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["follow","post","task","user"]};

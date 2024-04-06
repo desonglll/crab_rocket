@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["address","budget","city","creation_date","department_id","department_name","description","email","last_update","location","manager_id","number_of_employees","parent_department_id","phone_number","postal_code","star","state"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["body","created_at","post_id","star","status","title","updated_at","user_id"]};

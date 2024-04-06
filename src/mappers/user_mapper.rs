@@ -1,6 +1,7 @@
-use crate::models::user::{NewUser, User};
+use crate::models::user::{NewUser, PatchUser, User};
 use crate::schema::users::dsl::*;
 use crate::schema::users::{self};
+use crate::utils::time::get_e8_time;
 use diesel::prelude::*;
 
 pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, diesel::result::Error> {
@@ -14,6 +15,34 @@ pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, dies
 
 pub fn fetch_all_users(conn: &mut PgConnection) -> Result<Vec<User>, diesel::result::Error> {
     users.order(users::user_id.asc()).load::<User>(conn)
+}
+
+pub fn fetch_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diesel::result::Error> {
+    users.filter(users::user_id.eq(id)).first(conn)
+}
+
+pub fn update_user_by_id(
+    conn: &mut PgConnection,
+    id: i32,
+    user: &PatchUser,
+) -> Result<User, diesel::result::Error> {
+    diesel::update(users.filter(user_id.eq(id)))
+        .set((
+            users::username.eq(user.username.clone()),
+            users::password.eq(user.password.clone()),
+            users::role.eq(user.role.clone()),
+            users::email.eq(user.email.clone()),
+            users::fullname.eq(user.fullname.clone()),
+            users::avatar_url.eq(user.avatar_url.clone()),
+            users::bio.eq(user.bio.clone()),
+            users::updated_at.eq(Some(get_e8_time())),
+            users::mobile_phone.eq(user.mobile_phone.clone()),
+        ))
+        .get_result(conn)
+}
+
+pub fn delete_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diesel::result::Error> {
+    diesel::delete(users.filter(users::user_id.eq(id))).get_result(conn)
 }
 
 mod test {
@@ -51,5 +80,34 @@ mod test {
         let mut conn = establish_pg_connection();
         let all_users = fetch_all_users(&mut conn).unwrap();
         println!("{all_users:?}");
+    }
+
+    #[test]
+    fn test_fetch_user_by_id() {
+        use super::fetch_user_by_id;
+        use crate::establish_pg_connection;
+        let id = 1;
+        let mut conn = establish_pg_connection();
+        let user = fetch_user_by_id(&mut conn, id).unwrap();
+        println!("{user}");
+    }
+
+    #[test]
+    fn test_update_user_by_id() {
+        use crate::models::user::User;
+        let mut conn = crate::establish_pg_connection();
+        let id = 1;
+        let user = User::new_empty();
+        let result =
+            crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user.into()).unwrap();
+        println!("{result}");
+    }
+
+    #[test]
+    fn test_delete_user_by_id() {
+        let mut conn = crate::establish_pg_connection();
+        let id = 1;
+        let result = super::delete_user_by_id(&mut conn, id).unwrap();
+        println!("{result}");
     }
 }

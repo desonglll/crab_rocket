@@ -88,6 +88,22 @@ impl Display for User {
         )
     }
 }
+impl Into<PatchUser> for User {
+    fn into(self) -> PatchUser {
+        PatchUser {
+            username: self.username,
+            role: self.role,
+            created_at: self.created_at,
+            email: self.email,
+            password: self.password,
+            fullname: self.fullname,
+            avatar_url: self.avatar_url,
+            bio: self.bio,
+            updated_at: self.updated_at,
+            mobile_phone: self.mobile_phone,
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
@@ -131,6 +147,84 @@ impl NewUser {
             bio,
             updated_at,
             mobile_phone,
+        }
+    }
+}
+
+impl Into<PatchUser> for NewUser {
+    fn into(self) -> PatchUser {
+        PatchUser {
+            username: self.username,
+            role: self.role,
+            created_at: self.created_at,
+            email: self.email,
+            password: self.password,
+            fullname: self.fullname,
+            avatar_url: self.avatar_url,
+            bio: self.bio,
+            updated_at: self.updated_at,
+            mobile_phone: self.mobile_phone,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(crate = "rocket::serde")]
+#[derive(Queryable, Selectable, Insertable)]
+#[diesel(table_name = crate::schema::users)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct PatchUser {
+    pub username: String,
+    pub role: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub email: Option<String>,
+    pub password: String,
+    pub fullname: Option<String>,
+    pub avatar_url: Option<String>,
+    pub bio: Option<String>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
+    pub mobile_phone: String,
+}
+
+impl PatchUser {
+    pub fn new(
+        username: String,
+        role: Option<String>,
+        created_at: Option<chrono::NaiveDateTime>,
+        email: Option<String>,
+        password: String,
+        fullname: Option<String>,
+        avatar_url: Option<String>,
+        bio: Option<String>,
+        updated_at: Option<chrono::NaiveDateTime>,
+        mobile_phone: String,
+    ) -> Self {
+        PatchUser {
+            username,
+            role,
+            created_at,
+            email,
+            password,
+            fullname,
+            avatar_url,
+            bio,
+            updated_at,
+            mobile_phone,
+        }
+    }
+
+    pub fn new_empty() -> Self {
+        PatchUser {
+            username: String::from(""),
+            role: Some(String::from("")),
+            created_at: Some(get_e8_time()),
+            email: Some(String::from("")),
+            password: String::from(""),
+            fullname: Some(String::from("")),
+            avatar_url: Some(String::from("")),
+            bio: Some(String::from("")),
+            updated_at: Some(get_e8_time()),
+            mobile_phone: String::from(""),
         }
     }
 }
