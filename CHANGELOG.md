@@ -11,3 +11,5 @@
     - Finish `Task` CRUD.
   - `7c76dac6b5e34ae2d710555ed1fc5a40195b82ac`
     - Add `users, follows, posts` table, finish `User` structure and implemented some `GET` and `POST` for `User`.
+  - `3dc550964f18eb0cd0841d318d2df8cf8d3ae568`
+    - Finish `CRUD` for `User`

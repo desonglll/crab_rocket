@@ -207,6 +207,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06ea2b9bc92be3c2baa9334a323ebca2d6f074ff852cd1d7b11064035cd3868f"
 
 [[package]]
+name = "crab_rocket"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "diesel",
+ "dotenvy",
+ "rocket",
+ "rocket_cors",
+ "serde_json",
+]
+
+[[package]]
 name = "deranged"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -480,19 +493,6 @@ name = "hashbrown"
 version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "290f1a1d9242c78d09ce40a5e87e7554ee637af1351968159f4952f028f75604"
-
-[[package]]
-name = "hello-rocket"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "chrono-tz",
- "diesel",
- "dotenvy",
- "rocket",
- "rocket_cors",
- "serde_json",
-]
 
 [[package]]
 name = "hermit-abi"
