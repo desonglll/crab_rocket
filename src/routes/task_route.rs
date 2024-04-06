@@ -1,8 +1,7 @@
 use crate::controllers::task_controller;
 use crate::models::task::{NewTask, PatchTask, PutTask, Task};
-use crate::services::task_service::GetTask;
 use rocket::serde::json::Json;
-use rocket::{delete, get, patch, post, put, response};
+use rocket::{delete, get, patch, post, put};
 use serde_json::json;
 
 /// # Note

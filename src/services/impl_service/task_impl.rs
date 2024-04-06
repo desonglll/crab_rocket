@@ -3,11 +3,11 @@ use crate::mappers::task_mapper;
 use crate::models::task::{NewTask, Task};
 use crate::services::task_service;
 impl task_service::GetTask for Task {
-    fn insert_single_task(task: NewTask) -> Task {
+    fn insert_single_task(task: NewTask) -> Result<Task, diesel::result::Error> {
         let mut conn = establish_pg_connection();
         match task_mapper::insert_task(&mut conn, &task) {
-            Ok(inserted_task) => inserted_task,
-            Err(e) => panic!("oWo! {e:?}"),
+            Ok(inserted_task) => Ok(inserted_task),
+            Err(e) => Err(e),
         }
     }
     fn get_all_tasks() -> Result<Vec<Task>, diesel::result::Error> {

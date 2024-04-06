@@ -42,8 +42,10 @@ pub fn insert_single_task_controller(raw_task: &mut NewTask) -> (i32, &'static s
     if raw_task.updated_at == None {
         raw_task.updated_at = Some(get_e8_time());
     }
-    let result_task = Task::insert_single_task(raw_task.clone());
-    (201, "Created", result_task)
+    match Task::insert_single_task(raw_task.clone()) {
+        Ok(result_task) => (201, "Created", result_task),
+        Err(_) => (204, "CREATED ERROR", Task::new_empty()),
+    }
 }
 
 pub fn put_task_by_id_controller(

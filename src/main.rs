@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate rocket;
-use hello_rocket::routes::task_route;
+use hello_rocket::routes::{task_route, user_route};
 
 use rocket::http::Method;
 use rocket::routes;
@@ -31,7 +31,9 @@ fn rocket() -> _ {
                 task_route::get_task_by_id,
                 task_route::update_task_by_id,
                 task_route::delete_task_by_id,
-                task_route::put_task
+                task_route::put_task,
+                user_route::insert_single_user,
+                user_route::get_all_users
             ],
         )
         .attach(cors)
