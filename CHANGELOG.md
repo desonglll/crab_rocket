@@ -17,5 +17,7 @@
     - Finish `Post` structure and make test more strong.
   - `b57067207387523b6153bf880075f1c5c52bb568`
     - Make `establish_pg_connection` more stronger.
-  - `
+  - `84a29814ff7b3f82e5f841cf59a057510369a156`
     - Fix `test_insert_single_user` for `cargo run` in github workflow.
+  - `
+    - Finish `post_route::insert_single_post`.

@@ -7,13 +7,13 @@ use rocket::serde::{Deserialize, Serialize};
 #[diesel(table_name = crate::schema::posts)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Post {
-    post_id: i32,
-    title: Option<String>,
-    body: Option<String>,
-    user_id: Option<i32>,
-    status: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
+    pub post_id: i32,
+    pub title: Option<String>,
+    pub body: Option<String>,
+    pub user_id: Option<i32>,
+    pub status: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl Post {
@@ -49,6 +49,16 @@ impl Post {
         }
     }
 }
+
+///示例数据
+// {
+//   "title": "Sample Post",
+//   "body": "This is a sample post body.",
+//   "user_id": 123,
+//   "status": "Published",
+//   "created_at": "2024-04-07T08:30:00",
+//   "updated_at": "2024-04-07T08:30:00"
+// }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
