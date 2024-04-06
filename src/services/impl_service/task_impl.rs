@@ -4,57 +4,71 @@ use crate::models::task::{NewTask, Task};
 use crate::services::task_service;
 impl task_service::GetTask for Task {
     fn insert_single_task(task: NewTask) -> Result<Task, diesel::result::Error> {
-        let mut conn = establish_pg_connection();
-        match task_mapper::insert_task(&mut conn, &task) {
-            Ok(inserted_task) => Ok(inserted_task),
-            Err(e) => Err(e),
+        match establish_pg_connection() {
+            Ok(mut conn) => match task_mapper::insert_task(&mut conn, &task) {
+                Ok(inserted_task) => Ok(inserted_task),
+                Err(e) => Err(e),
+            },
+            Err(_) => Err(diesel::result::Error::NotFound),
         }
     }
     fn get_all_tasks() -> Result<Vec<Task>, diesel::result::Error> {
-        let mut conn = establish_pg_connection();
-        match task_mapper::fetch_all_tasks(&mut conn) {
-            Ok(all_tasks) => {
-                if all_tasks.len() != 0 {
-                    Ok(all_tasks)
-                } else {
-                    Err(diesel::result::Error::NotFound)
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match task_mapper::fetch_all_tasks(&mut conn) {
+                    Ok(all_tasks) => {
+                        if all_tasks.len() != 0 {
+                            Ok(all_tasks)
+                        } else {
+                            Err(diesel::result::Error::NotFound)
+                        }
+                    }
+                    Err(e) => {
+                        // panic!("oWo! Please add task first!");
+                        Err(e)
+                    }
                 }
             }
-            Err(e) => {
-                // panic!("oWo! Please add task first!");
-                Err(e)
-            }
+            Err(_) => Err(diesel::NotFound),
         }
     }
     fn get_task_by_id(t_id: i32) -> Result<Task, diesel::result::Error> {
-        let mut conn = establish_pg_connection();
-        match task_mapper::fetch_task_by_id(&mut conn, t_id) {
-            Ok(task) => Ok(task),
-            Err(e) => Err(e),
+        match establish_pg_connection() {
+            Ok(mut conn) => match task_mapper::fetch_task_by_id(&mut conn, t_id) {
+                Ok(task) => Ok(task),
+                Err(e) => Err(e),
+            },
+            Err(_) => Err(diesel::NotFound),
         }
     }
     fn update_task_by_id(
         t_id: i32,
         task: crate::models::task::PatchTask,
     ) -> Result<Task, diesel::result::Error> {
-        let mut conn = establish_pg_connection();
-        match task_mapper::update_task_by_id(&mut conn, t_id, task) {
-            Ok(task) => Ok(task),
-            Err(e) => Err(e),
+        match establish_pg_connection() {
+            Ok(mut conn) => match task_mapper::update_task_by_id(&mut conn, t_id, task) {
+                Ok(task) => Ok(task),
+                Err(e) => Err(e),
+            },
+            Err(_) => Err(diesel::NotFound),
         }
     }
     fn delete_task_by_id(t_id: i32) -> Result<Task, diesel::result::Error> {
-        let mut conn = establish_pg_connection();
-        match task_mapper::delete_task_by_id(&mut conn, t_id) {
-            Ok(deleted_task) => Ok(deleted_task),
-            Err(e) => Err(e),
+        match establish_pg_connection() {
+            Ok(mut conn) => match task_mapper::delete_task_by_id(&mut conn, t_id) {
+                Ok(deleted_task) => Ok(deleted_task),
+                Err(e) => Err(e),
+            },
+            Err(_) => Err(diesel::NotFound),
         }
     }
     fn insert_full_single_task(task: Task) -> Result<Task, diesel::result::Error> {
-        let mut conn = establish_pg_connection();
-        match task_mapper::insert_full_single_task(&mut conn, &task) {
-            Ok(inserted_full_task) => Ok(inserted_full_task),
-            Err(e) => Err(e),
+        match establish_pg_connection() {
+            Ok(mut conn) => match task_mapper::insert_full_single_task(&mut conn, &task) {
+                Ok(inserted_full_task) => Ok(inserted_full_task),
+                Err(e) => Err(e),
+            },
+            Err(_) => Err(diesel::NotFound),
         }
     }
 }

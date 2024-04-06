@@ -83,62 +83,86 @@ mod tests {
 
     #[test]
     fn test_insert_task() {
-        let mut conn = establish_pg_connection();
-        let task = NewTask::new(
-            "title".to_string().into(),
-            "new content".to_string().into(),
-            Some(chrono::Local::now().naive_utc()),
-            Some(chrono::Local::now().naive_utc()),
-        );
-        let _ = insert_task(&mut conn, &task);
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let task = NewTask::new(
+                    "title".to_string().into(),
+                    "new content".to_string().into(),
+                    Some(chrono::Local::now().naive_utc()),
+                    Some(chrono::Local::now().naive_utc()),
+                );
+                let _ = insert_task(&mut conn, &task);
+            }
+            Err(_) => println!("establish_pg_connection error"),
+        }
     }
 
     #[test]
     fn test_fetch_all_tasks() {
-        let mut conn = establish_pg_connection();
-        let all_tasks = fetch_all_tasks(&mut conn).unwrap();
-        let json_string = serde_json::to_string_pretty(&all_tasks).unwrap();
-        println!("{json_string:?}");
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let all_tasks = fetch_all_tasks(&mut conn).unwrap();
+                let json_string = serde_json::to_string_pretty(&all_tasks).unwrap();
+                println!("{json_string:?}");
+            }
+            Err(_) => println!("establish_pg_connection error"),
+        }
     }
     #[test]
     fn test_fetch_task_by_id() {
-        let mut conn = establish_pg_connection();
-        let t_id = 3;
-        let task = fetch_task_by_id(&mut conn, t_id).unwrap();
-        println!("{task:?}");
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let t_id = 3;
+                let task = fetch_task_by_id(&mut conn, t_id).unwrap();
+                println!("{task:?}");
+            }
+            Err(_) => println!("establish_pg_connection error"),
+        }
     }
 
     #[test]
     fn test_update_task_by_id() {
-        let mut conn = establish_pg_connection();
-        let t_id = 1;
-        let put_task: PatchTask = PatchTask::new(
-            "title for put 1".to_string(),
-            "new content for put".to_string().into(),
-            Some(chrono::Local::now().naive_utc()),
-        );
-        match update_task_by_id(&mut conn, t_id, put_task) {
-            Ok(res) => println!("{res:?}"),
-            Err(_) => println!("Err"),
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let t_id = 1;
+                let put_task: PatchTask = PatchTask::new(
+                    "title for put 1".to_string(),
+                    "new content for put".to_string().into(),
+                    Some(chrono::Local::now().naive_utc()),
+                );
+                match update_task_by_id(&mut conn, t_id, put_task) {
+                    Ok(res) => println!("{res:?}"),
+                    Err(_) => println!("Err"),
+                }
+            }
+            Err(_) => println!("establish_pg_connection error"),
         }
     }
     #[test]
     fn test_delete_task_by_id() {
-        let mut conn = establish_pg_connection();
-        let t_id = 2;
-        match delete_task_by_id(&mut conn, t_id) {
-            Ok(res) => println!("{res:?}"),
-            Err(_) => println!("Err"),
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let t_id = 2;
+                match delete_task_by_id(&mut conn, t_id) {
+                    Ok(res) => println!("{res:?}"),
+                    Err(_) => println!("Err"),
+                }
+            }
+            Err(_) => println!("establish_pg_connection error"),
         }
     }
 
     #[test]
     fn test_insert_full_single_task() {
-        let mut conn = establish_pg_connection();
-        let task = Task::new(1, "title".to_string(), "content".to_string().into());
-        match insert_full_single_task(&mut conn, &task) {
-            Ok(res) => println!("{res:?}"),
-            Err(_) => println!("Err"),
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let task = Task::new(1, "title".to_string(), "content".to_string().into());
+                match insert_full_single_task(&mut conn, &task) {
+                    Ok(res) => println!("{res:?}"),
+                    Err(_) => println!("Err"),
+                }
+            }
+            Err(_) => println!("establish_pg_connection error"),
         }
     }
 }

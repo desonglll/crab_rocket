@@ -51,21 +51,25 @@ pub fn put_task_by_id_controller(
     id: i32,
     task: crate::models::task::PutTask,
 ) -> (i32, &'static str, Task) {
-    let mut conn = establish_pg_connection();
-    if task_mapper::check_exist_task_by_id(&mut conn, id) {
-        // Update all fields if exists.
-        println!("Update all fields.");
-        match Task::update_task_by_id(id, task.clone().into()) {
-            Ok(task) => (200, "PUT OK", task),
-            Err(_) => (204, "PUT ERROR", Task::new_empty()),
+    match establish_pg_connection() {
+        Ok(mut conn) => {
+            if task_mapper::check_exist_task_by_id(&mut conn, id) {
+                // Update all fields if exists.
+                println!("Update all fields.");
+                match Task::update_task_by_id(id, task.clone().into()) {
+                    Ok(task) => (200, "PUT OK", task),
+                    Err(_) => (204, "PUT ERROR", Task::new_empty()),
+                }
+            } else {
+                // Insert a new task if not exists.
+                println!("Insert a new task.");
+                match Task::insert_full_single_task(task.clone().into()) {
+                    Ok(inserted_new_task) => (200, "PUT -> INSERT NEW OK", inserted_new_task),
+                    Err(_) => (204, "PUT -> INSERT NEW ERROR", Task::new_empty()),
+                }
+            }
         }
-    } else {
-        // Insert a new task if not exists.
-        println!("Insert a new task.");
-        match Task::insert_full_single_task(task.clone().into()) {
-            Ok(inserted_new_task) => (200, "PUT -> INSERT NEW OK", inserted_new_task),
-            Err(_) => (204, "PUT -> INSERT NEW ERROR", Task::new_empty()),
-        }
+        Err(_) => (504, "establish_pg_connection error", Task::new_empty()),
     }
 }
 pub fn update_task_by_id_controller(

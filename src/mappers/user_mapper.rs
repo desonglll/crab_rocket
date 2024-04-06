@@ -67,9 +67,13 @@ mod test {
             "mobile_phone".to_string(),
         );
         println!("{user:?}");
-        let mut conn = establish_pg_connection();
-        let result = insert_user(&mut conn, &user).unwrap();
-        println!("{result}");
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let result = insert_user(&mut conn, &user).unwrap();
+                println!("{result}");
+            }
+            Err(_) => println!("establish_pg_connection error"),
+        }
     }
 
     #[test]
@@ -77,10 +81,12 @@ mod test {
         use crate::establish_pg_connection;
 
         use super::fetch_all_users;
-        let mut conn = establish_pg_connection();
-        match fetch_all_users(&mut conn) {
-            Ok(res) => println!("{res:?}"),
-            Err(_) => println!("Err"),
+        match establish_pg_connection() {
+            Ok(mut conn) => match fetch_all_users(&mut conn) {
+                Ok(res) => println!("{res:?}"),
+                Err(_) => println!("Err"),
+            },
+            Err(_) => println!("establish_pg_connection error"),
         }
     }
 
@@ -89,33 +95,43 @@ mod test {
         use super::fetch_user_by_id;
         use crate::establish_pg_connection;
         let id = 1;
-        let mut conn = establish_pg_connection();
-        match fetch_user_by_id(&mut conn, id) {
-            Ok(res) => println!("{res}"),
-            Err(_) => println!("Err"),
+        match establish_pg_connection() {
+            Ok(mut conn) => match fetch_user_by_id(&mut conn, id) {
+                Ok(res) => println!("{res}"),
+                Err(_) => println!("Err"),
+            },
+            Err(_) => println!("establish_pg_connection error"),
         }
     }
 
     #[test]
     fn test_update_user_by_id() {
         use crate::models::user::User;
-        let mut conn = crate::establish_pg_connection();
-        let id = 1;
-        let user = User::new_empty();
-        match crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user.into()) {
-            Ok(res) => println!("{res}"),
-            Err(_) => println!("Err"),
+        match crate::establish_pg_connection() {
+            Ok(mut conn) => {
+                let id = 1;
+                let user = User::new_empty();
+                match crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user.into()) {
+                    Ok(res) => println!("{res}"),
+                    Err(_) => println!("Err"),
+                }
+            }
+            Err(_) => println!("establish_pg_connection error"),
         }
     }
 
     #[test]
     fn test_delete_user_by_id() {
-        let mut conn = crate::establish_pg_connection();
-        let id = 1;
-        let result = super::delete_user_by_id(&mut conn, id);
-        match result {
-            Ok(res) => println!("{res}"),
-            Err(_) => println!("Err"),
+        match crate::establish_pg_connection() {
+            Ok(mut conn) => {
+                let id = 1;
+                let result = super::delete_user_by_id(&mut conn, id);
+                match result {
+                    Ok(res) => println!("{res}"),
+                    Err(_) => println!("Err"),
+                }
+            }
+            Err(_) => println!("establish_pg_connection error"),
         }
     }
 }
