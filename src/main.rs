@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate rocket;
-use crab_rocket::routes::{post_route, task_route, user_route};
+use crab_rocket::routes::{follow_route, post_route, task_route, user_route};
 
 use rocket::http::Method;
 use rocket::routes;
@@ -24,6 +24,7 @@ fn rocket() -> _ {
         .mount(
             "/",
             routes![
+                // task routes
                 task_route::index,
                 task_route::demo,
                 task_route::insert_single_task,
@@ -32,16 +33,23 @@ fn rocket() -> _ {
                 task_route::update_task_by_id,
                 task_route::delete_task_by_id,
                 task_route::put_task,
+                //user routes
                 user_route::insert_single_user,
                 user_route::get_all_users,
                 user_route::get_user_by_id,
                 user_route::update_user_by_id,
                 user_route::delete_user_by_id,
+                // post routes
                 post_route::insert_single_post,
                 post_route::get_all_posts,
                 post_route::get_post_by_id,
                 post_route::update_post_by_id,
-                post_route::delete_post_by_id
+                post_route::delete_post_by_id,
+                // follow routes
+                follow_route::insert_single_follow,
+                follow_route::get_all_follows,
+                follow_route::get_follows_by_id,
+                follow_route::delete_follow
             ],
         )
         .attach(cors)

@@ -22,7 +22,10 @@
   - `f7292ed2924d8580f4c74f5e2adf29c849605455`
     - Finish `post_route::insert_single_post`.
 - 2024.04.07:
-  - `
+  - `f7292ed2924d8580f4c74f5e2adf29c849605455`
     - Fix database foreign key to `CASCADE`.
     - Finish `CRUD` for `Post`.
     - Make `Error` stuff more strong.
+  - `
+    - Finish `get_follows_by_id`
+    - Finish `CRUD` for `Follow`.

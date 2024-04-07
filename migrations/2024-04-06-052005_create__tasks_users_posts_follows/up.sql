@@ -41,8 +41,8 @@ CREATE TABLE "employee_table" (
 );
 
 CREATE TABLE "follows" (
-  "following_user_id" int4,
-  "followed_user_id" int4,
+  "following_user_id" int4 NOT NULL,
+  "followed_user_id" int4 NOT NULL,
   "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "follow_id" serial,
   PRIMARY KEY ("follow_id")

@@ -64,8 +64,8 @@ diesel::table! {
 
 diesel::table! {
     follows (follow_id) {
-        following_user_id -> Nullable<Int4>,
-        followed_user_id -> Nullable<Int4>,
+        following_user_id -> Int4,
+        followed_user_id -> Int4,
         created_at -> Nullable<Timestamp>,
         follow_id -> Int4,
     }
