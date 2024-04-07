@@ -1,5 +1,6 @@
 use crate::{
     models::follow::{Follow, NewFollow},
+    routes::models::follow_param::FollowParam,
     services::follow_service::GetFollow,
 };
 
@@ -24,22 +25,10 @@ pub fn delete_follow_controller(follow: &NewFollow) -> (i32, &'static str, Follo
     }
 }
 
-pub fn get_follows_by_user_id_controller(
-    following_id: i32,
-    followed_id: i32,
-) -> (i32, &'static str, Vec<Follow>) {
-    if following_id != 0 && followed_id == 0 {
-        match Follow::get_following_by_id(following_id) {
-            Ok(followings) => (200, "GET FOLLOWING BY ID OK", followings),
-            Err(_) => (204, "GET FOLLOWING BY ID ERROR", Vec::new()),
-        }
-    } else if following_id == 0 && followed_id != 0 {
-        match Follow::get_followed_by_id(followed_id) {
-            Ok(followeds) => (200, "GET FOLLOWEDS BY ID OK", followeds),
-            Err(_) => (204, "GET FOLLOWEDS BY ID ERROR", Vec::new()),
-        }
-    } else {
-        (204, "GET FOLLOWS ERROR", Vec::new())
+pub fn get_follows_by_params_controller(params: &FollowParam) -> (i32, &'static str, Vec<Follow>) {
+    match Follow::get_follows_by_params(params) {
+        Ok(follows) => (200, "GET FOLLOWS BT PARAMS OK", follows),
+        Err(_) => (204, "GET FOLLOWS BY PARAMS ERROR", Vec::new()),
     }
 }
 

@@ -48,6 +48,13 @@ pub fn delete_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diese
     diesel::delete(posts.filter(posts::post_id.eq(id))).get_result(conn)
 }
 
+// pub fn fetch_posts_by_user_id(
+//     conn: &mut PgConnection,
+//     uid: i32,
+// ) -> Result<Vec<Post>, diesel::result::Error> {
+//     posts.filter(posts::user_id.eq(uid)).load::<Post>(conn)
+// }
+
 #[cfg(test)]
 mod tests {
 
@@ -145,4 +152,19 @@ mod tests {
             Err(_) => (),
         }
     }
+
+    // #[test]
+    // fn test_fetch_posts_by_user_id() {
+    //     use super::*;
+    //     use crate::establish_pg_connection; // 建立数据库连接
+    //     match establish_pg_connection() {
+    //         Ok(mut conn) => match fetch_posts_by_user_id(&mut conn, 1) {
+    //             Ok(u_posts) => {
+    //                 println!("{u_posts:?}")
+    //             }
+    //             Err(_) => (),
+    //         },
+    //         Err(_) => (),
+    //     }
+    // }
 }

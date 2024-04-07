@@ -48,7 +48,7 @@ fn rocket() -> _ {
                 // follow routes
                 follow_route::insert_single_follow,
                 follow_route::get_all_follows,
-                follow_route::get_follows_by_id,
+                follow_route::get_follows_by_params,
                 follow_route::delete_follow
             ],
         )

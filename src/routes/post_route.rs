@@ -1,10 +1,16 @@
-use rocket::{delete, get, patch, post, serde::json::Json};
+use rocket::{delete, form::FromForm, get, patch, post, serde::json::Json};
 use serde_json::json;
 
 use crate::{
     controllers::post_controller,
     models::post::{NewPost, PatchPost},
 };
+#[derive(FromForm)]
+pub struct PostQuery {
+    pub author_id: Option<i32>,
+    pub category: Option<String>,
+    // 其他可能的查询条件
+}
 
 #[get("/post")]
 pub fn get_all_posts() -> Json<serde_json::Value> {

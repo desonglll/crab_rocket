@@ -33,6 +33,7 @@ A web backend server written in Rust and based on Rocket.
 ## Development
 
 ```shell
+diesel setup
 diesel migration redo
 diesel migration run
 cargo run
@@ -47,11 +48,13 @@ cargo build --release
 ## Running Executive Binary File
 
 Setting environment variable.
+
 `export DATABASE_URL=postgres://@localhost/hello_rocket`
 
 ### First Running
 
 ```shell
+diesel setup
 diesel migration redo
 diesel migration run
 ```
@@ -65,7 +68,7 @@ diesel migration run
 ## Work Flow
 
 - Change Models
-- run diesel migration
+- Run diesel migration
 - Modify Mappers
 - Modify Services
 - Modify Routes
@@ -73,8 +76,8 @@ diesel migration run
 
 ### impl level
 
-handle all error in impl level, and print out the error detail in backend.
+Handle all error in impl level, and print out the error detail in backend.
 
 ## Changelog
 
-[change log](./CHANGELOG.md)
+[Change Log](./CHANGELOG.md)

@@ -26,6 +26,9 @@
     - Fix database foreign key to `CASCADE`.
     - Finish `CRUD` for `Post`.
     - Make `Error` stuff more strong.
-  - `
+  - `05daeae984034e8a4965a79f67c82007745b7e49`
     - Finish `get_follows_by_id`
     - Finish `CRUD` for `Follow`.
+  - `
+    - Add follow filter to route.
+    - Rebuild mapper for follow.

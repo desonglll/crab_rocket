@@ -1,4 +1,5 @@
 use crate::models::follow::{Follow, NewFollow};
+use crate::routes::models::follow_param::FollowParam;
 use crate::schema::follows::dsl::*;
 use crate::schema::follows::{self};
 use diesel::prelude::*;
@@ -29,22 +30,27 @@ pub fn fetch_all_follows(conn: &mut PgConnection) -> Result<Vec<Follow>, diesel:
     follows.order(follows::follow_id.asc()).load::<Follow>(conn)
 }
 
-pub fn fetch_following_by_id(
+pub fn fetch_follows_by_params(
     conn: &mut PgConnection,
-    following_id: i32,
+    params: &FollowParam,
 ) -> Result<Vec<Follow>, diesel::result::Error> {
-    follows
-        .filter(follows::following_user_id.eq(following_id))
-        .load::<Follow>(conn)
+    let mut query = follows.into_boxed();
+
+    if let Some(following_uid) = params.following_user_id {
+        if following_uid != 0 {
+            query = query.filter(follows::following_user_id.eq(following_uid));
+        }
+    }
+
+    if let Some(followed_uid) = params.followed_user_id {
+        if followed_uid != 0 {
+            query = query.filter(follows::followed_user_id.eq(followed_uid));
+        }
+    }
+
+    query.load::<Follow>(conn)
 }
-pub fn fetch_followed_by_id(
-    conn: &mut PgConnection,
-    followed_id: i32,
-) -> Result<Vec<Follow>, diesel::result::Error> {
-    follows
-        .filter(follows::followed_user_id.eq(followed_id))
-        .load::<Follow>(conn)
-}
+
 pub fn delete_follow(
     conn: &mut PgConnection,
     follow: &NewFollow,
@@ -88,8 +94,9 @@ pub fn check_exist_follow(
 #[cfg(test)]
 mod test {
     use crate::{
-        mappers::follow_mapper::{delete_follow, fetch_following_by_id},
+        mappers::follow_mapper::{delete_follow, fetch_follows_by_params},
         models::follow::NewFollow,
+        routes::models::follow_param::FollowParam,
     };
 
     #[test]
@@ -138,11 +145,15 @@ mod test {
     }
 
     #[test]
-    fn test_fetch_following_by_id() {
+    fn test_fetch_follows_by_params() {
         use crate::establish_pg_connection;
+        let params: FollowParam = FollowParam {
+            following_user_id: Some(1),
+            followed_user_id: Some(0),
+        };
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let follows = fetch_following_by_id(&mut conn, 2);
+                let follows = fetch_follows_by_params(&mut conn, &params);
                 println!("{follows:?}");
             }
             Err(_) => (),

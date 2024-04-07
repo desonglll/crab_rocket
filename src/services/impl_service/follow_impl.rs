@@ -2,6 +2,7 @@ use crate::{
     establish_pg_connection,
     mappers::follow_mapper,
     models::follow::{Follow, NewFollow},
+    routes::models::follow_param::FollowParam,
     services::follow_service::GetFollow,
 };
 
@@ -54,25 +55,12 @@ impl GetFollow for Follow {
         }
     }
 
-    fn get_following_by_id(following_id: i32) -> Result<Vec<Follow>, Box<dyn std::error::Error>> {
+    fn get_follows_by_params(
+        params: &FollowParam,
+    ) -> Result<Vec<Follow>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match follow_mapper::fetch_following_by_id(&mut conn, following_id) {
-                Ok(followings) => Ok(followings),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
-    }
-    fn get_followed_by_id(followed_id: i32) -> Result<Vec<Follow>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match follow_mapper::fetch_followed_by_id(&mut conn, followed_id) {
-                Ok(followeds) => Ok(followeds),
+            Ok(mut conn) => match follow_mapper::fetch_follows_by_params(&mut conn, params) {
+                Ok(follows) => Ok(follows),
                 Err(e) => {
                     println!("{e:?}");
                     Err(Box::new(e))

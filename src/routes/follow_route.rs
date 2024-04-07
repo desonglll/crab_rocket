@@ -14,10 +14,11 @@ pub fn get_all_follows() -> Json<serde_json::Value> {
     Json(response)
 }
 
-#[get("/follow?<following_uid>&<followed_uid>")]
-pub fn get_follows_by_id(following_uid: i32, followed_uid: i32) -> Json<serde_json::Value> {
-    let (code, message, follows) =
-        follow_controller::get_follows_by_user_id_controller(following_uid, followed_uid);
+#[post("/follow/filter", data = "<params>")]
+pub fn get_follows_by_params(
+    params: Json<crate::routes::models::follow_param::FollowParam>,
+) -> Json<serde_json::Value> {
+    let (code, message, follows) = follow_controller::get_follows_by_params_controller(&params);
     let response = serde_json::from_value(json!({
         "code":code,
         "message":message,
