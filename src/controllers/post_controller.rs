@@ -1,5 +1,5 @@
 use crate::{
-    models::post::{NewPost, Post},
+    models::post::{NewPost, PatchPost, Post},
     services::post_service::GetPost,
 };
 
@@ -10,6 +10,32 @@ pub fn insert_single_post_controller(post: &NewPost) -> (i32, &'static str, Post
     }
 }
 
+pub fn get_all_posts_controller() -> (i32, &'static str, Vec<Post>) {
+    match Post::get_all_posts() {
+        Ok(all_posts) => (200, "GET ALL POSTS OK", all_posts),
+        Err(_) => (204, "GET ALL POSTS EROR", Vec::new()),
+    }
+}
+
+pub fn get_post_by_id_controller(id: i32) -> (i32, &'static str, Post) {
+    match Post::get_post_by_id(id) {
+        Ok(post) => (200, "GET POST BY ID OK", post),
+        Err(_) => (204, "GET POST BY ID ERROR", Post::new_empty()),
+    }
+}
+
+pub fn update_post_by_id_controller(id: i32, post: &PatchPost) -> (i32, &'static str, Post) {
+    match Post::update_post_by_id(id, post) {
+        Ok(updated_post) => (200, "UPDATE POST BY ID OK", updated_post),
+        Err(_) => (204, "UPDATE POST BY ID ERROR", Post::new_empty()),
+    }
+}
+pub fn delete_post_by_id_controller(id: i32) -> (i32, &'static str, Post) {
+    match Post::delete_post_by_id(id) {
+        Ok(deleted_post) => (200, "DELETE POST BY ID OK", deleted_post),
+        Err(_) => (204, "DELETE POST BY ID ERROR", Post::new_empty()),
+    }
+}
 #[cfg(test)]
 mod test {
 

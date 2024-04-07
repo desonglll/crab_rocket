@@ -5,6 +5,7 @@ use crate::utils::time::get_e8_time;
 use diesel::prelude::*;
 
 /// Inserts a task into the database.
+/// GOOD:
 pub fn insert_task(conn: &mut PgConnection, task: &NewTask) -> Result<Task, diesel::result::Error> {
     let inserted_task = diesel::insert_into(tasks::table)
         .values(task)
@@ -14,6 +15,7 @@ pub fn insert_task(conn: &mut PgConnection, task: &NewTask) -> Result<Task, dies
     Ok(inserted_task)
 }
 
+// GOOD:
 pub fn insert_full_single_task(
     conn: &mut PgConnection,
     task: &Task,
@@ -31,6 +33,7 @@ pub fn insert_full_single_task(
 }
 
 /// Fetch all tasks
+/// GOOD:
 pub fn fetch_all_tasks(conn: &mut PgConnection) -> Result<Vec<Task>, diesel::result::Error> {
     // sort
     // https://docs.diesel.rs/master/diesel/query_dsl/trait.QueryDsl.html#method.order_by
@@ -46,30 +49,36 @@ pub fn fetch_all_tasks(conn: &mut PgConnection) -> Result<Vec<Task>, diesel::res
 /// Diesel 相关的代码时， 它们会自动为结构体实现相应的方法，并且使用 table
 /// 方法来指定表名。 因此，你在使用查询时直接使用 tasks 而不是 tasks.table
 /// 就可以了。 tasks::table.filter(tasks::id.eq(id)).first(conn)
+/// GOOD:
 pub fn fetch_task_by_id(conn: &mut PgConnection, t_id: i32) -> Result<Task, diesel::result::Error> {
     tasks.filter(tasks::id.eq(t_id)).first(conn)
 }
 
+// GOOD:
 pub fn update_task_by_id(
     conn: &mut PgConnection,
     t_id: i32,
-    task: PatchTask,
+    task: &PatchTask,
 ) -> Result<Task, diesel::result::Error> {
     diesel::update(tasks.filter(id.eq(t_id)))
         .set((
-            tasks::title.eq(task.title),
-            tasks::content.eq(task.content),
+            tasks::title.eq(task.title.clone()),
+            tasks::content.eq(task.content.clone()),
             tasks::updated_at.eq(Some(get_e8_time())), //Update time
+            tasks::user_id.eq(task.user_id),
         ))
         .get_result(conn)
 }
 
+// GOOD:
 pub fn delete_task_by_id(
     conn: &mut PgConnection,
     t_id: i32,
 ) -> Result<Task, diesel::result::Error> {
     diesel::delete(tasks.filter(tasks::id.eq(t_id))).get_result(conn)
 }
+
+// GOOD:
 pub fn check_exist_task_by_id(conn: &mut PgConnection, t_id: i32) -> bool {
     match tasks.filter(tasks::id.eq(t_id)).first::<Task>(conn) {
         Ok(_) => true,
@@ -90,6 +99,7 @@ mod tests {
                     "new content".to_string().into(),
                     Some(chrono::Local::now().naive_utc()),
                     Some(chrono::Local::now().naive_utc()),
+                    Some(4),
                 );
                 let _ = insert_task(&mut conn, &task);
             }
@@ -129,8 +139,9 @@ mod tests {
                     "title for put 1".to_string(),
                     "new content for put".to_string().into(),
                     Some(chrono::Local::now().naive_utc()),
+                    Some(4),
                 );
-                match update_task_by_id(&mut conn, t_id, put_task) {
+                match update_task_by_id(&mut conn, t_id, &put_task) {
                     Ok(res) => println!("{res:?}"),
                     Err(_) => println!("Err"),
                 }
@@ -156,7 +167,12 @@ mod tests {
     fn test_insert_full_single_task() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let task = Task::new(1, "title".to_string(), "content".to_string().into());
+                let task = Task::new(
+                    1,
+                    "title".to_string(),
+                    "content".to_string().into(),
+                    Some(4),
+                );
                 match insert_full_single_task(&mut conn, &task) {
                     Ok(res) => println!("{res:?}"),
                     Err(_) => println!("Err"),

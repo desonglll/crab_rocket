@@ -15,6 +15,7 @@ pub struct Task {
     pub content: Option<String>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
+    pub user_id: Option<i32>,
 }
 
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
@@ -25,18 +26,21 @@ pub struct NewTask {
     pub content: Option<String>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
+    pub user_id: Option<i32>,
 }
 
 impl Task {
-    pub fn new(id: i32, title: String, content: Option<String>) -> Self {
+    pub fn new(id: i32, title: String, content: Option<String>, user_id: Option<i32>) -> Self {
         Task {
             id,
             title,
             content,
             created_at: Some(get_e8_time()),
             updated_at: Some(get_e8_time()),
-            // created_at: Some(chrono::Local::now().with_timezone(&Shanghai).naive_utc()),
-            // updated_at: Some(chrono::Local::now().with_timezone(&Shanghai).naive_utc()),
+            user_id, /* created_at:
+                      * Some(chrono::Local::now().with_timezone(&Shanghai).naive_utc()),
+                      * updated_at:
+                      * Some(chrono::Local::now().with_timezone(&Shanghai).naive_utc()), */
         }
     }
     pub fn new_empty() -> Self {
@@ -46,6 +50,7 @@ impl Task {
             content: String::new().into(),
             created_at: Some(get_e8_time()),
             updated_at: Some(get_e8_time()),
+            user_id: Some(-1),
         }
     }
 
@@ -73,12 +78,14 @@ impl NewTask {
         content: Option<String>,
         created_at: Option<chrono::NaiveDateTime>,
         updated_at: Option<chrono::NaiveDateTime>,
+        user_id: Option<i32>,
     ) -> Self {
         NewTask {
             title,
             content,
             created_at,
             updated_at,
+            user_id,
         }
     }
 }
@@ -90,6 +97,7 @@ pub struct PatchTask {
     pub title: String,
     pub content: Option<String>,
     pub updated_at: Option<chrono::NaiveDateTime>,
+    pub user_id: Option<i32>,
 }
 
 impl PatchTask {
@@ -97,11 +105,13 @@ impl PatchTask {
         title: String,
         content: Option<String>,
         updated_at: Option<chrono::NaiveDateTime>,
+        user_id: Option<i32>,
     ) -> Self {
         PatchTask {
             title,
             content,
             updated_at,
+            user_id,
         }
     }
 }
@@ -112,6 +122,7 @@ impl Into<PatchTask> for Task {
             title: self.title,
             content: self.content,
             updated_at: self.updated_at,
+            user_id: self.user_id,
         }
     }
 }
@@ -122,6 +133,7 @@ impl Into<NewTask> for Task {
             content: self.content,
             created_at: Some(get_e8_time()),
             updated_at: Some(get_e8_time()),
+            user_id: self.user_id,
         }
     }
 }
@@ -134,6 +146,7 @@ pub struct PutTask {
     pub title: String,
     pub content: Option<String>,
     pub updated_at: Option<chrono::NaiveDateTime>,
+    pub user_id: Option<i32>,
 }
 
 impl PutTask {
@@ -142,12 +155,14 @@ impl PutTask {
         title: String,
         content: Option<String>,
         updated_at: Option<chrono::NaiveDateTime>,
+        user_id: Option<i32>,
     ) -> Self {
         PutTask {
             id,
             title,
             content,
             updated_at,
+            user_id,
         }
     }
 }
@@ -159,6 +174,7 @@ impl Into<PutTask> for Task {
             title: self.title,
             content: self.content,
             updated_at: self.updated_at,
+            user_id: self.user_id,
         }
     }
 }
@@ -168,6 +184,7 @@ impl Into<PatchTask> for PutTask {
             title: self.title,
             content: self.content,
             updated_at: self.updated_at,
+            user_id: self.user_id,
         }
     }
 }
@@ -178,6 +195,7 @@ impl Into<NewTask> for PutTask {
             content: self.content,
             created_at: Some(get_e8_time()),
             updated_at: self.updated_at,
+            user_id: self.user_id,
         }
     }
 }
@@ -190,6 +208,7 @@ impl Into<Task> for PutTask {
             content: self.content,
             created_at: Some(get_e8_time()),
             updated_at: self.updated_at,
+            user_id: self.user_id,
         }
     }
 }
@@ -197,7 +216,12 @@ impl Into<Task> for PutTask {
 mod test {
     #[test]
     fn test_task_new() {
-        let task = super::Task::new(1, "title".to_string(), "content".to_string().into());
+        let task = super::Task::new(
+            1,
+            "title".to_string(),
+            "content".to_string().into(),
+            Some(4),
+        );
         println!("{task}");
 
         let fixed_dt = crate::utils::time::get_e8_time();

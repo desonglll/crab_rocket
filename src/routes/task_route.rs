@@ -28,7 +28,7 @@ pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
 #[patch("/task/<id>", data = "<task>")]
 pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
     let (code, message, patched_task) =
-        task_controller::update_task_by_id_controller(id, task.into_inner());
+        task_controller::update_task_by_id_controller(id, &task.into_inner());
     let response = serde_json::from_value(json!({
         "code":code,
         "message":message,
@@ -45,8 +45,9 @@ pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
         title: task.title.clone(),
         content: task.content.clone(),
         updated_at: task.updated_at,
+        user_id: task.user_id,
     };
-    let (code, message, task) = task_controller::put_task_by_id_controller(id, put_task.into());
+    let (code, message, task) = task_controller::put_task_by_id_controller(id, &put_task.into());
     println!("{task:?}");
     let response = serde_json::from_value(json!({
         "code":code,

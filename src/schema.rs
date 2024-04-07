@@ -92,6 +92,7 @@ diesel::table! {
         content -> Nullable<Text>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
+        user_id -> Nullable<Int4>,
     }
 }
 
@@ -119,6 +120,7 @@ diesel::table! {
 }
 
 diesel::joinable!(posts -> users (user_id));
+diesel::joinable!(tasks -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     department_table,

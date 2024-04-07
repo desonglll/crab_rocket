@@ -4,6 +4,7 @@ use crate::schema::users::{self};
 use crate::utils::time::get_e8_time;
 use diesel::prelude::*;
 
+// GOOD:
 pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, diesel::result::Error> {
     let new_user = diesel::insert_into(users)
         .values(user)
@@ -13,14 +14,17 @@ pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, dies
     Ok(new_user)
 }
 
+// GOOD:
 pub fn fetch_all_users(conn: &mut PgConnection) -> Result<Vec<User>, diesel::result::Error> {
     users.order(users::user_id.asc()).load::<User>(conn)
 }
 
+// GOOD:
 pub fn fetch_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diesel::result::Error> {
     users.filter(users::user_id.eq(id)).first(conn)
 }
 
+// GOOD:
 pub fn update_user_by_id(
     conn: &mut PgConnection,
     id: i32,
@@ -41,6 +45,7 @@ pub fn update_user_by_id(
         .get_result(conn)
 }
 
+// GOOD:
 pub fn delete_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diesel::result::Error> {
     diesel::delete(users.filter(users::user_id.eq(id))).get_result(conn)
 }

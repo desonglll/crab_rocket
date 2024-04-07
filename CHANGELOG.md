@@ -16,8 +16,13 @@
   - `12eb9752c308816175737f4221b869cfe7df01cd`
     - Finish `Post` structure and make test more strong.
   - `b57067207387523b6153bf880075f1c5c52bb568`
-    - Make `establish_pg_connection` more stronger.
+    - Make `establish_pg_connection` more strong.
   - `84a29814ff7b3f82e5f841cf59a057510369a156`
     - Fix `test_insert_single_user` for `cargo run` in github workflow.
-  - `
+  - `f7292ed2924d8580f4c74f5e2adf29c849605455`
     - Finish `post_route::insert_single_post`.
+- 2024.04.07:
+  - `
+    - Fix database foreign key to `CASCADE`.
+    - Finish `CRUD` for `Post`.
+    - Make `Error` stuff more strong.

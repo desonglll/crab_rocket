@@ -1,8 +1,56 @@
-use rocket::{post, serde::json::Json};
+use rocket::{delete, get, patch, post, serde::json::Json};
 use serde_json::json;
 
-use crate::{controllers::post_controller, models::post::NewPost};
+use crate::{
+    controllers::post_controller,
+    models::post::{NewPost, PatchPost},
+};
 
+#[get("/post")]
+pub fn get_all_posts() -> Json<serde_json::Value> {
+    let (code, message, all_posts) = post_controller::get_all_posts_controller();
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":all_posts
+    }))
+    .unwrap();
+    Json(response)
+}
+
+#[get("/post/<id>")]
+pub fn get_post_by_id(id: i32) -> Json<serde_json::Value> {
+    let (code, message, post) = post_controller::get_post_by_id_controller(id);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":post
+    }))
+    .unwrap();
+    Json(response)
+}
+#[patch("/post/<id>", data = "<post>")]
+pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Value> {
+    let (code, message, updated_post) = post_controller::update_post_by_id_controller(id, &post);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":updated_post
+    }))
+    .unwrap();
+    Json(response)
+}
+#[delete("/post/<id>")]
+pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
+    let (code, message, deleted_post) = post_controller::delete_post_by_id_controller(id);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":deleted_post
+    }))
+    .unwrap();
+    Json(response)
+}
 #[post("/post", data = "<post>")]
 pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
     let (code, message, inserted_post) = post_controller::insert_single_post_controller(&post);

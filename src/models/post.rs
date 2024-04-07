@@ -105,6 +105,64 @@ impl NewPost {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+#[derive(Queryable, Selectable, Insertable)]
+#[diesel(table_name = crate::schema::posts)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct PatchPost {
+    pub title: Option<String>,
+    pub body: Option<String>,
+    pub user_id: Option<i32>,
+    pub status: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
+}
+
+impl PatchPost {
+    pub fn new(
+        title: Option<String>,
+        body: Option<String>,
+        user_id: Option<i32>,
+        status: Option<String>,
+        created_at: Option<chrono::NaiveDateTime>,
+        updated_at: Option<chrono::NaiveDateTime>,
+    ) -> Self {
+        PatchPost {
+            title,
+            body,
+            user_id,
+            status,
+            created_at,
+            updated_at,
+        }
+    }
+
+    pub fn new_empty() -> Self {
+        PatchPost {
+            title: None,
+            body: None,
+            user_id: None,
+            status: None,
+            created_at: None,
+            updated_at: None,
+        }
+    }
+}
+
+impl Into<PatchPost> for NewPost {
+    fn into(self) -> PatchPost {
+        PatchPost {
+            title: self.title,
+            body: self.body,
+            user_id: self.user_id,
+            status: self.status,
+            created_at: self.created_at,
+            updated_at: self.updated_at,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

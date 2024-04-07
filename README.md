@@ -7,6 +7,7 @@
   - [First Running](#first-running)
   - [Second Running](#second-running)
 - [Work Flow](#work-flow)
+  - [impl level](#impl-level)
 - [Changelog](#changelog)
 
 ## Crab Rocket
@@ -69,6 +70,10 @@ diesel migration run
 - Modify Services
 - Modify Routes
 - Mount routes in Main
+
+### impl level
+
+handle all error in impl level, and print out the error detail in backend.
 
 ## Changelog
 

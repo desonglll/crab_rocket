@@ -1,8 +1,9 @@
-use crate::models::post::{NewPost, Post};
-// use crate::schema::posts::dsl::*; //配合下面的 `tasks.filter()`
+use crate::models::post::{NewPost, PatchPost, Post};
+use crate::schema::posts::dsl::*; //配合下面的 `posts.filter()`
 use crate::schema::posts::{self};
 use diesel::prelude::*;
 
+// GOOD:
 pub fn insert_post(conn: &mut PgConnection, post: &NewPost) -> Result<Post, diesel::result::Error> {
     match diesel::insert_into(posts::table)
         .values(post)
@@ -13,6 +14,40 @@ pub fn insert_post(conn: &mut PgConnection, post: &NewPost) -> Result<Post, dies
         Err(e) => Err(e),
     }
 }
+
+// GOOD:
+pub fn fetch_all_posts(conn: &mut PgConnection) -> Result<Vec<Post>, diesel::result::Error> {
+    posts::table.order(posts::post_id.asc()).load::<Post>(conn)
+}
+
+// GOOD:
+pub fn fetch_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diesel::result::Error> {
+    // 配合 use crate::schema::posts::dsl::*;
+    posts.filter(posts::post_id.eq(id)).first(conn)
+}
+
+// GOOD:
+pub fn update_post_by_id(
+    conn: &mut PgConnection,
+    id: i32,
+    post: &PatchPost,
+) -> Result<Post, diesel::result::Error> {
+    diesel::update(posts.filter(post_id.eq(id)))
+        .set((
+            posts::title.eq(post.title.clone()),
+            posts::body.eq(post.body.clone()),
+            posts::user_id.eq(post.user_id),
+            posts::status.eq(post.status.clone()),
+            posts::created_at.eq(post.created_at),
+            posts::updated_at.eq(post.updated_at),
+        ))
+        .get_result(conn)
+}
+
+pub fn delete_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diesel::result::Error> {
+    diesel::delete(posts.filter(posts::post_id.eq(id))).get_result(conn)
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -39,6 +74,74 @@ mod tests {
                 // Title"))) .execute(&mut conn)
                 // .expect("Failed to delete test data");
             }
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_fetch_all_posts() {
+        use super::*;
+        use crate::establish_pg_connection; // 建立数据库连接
+        match establish_pg_connection() {
+            Ok(mut conn) => match fetch_all_posts(&mut conn) {
+                Ok(all_posts) => {
+                    println!("{all_posts:?}")
+                }
+                Err(_) => (),
+            },
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_fetch_post_by_id() {
+        use super::*;
+        use crate::establish_pg_connection; // 建立数据库连接
+        match establish_pg_connection() {
+            Ok(mut conn) => match fetch_post_by_id(&mut conn, 1) {
+                Ok(post) => {
+                    println!("{post:?}")
+                }
+                Err(_) => (),
+            },
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_update_post_by_id() {
+        use super::*;
+        use crate::establish_pg_connection; // 建立数据库连接
+        let new_post = NewPost::new(
+            Some("Test newe".to_string()),
+            Some("Test Body".to_string()),
+            Some(1),
+            Some("Published".to_string()),
+            Some(chrono::Utc::now().naive_utc()), // 使用当前时间作为创建时间
+            Some(chrono::Utc::now().naive_utc()), // 使用当前时间作为更新时间
+        );
+        match establish_pg_connection() {
+            Ok(mut conn) => match update_post_by_id(&mut conn, 4, &new_post.into()) {
+                Ok(updated_post) => {
+                    println!("{updated_post:?}")
+                }
+                Err(_) => (),
+            },
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_delete_post_by_id() {
+        use super::*;
+        use crate::establish_pg_connection; // 建立数据库连接
+        match establish_pg_connection() {
+            Ok(mut conn) => match delete_post_by_id(&mut conn, 1) {
+                Ok(deleted_post) => {
+                    println!("{deleted_post:?}")
+                }
+                Err(_) => (),
+            },
             Err(_) => (),
         }
     }

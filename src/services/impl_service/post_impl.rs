@@ -1,15 +1,90 @@
 use crate::{establish_pg_connection, mappers::post_mapper, models::post::Post};
 
 impl crate::services::post_service::GetPost for Post {
+    // GOOD:
     fn insert_single_post(
         post: &crate::models::post::NewPost,
-    ) -> Result<Post, diesel::result::Error> {
+    ) -> Result<Post, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match post_mapper::insert_post(&mut conn, &post) {
                 Ok(inserted_post) => Ok(inserted_post),
-                Err(e) => Err(e),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
             },
-            Err(_) => Err(diesel::result::Error::NotFound),
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+
+    // GOOD:
+    fn get_all_posts() -> Result<Vec<Post>, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match post_mapper::fetch_all_posts(&mut conn) {
+                Ok(all_posts) => Ok(all_posts),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+
+    fn get_post_by_id(id: i32) -> Result<Post, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match post_mapper::fetch_post_by_id(&mut conn, id) {
+                Ok(post) => Ok(post),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+
+    fn update_post_by_id(
+        id: i32,
+        post: &crate::models::post::PatchPost,
+    ) -> Result<Post, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match post_mapper::update_post_by_id(&mut conn, id, post) {
+                Ok(updated_post) => Ok(updated_post),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+
+    fn delete_post_by_id(id: i32) -> Result<Post, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match post_mapper::delete_post_by_id(&mut conn, id) {
+                Ok(deleted_post) => Ok(deleted_post),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
         }
     }
 }
@@ -36,5 +111,40 @@ mod test {
         );
         let inserted_post = Post::insert_single_post(&post.into());
         println!("{inserted_post:?}");
+    }
+    #[test]
+    fn test_get_all_posts() {
+        use crate::models::post::Post;
+        use crate::services::post_service::GetPost;
+        match Post::get_all_posts() {
+            Ok(all_posts) => {
+                println!("{all_posts:?}");
+            }
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_get_post_by_id() {
+        use crate::models::post::Post;
+        use crate::services::post_service::GetPost;
+        match Post::get_post_by_id(4) {
+            Ok(post) => {
+                println!("{post:?}");
+            }
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_delete_post_by_id() {
+        use crate::models::post::Post;
+        use crate::services::post_service::GetPost;
+        match Post::delete_post_by_id(4) {
+            Ok(deleted_post) => {
+                println!("{deleted_post:?}");
+            }
+            Err(_) => (),
+        }
     }
 }
