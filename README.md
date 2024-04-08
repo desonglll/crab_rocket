@@ -1,22 +1,22 @@
-- [Crab Rocket](#crab-rocket)
-- [Project Dependencies](#project-dependencies)
-- [Requirement](#requirement)
+- [🦀 Crab Rocket](#-crab-rocket)
+- [🧩 Project Dependencies](#-project-dependencies)
+- [⚙️ Requirement](#️-requirement)
 - [Development](#development)
-- [Compile Released Version](#compile-released-version)
-- [Running Executive Binary File](#running-executive-binary-file)
+- [🔧 Compile Released Version](#-compile-released-version)
+- [🚀 Running Executive Binary File](#-running-executive-binary-file)
   - [First Running](#first-running)
   - [Second Running](#second-running)
-- [Work Flow](#work-flow)
+- [🚦 Work Flow](#-work-flow)
   - [impl level](#impl-level)
-- [Changelog](#changelog)
+- [📖 Change Log](#-change-log)
 
-## Crab Rocket
+## 🦀 Crab Rocket
 
 A web backend server written in Rust and based on Rocket.
 
 ![crab_rocket](./assets/crab,super_moden_rocket,_fast_and_complex,_in_the_universe,_full_of_stars,_delightful.png)
 
-## Project Dependencies
+## 🧩 Project Dependencies
 
 - Rust
 - Rocket
@@ -25,9 +25,9 @@ A web backend server written in Rust and based on Rocket.
 - serde_json
 - chrono
 
-## Requirement
+## ⚙️ Requirement
 
-- Rust environment
+- Rust 2021 environment
 - Postgres
 
 ## Development
@@ -39,13 +39,13 @@ diesel migration run
 cargo run
 ```
 
-## Compile Released Version
+## 🔧 Compile Released Version
 
 ```shell
 cargo build --release
 ```
 
-## Running Executive Binary File
+## 🚀 Running Executive Binary File
 
 Setting environment variable.
 
@@ -65,7 +65,7 @@ diesel migration run
 ./hello_rocket
 ```
 
-## Work Flow
+## 🚦 Work Flow
 
 - Change Models
 - Run diesel migration
@@ -78,6 +78,6 @@ diesel migration run
 
 Handle all error in impl level, and print out the error detail in backend.
 
-## Changelog
+## 📖 Change Log
 
 [Change Log](./CHANGELOG.md)

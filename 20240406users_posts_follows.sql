@@ -41,8 +41,8 @@ CREATE TABLE "employee_table" (
 );
 
 CREATE TABLE "follows" (
-  "following_user_id" int4 NOT NULL,
-  "followed_user_id" int4 NOT NULL,
+  "following_user_id" int4 NOT NULL DEFAULT -1,
+  "followed_user_id" int4 NOT NULL DEFAULT -1,
   "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "follow_id" serial,
   PRIMARY KEY ("follow_id")
@@ -51,8 +51,8 @@ CREATE TABLE "follows" (
 CREATE TABLE "posts" (
   "post_id" serial,
   "title" varchar(255) DEFAULT 'Untitled',
-  "body" text,
-  "user_id" int4,
+  "body" text DEFAULT 'No Content',
+  "user_id" int4 DEFAULT -1,
   "status" varchar(255),
   "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -62,10 +62,10 @@ CREATE TABLE "posts" (
 CREATE TABLE "tasks" (
   "id" serial,
   "title" text NOT NULL,
-  "content" text,
+  "content" text DEFAULT '',
   "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-  "user_id" int4,
+  "user_id" int4 DEFAULT -1,
   PRIMARY KEY ("id")
 );
 
@@ -78,7 +78,7 @@ CREATE TABLE "users" (
   "password" varchar(255) NOT NULL,
   "fullname" varchar(255),
   "avatar_url" varchar(255),
-  "bio" text,
+  "bio" text DEFAULT '',
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "mobile_phone" varchar(255) NOT NULL,
   PRIMARY KEY ("user_id")
