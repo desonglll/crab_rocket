@@ -23,7 +23,7 @@ pub fn get_all_posts() -> Json<serde_json::Value> {
         "message":message,
         "data":all_posts
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -35,7 +35,7 @@ pub fn get_post_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "data":post
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -47,7 +47,7 @@ pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Val
         "message":message,
         "data":updated_post
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -59,7 +59,7 @@ pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "data":deleted_post
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -71,7 +71,7 @@ pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
         "message":message,
         "data":inserted_post
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -83,6 +83,6 @@ pub fn get_posts_by_params(params: Json<PostParam>) -> Json<serde_json::Value> {
         "message":message,
         "data":post
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }

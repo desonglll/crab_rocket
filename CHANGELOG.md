@@ -36,3 +36,7 @@
   - `b9a4b132a061fe4acb16f206d0657c7807bf4a72`
     - Add task filter to route.
     - Rename filter stuff to filter\_\*.
+  - `
+    - Change `cors` strategy.
+    - Connect to frontend.
+    - Change model `PatchPost`.

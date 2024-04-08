@@ -3,7 +3,7 @@ extern crate rocket;
 
 use crab_rocket::routes::{follow_route, post_route, task_route, user_route};
 
-use rocket::http::Method;
+use rocket::http::{Header, Method};
 use rocket::routes;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
@@ -14,8 +14,23 @@ fn rocket() -> _ {
     // You can also deserialize this
     let cors = rocket_cors::CorsOptions {
         allowed_origins,
-        allowed_methods: vec![Method::Get].into_iter().map(From::from).collect(),
-        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
+        allowed_methods: vec![
+            Method::Get,
+            Method::Post,
+            Method::Patch,
+            Method::Put,
+            Method::Delete,
+        ]
+        .into_iter()
+        .map(From::from)
+        .collect(),
+        allowed_headers: AllowedHeaders::some(&[
+            "Content-Type",
+            "Authorization",
+            "Another-Header", // 允许的其他头部信息
+            "Authorization",
+            "Accept",
+        ]),
         allow_credentials: true,
         ..Default::default()
     }
