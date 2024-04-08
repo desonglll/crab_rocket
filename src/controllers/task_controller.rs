@@ -1,6 +1,7 @@
 use crate::establish_pg_connection;
 use crate::mappers::task_mapper;
 
+use crate::routes::models::task_param::TaskParam;
 use crate::services::task_service::GetTask;
 use crate::{
     models::task::{NewTask, Task},
@@ -104,5 +105,11 @@ pub fn delete_task_by_id_controller(id: i32) -> (i32, &'static str, Task) {
     match Task::delete_task_by_id(id) {
         Ok(deleted_task) => (204, "Deleted", deleted_task),
         Err(_) => (204, "Delete Failed", Task::new_empty()),
+    }
+}
+pub fn get_tasks_by_params_controller(params: &TaskParam) -> (i32, &'static str, Vec<Task>) {
+    match Task::filter_tasks_by_params(params) {
+        Ok(filtered_tasks) => (200, "GET TASKS BY PARAMS OK", filtered_tasks),
+        Err(_) => (204, "GET TASKS BY PARAMS ERROR", Vec::new()),
     }
 }

@@ -1,4 +1,5 @@
 use crate::models::post::{NewPost, PatchPost, Post};
+use crate::routes::models::post_param::PostParam;
 use crate::schema::posts::dsl::*; //配合下面的 `posts.filter()`
 use crate::schema::posts::{self};
 use diesel::prelude::*;
@@ -48,12 +49,19 @@ pub fn delete_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diese
     diesel::delete(posts.filter(posts::post_id.eq(id))).get_result(conn)
 }
 
-// pub fn fetch_posts_by_user_id(
-//     conn: &mut PgConnection,
-//     uid: i32,
-// ) -> Result<Vec<Post>, diesel::result::Error> {
-//     posts.filter(posts::user_id.eq(uid)).load::<Post>(conn)
-// }
+pub fn fetch_posts_by_params(
+    conn: &mut PgConnection,
+    params: &PostParam,
+) -> Result<Vec<Post>, diesel::result::Error> {
+    let mut query = posts.into_boxed();
+
+    if let Some(uid) = params.user_id {
+        if uid != 0 {
+            query = query.filter(posts::user_id.eq(uid));
+        }
+    }
+    query.load::<Post>(conn)
+}
 
 #[cfg(test)]
 mod tests {
@@ -153,18 +161,19 @@ mod tests {
         }
     }
 
-    // #[test]
-    // fn test_fetch_posts_by_user_id() {
-    //     use super::*;
-    //     use crate::establish_pg_connection; // 建立数据库连接
-    //     match establish_pg_connection() {
-    //         Ok(mut conn) => match fetch_posts_by_user_id(&mut conn, 1) {
-    //             Ok(u_posts) => {
-    //                 println!("{u_posts:?}")
-    //             }
-    //             Err(_) => (),
-    //         },
-    //         Err(_) => (),
-    //     }
-    // }
+    #[test]
+    fn test_fetch_posts_by_params() {
+        use super::*;
+        use crate::establish_pg_connection; // 建立数据库连接
+        let params = PostParam { user_id: Some(2) };
+        match establish_pg_connection() {
+            Ok(mut conn) => match fetch_posts_by_params(&mut conn, &params) {
+                Ok(u_posts) => {
+                    println!("{u_posts:?}")
+                }
+                Err(_) => (),
+            },
+            Err(_) => (),
+        }
+    }
 }

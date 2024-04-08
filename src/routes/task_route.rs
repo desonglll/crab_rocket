@@ -94,7 +94,19 @@ pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
     .unwrap();
     Json(response)
 }
-
+#[post("/task/filter", data = "<params>")]
+pub fn get_tasks_by_params(
+    params: Json<crate::routes::models::task_param::TaskParam>,
+) -> Json<serde_json::Value> {
+    let (code, message, filtered_tasks) = task_controller::get_tasks_by_params_controller(&params);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":filtered_tasks
+    }))
+    .unwrap();
+    Json(response)
+}
 #[get("/")]
 pub fn index() -> &'static str { "hello world!" }
 

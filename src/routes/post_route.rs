@@ -5,6 +5,9 @@ use crate::{
     controllers::post_controller,
     models::post::{NewPost, PatchPost},
 };
+
+use super::models::post_param::PostParam;
+
 #[derive(FromForm)]
 pub struct PostQuery {
     pub author_id: Option<i32>,
@@ -20,7 +23,7 @@ pub fn get_all_posts() -> Json<serde_json::Value> {
         "message":message,
         "data":all_posts
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
@@ -32,9 +35,10 @@ pub fn get_post_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "data":post
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
+
 #[patch("/post/<id>", data = "<post>")]
 pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Value> {
     let (code, message, updated_post) = post_controller::update_post_by_id_controller(id, &post);
@@ -43,9 +47,10 @@ pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Val
         "message":message,
         "data":updated_post
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
+
 #[delete("/post/<id>")]
 pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, deleted_post) = post_controller::delete_post_by_id_controller(id);
@@ -54,9 +59,10 @@ pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "data":deleted_post
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
+
 #[post("/post", data = "<post>")]
 pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
     let (code, message, inserted_post) = post_controller::insert_single_post_controller(&post);
@@ -65,6 +71,18 @@ pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
         "message":message,
         "data":inserted_post
     }))
-    .unwrap();
+        .unwrap();
+    Json(response)
+}
+
+#[post("/post/filter", data = "<params>")]
+pub fn get_posts_by_params(params: Json<PostParam>) -> Json<serde_json::Value> {
+    let (code, message, post) = post_controller::get_post_by_params_controller(&params);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":post
+    }))
+        .unwrap();
     Json(response)
 }

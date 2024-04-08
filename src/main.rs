@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate rocket;
+
 use crab_rocket::routes::{follow_route, post_route, task_route, user_route};
 
 use rocket::http::Method;
@@ -33,6 +34,7 @@ fn rocket() -> _ {
                 task_route::update_task_by_id,
                 task_route::delete_task_by_id,
                 task_route::put_task,
+                task_route::get_tasks_by_params,
                 //user routes
                 user_route::insert_single_user,
                 user_route::get_all_users,
@@ -45,6 +47,7 @@ fn rocket() -> _ {
                 post_route::get_post_by_id,
                 post_route::update_post_by_id,
                 post_route::delete_post_by_id,
+                post_route::get_posts_by_params,
                 // follow routes
                 follow_route::insert_single_follow,
                 follow_route::get_all_follows,

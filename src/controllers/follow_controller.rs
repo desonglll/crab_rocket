@@ -26,7 +26,7 @@ pub fn delete_follow_controller(follow: &NewFollow) -> (i32, &'static str, Follo
 }
 
 pub fn get_follows_by_params_controller(params: &FollowParam) -> (i32, &'static str, Vec<Follow>) {
-    match Follow::get_follows_by_params(params) {
+    match Follow::filter_follows_by_params(params) {
         Ok(follows) => (200, "GET FOLLOWS BT PARAMS OK", follows),
         Err(_) => (204, "GET FOLLOWS BY PARAMS ERROR", Vec::new()),
     }

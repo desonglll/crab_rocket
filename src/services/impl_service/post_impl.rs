@@ -87,10 +87,28 @@ impl crate::services::post_service::GetPost for Post {
             }
         }
     }
+    fn filter_posts_by_params(
+        params: &crate::routes::models::post_param::PostParam,
+    ) -> Result<Vec<Post>, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match post_mapper::fetch_posts_by_params(&mut conn, params) {
+                Ok(updated_post) => Ok(updated_post),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
+
     #[test]
     fn test_insert_single_post() {
         use crate::models::post::{NewPost, Post};
@@ -143,6 +161,20 @@ mod test {
         match Post::delete_post_by_id(4) {
             Ok(deleted_post) => {
                 println!("{deleted_post:?}");
+            }
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_get_posts_by_params() {
+        use crate::models::post::Post;
+        use crate::routes::models::post_param::PostParam;
+        use crate::services::post_service::GetPost;
+        let params = PostParam { user_id: Some(2) };
+        match Post::filter_posts_by_params(&params) {
+            Ok(posts) => {
+                println!("{posts:?}");
             }
             Err(_) => (),
         }

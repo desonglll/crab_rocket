@@ -1,5 +1,6 @@
 use crate::{
     models::post::{NewPost, PatchPost, Post},
+    routes::models::post_param::PostParam,
     services::post_service::GetPost,
 };
 
@@ -34,6 +35,13 @@ pub fn delete_post_by_id_controller(id: i32) -> (i32, &'static str, Post) {
     match Post::delete_post_by_id(id) {
         Ok(deleted_post) => (200, "DELETE POST BY ID OK", deleted_post),
         Err(_) => (204, "DELETE POST BY ID ERROR", Post::new_empty()),
+    }
+}
+
+pub fn get_post_by_params_controller(params: &PostParam) -> (i32, &'static str, Vec<Post>) {
+    match Post::filter_posts_by_params(params) {
+        Ok(filtered_posts) => (200, "GET POST BY PARAMS OK", filtered_posts),
+        Err(_) => (204, "GET POST BY PARAMS ERROR", Vec::new()),
     }
 }
 #[cfg(test)]

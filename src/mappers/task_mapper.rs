@@ -1,4 +1,5 @@
 use crate::models::task::{NewTask, PatchTask, Task};
+use crate::routes::models::task_param::TaskParam;
 use crate::schema::tasks::dsl::*; //配合下面的 `tasks.filter()`
 use crate::schema::tasks::{self};
 use crate::utils::time::get_e8_time;
@@ -84,6 +85,20 @@ pub fn check_exist_task_by_id(conn: &mut PgConnection, t_id: i32) -> bool {
         Ok(_) => true,
         Err(_) => false,
     }
+}
+
+pub fn fetch_tasks_by_params(
+    conn: &mut PgConnection,
+    params: &TaskParam,
+) -> Result<Vec<Task>, diesel::result::Error> {
+    let mut query = tasks.into_boxed();
+    if let Some(uid) = params.user_id {
+        if uid != 0 {
+            query = query.filter(tasks::user_id.eq(uid));
+        }
+    }
+
+    query.load::<Task>(conn)
 }
 #[cfg(test)]
 mod tests {
@@ -175,6 +190,20 @@ mod tests {
                 );
                 match insert_full_single_task(&mut conn, &task) {
                     Ok(res) => println!("{res:?}"),
+                    Err(_) => println!("Err"),
+                }
+            }
+            Err(_) => println!("establish_pg_connection error"),
+        }
+    }
+
+    #[test]
+    fn test_fetch_tasks_by_params() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let param: TaskParam = TaskParam { user_id: Some(2) };
+                match fetch_tasks_by_params(&mut conn, &param) {
+                    Ok(filtered_tasks) => println!("{filtered_tasks:?}"),
                     Err(_) => println!("Err"),
                 }
             }

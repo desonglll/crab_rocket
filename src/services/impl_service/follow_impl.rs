@@ -55,7 +55,7 @@ impl GetFollow for Follow {
         }
     }
 
-    fn get_follows_by_params(
+    fn filter_follows_by_params(
         params: &FollowParam,
     ) -> Result<Vec<Follow>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {

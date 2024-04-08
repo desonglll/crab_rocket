@@ -114,11 +114,41 @@ impl task_service::GetTask for Task {
             }
         }
     }
+    fn filter_tasks_by_params(
+        params: &crate::routes::models::task_param::TaskParam,
+    ) -> Result<Vec<Task>, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match task_mapper::fetch_tasks_by_params(&mut conn, params) {
+                    Ok(filtered_tasks) => {
+                        if filtered_tasks.len() != 0 {
+                            Ok(filtered_tasks)
+                        } else {
+                            println!("Empty query.");
+                            Err(Box::new(diesel::result::Error::NotFound))
+                        }
+                    }
+                    Err(e) => {
+                        // panic!("oWo! Please add task first!");
+
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{models::task::PatchTask, utils::time::get_e8_time};
+    use crate::{
+        models::task::PatchTask, routes::models::task_param::TaskParam, utils::time::get_e8_time,
+    };
 
     use self::task_service::GetTask;
     use super::*;
@@ -174,5 +204,12 @@ mod tests {
         );
         let inserted_task = Task::insert_full_single_task(&task);
         println!("{inserted_task:?}");
+    }
+
+    #[test]
+    fn test_get_tasks_by_params() {
+        let params: TaskParam = TaskParam { user_id: Some(2) };
+        let filtered_tasks = Task::filter_tasks_by_params(&params);
+        println!("{filtered_tasks:?}");
     }
 }
