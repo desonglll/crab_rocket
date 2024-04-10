@@ -1,8 +1,9 @@
 use crate::controllers::task_controller;
 use crate::models::task::{NewTask, PatchTask, PutTask, Task};
 use crate::utils::time::get_e8_time;
+use rocket::http::Status;
 use rocket::serde::json::Json;
-use rocket::{delete, get, patch, post, put};
+use rocket::{delete, get, options, patch, post, put};
 use serde_json::json;
 
 /// # Note
@@ -130,3 +131,5 @@ pub fn demo() -> Json<serde_json::Value> {
     });
     Json(serde_json::from_value(j).unwrap())
 }
+#[options("/task/filter")]
+pub fn options_task_filter() -> Status { Status::Ok }

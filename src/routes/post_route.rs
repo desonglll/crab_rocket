@@ -1,4 +1,4 @@
-use rocket::{delete, form::FromForm, get, patch, post, serde::json::Json};
+use rocket::{delete, form::FromForm, get, http::Status, options, patch, post, serde::json::Json};
 use serde_json::json;
 
 use crate::{
@@ -89,3 +89,5 @@ pub fn get_posts_by_params(params: Json<PostParam>) -> Json<serde_json::Value> {
     .unwrap();
     Json(response)
 }
+#[options("/post/filter")]
+pub fn options_post_filter() -> Status { Status::Ok }

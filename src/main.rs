@@ -50,6 +50,7 @@ fn rocket() -> _ {
                 task_route::delete_task_by_id,
                 task_route::put_task,
                 task_route::get_tasks_by_params,
+                task_route::options_task_filter,
                 //user routes
                 user_route::insert_single_user,
                 user_route::get_all_users,
@@ -63,6 +64,7 @@ fn rocket() -> _ {
                 post_route::update_post_by_id,
                 post_route::delete_post_by_id,
                 post_route::get_posts_by_params,
+                post_route::options_post_filter,
                 // follow routes
                 follow_route::insert_single_follow,
                 follow_route::get_all_follows,
