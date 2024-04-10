@@ -3,7 +3,7 @@ extern crate rocket;
 
 use crab_rocket::routes::{follow_route, post_route, task_route, user_route};
 
-use rocket::http::{Header, Method};
+use rocket::http::Method;
 use rocket::routes;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 

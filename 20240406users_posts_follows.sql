@@ -81,7 +81,9 @@ CREATE TABLE "users" (
   "bio" text DEFAULT '',
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "mobile_phone" varchar(255) NOT NULL,
-  PRIMARY KEY ("user_id")
+  PRIMARY KEY ("user_id"),
+  CONSTRAINT "username" UNIQUE ("username"),
+  CONSTRAINT "phonenumber" UNIQUE ("mobile_phone")
 );
 
 ALTER TABLE "department_table" ADD CONSTRAINT "mananger_id" FOREIGN KEY ("manager_id") REFERENCES "employee_table" ("employee_id") ON DELETE CASCADE ON UPDATE CASCADE;

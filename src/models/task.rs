@@ -96,21 +96,14 @@ impl NewTask {
 pub struct PatchTask {
     pub title: String,
     pub content: Option<String>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
     pub user_id: Option<i32>,
 }
 
 impl PatchTask {
-    pub fn new(
-        title: String,
-        content: Option<String>,
-        updated_at: Option<chrono::NaiveDateTime>,
-        user_id: Option<i32>,
-    ) -> Self {
+    pub fn new(title: String, content: Option<String>, user_id: Option<i32>) -> Self {
         PatchTask {
             title,
             content,
-            updated_at,
             user_id,
         }
     }
@@ -121,7 +114,6 @@ impl Into<PatchTask> for Task {
         PatchTask {
             title: self.title,
             content: self.content,
-            updated_at: self.updated_at,
             user_id: self.user_id,
         }
     }
@@ -183,7 +175,6 @@ impl Into<PatchTask> for PutTask {
         PatchTask {
             title: self.title,
             content: self.content,
-            updated_at: self.updated_at,
             user_id: self.user_id,
         }
     }

@@ -5,6 +5,7 @@ pub mod routes;
 pub mod schema;
 pub mod services;
 pub mod utils;
+
 use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;

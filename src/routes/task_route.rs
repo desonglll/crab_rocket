@@ -1,5 +1,6 @@
 use crate::controllers::task_controller;
 use crate::models::task::{NewTask, PatchTask, PutTask, Task};
+use crate::utils::time::get_e8_time;
 use rocket::serde::json::Json;
 use rocket::{delete, get, patch, post, put};
 use serde_json::json;
@@ -44,7 +45,7 @@ pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
         id,
         title: task.title.clone(),
         content: task.content.clone(),
-        updated_at: task.updated_at,
+        updated_at: Some(get_e8_time()),
         user_id: task.user_id,
     };
     let (code, message, task) = task_controller::put_task_by_id_controller(id, &put_task.into());
@@ -98,11 +99,15 @@ pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
 pub fn get_tasks_by_params(
     params: Json<crate::routes::models::task_param::TaskParam>,
 ) -> Json<serde_json::Value> {
-    let (code, message, filtered_tasks) = task_controller::get_tasks_by_params_controller(&params);
+    let (code, message, (filtered_tasks, info)) =
+        task_controller::get_tasks_by_params_controller(&params);
     let response = serde_json::from_value(json!({
         "code":code,
         "message":message,
-        "data":filtered_tasks
+        "data":{
+            "tasks":filtered_tasks,
+            "info":info
+        }
     }))
     .unwrap();
     Json(response)

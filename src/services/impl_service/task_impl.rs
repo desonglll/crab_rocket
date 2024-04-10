@@ -1,5 +1,6 @@
 use crate::establish_pg_connection;
 use crate::mappers::task_mapper;
+use crate::models::info::task_info::TaskInfo;
 use crate::models::task::{NewTask, Task};
 use crate::services::task_service;
 impl task_service::GetTask for Task {
@@ -116,29 +117,35 @@ impl task_service::GetTask for Task {
     }
     fn filter_tasks_by_params(
         params: &crate::routes::models::task_param::TaskParam,
-    ) -> Result<Vec<Task>, Box<dyn std::error::Error>> {
+    ) -> (Result<Vec<Task>, Box<dyn std::error::Error>>, TaskInfo) {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                match task_mapper::fetch_tasks_by_params(&mut conn, params) {
+                match task_mapper::fetch_tasks_by_params(&mut conn, params).0 {
                     Ok(filtered_tasks) => {
                         if filtered_tasks.len() != 0 {
-                            Ok(filtered_tasks)
+                            (
+                                Ok(filtered_tasks),
+                                task_mapper::fetch_tasks_by_params(&mut conn, params).1,
+                            )
                         } else {
                             println!("Empty query.");
-                            Err(Box::new(diesel::result::Error::NotFound))
+                            (
+                                Err(Box::new(diesel::result::Error::NotFound)),
+                                TaskInfo::new_empty(),
+                            )
                         }
                     }
                     Err(e) => {
                         // panic!("oWo! Please add task first!");
 
                         println!("{e:?}");
-                        Err(Box::new(e))
+                        (Err(Box::new(e)), TaskInfo::new_empty())
                     }
                 }
             }
             Err(e) => {
                 println!("{e:?}");
-                Err(Box::new(e))
+                (Err(Box::new(e)), TaskInfo::new_empty())
             }
         }
     }
@@ -183,7 +190,6 @@ mod tests {
         let task: PatchTask = PatchTask::new(
             "new title for put task".to_string(),
             "hello".to_string().into(),
-            Some(get_e8_time()),
             Some(4),
         );
         let updated_task = Task::update_task_by_id(t_id, &task);
@@ -208,7 +214,11 @@ mod tests {
 
     #[test]
     fn test_get_tasks_by_params() {
-        let params: TaskParam = TaskParam { user_id: Some(2) };
+        let params: TaskParam = TaskParam {
+            user_id: Some(2),
+            limit: Some(10),
+            offset: Some(0),
+        };
         let filtered_tasks = Task::filter_tasks_by_params(&params);
         println!("{filtered_tasks:?}");
     }

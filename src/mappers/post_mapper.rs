@@ -1,3 +1,4 @@
+use crate::models::info::post_info::PostInfo;
 use crate::models::post::{NewPost, PatchPost, Post};
 use crate::routes::models::post_param::PostParam;
 use crate::schema::posts::dsl::*; //配合下面的 `posts.filter()`
@@ -52,7 +53,7 @@ pub fn delete_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diese
 pub fn fetch_posts_by_params(
     conn: &mut PgConnection,
     params: &PostParam,
-) -> Result<Vec<Post>, diesel::result::Error> {
+) -> (Result<Vec<Post>, diesel::result::Error>, PostInfo) {
     let mut query = posts.into_boxed();
 
     if let Some(uid) = params.user_id {
@@ -60,7 +61,24 @@ pub fn fetch_posts_by_params(
             query = query.filter(posts::user_id.eq(uid));
         }
     }
-    query.load::<Post>(conn)
+    if let Some(limit) = params.limit {
+        if limit != 0 {
+            query = query.limit(limit.into());
+        }
+    }
+    if let Some(offset) = params.offset {
+        if offset != 0 {
+            query = query.offset(offset.into());
+        }
+    }
+    let filtered_posts = query.order(posts::post_id.asc()).load::<Post>(conn);
+    let count: i64 = posts.count().first(conn).expect("Error counting posts");
+
+    (filtered_posts, PostInfo { count: count })
+}
+pub fn get_count(conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
+    let count: i64 = posts.count().first(conn).expect("Error counting posts");
+    Ok(count)
 }
 
 #[cfg(test)]
@@ -165,9 +183,13 @@ mod tests {
     fn test_fetch_posts_by_params() {
         use super::*;
         use crate::establish_pg_connection; // 建立数据库连接
-        let params = PostParam { user_id: Some(2) };
+        let params = PostParam {
+            user_id: Some(2),
+            limit: None,
+            offset: None,
+        };
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_posts_by_params(&mut conn, &params) {
+            Ok(mut conn) => match fetch_posts_by_params(&mut conn, &params).0 {
                 Ok(u_posts) => {
                     println!("{u_posts:?}")
                 }

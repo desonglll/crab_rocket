@@ -22,7 +22,7 @@
   - `f7292ed2924d8580f4c74f5e2adf29c849605455`
     - Finish `post_route::insert_single_post`.
 - 2024.04.07:
-  - `f7292ed2924d8580f4c74f5e2adf29c849605455`
+  - `12c2762dbc54542d549c7db8d9e5567d516e08e8`
     - Fix database foreign key to `CASCADE`.
     - Finish `CRUD` for `Post`.
     - Make `Error` stuff more strong.
@@ -36,7 +36,12 @@
   - `b9a4b132a061fe4acb16f206d0657c7807bf4a72`
     - Add task filter to route.
     - Rename filter stuff to filter\_\*.
-  - `
+  - `cb6e3c3f007ae7bafb138b462a3249167aaf3ffb`
     - Change `cors` strategy.
     - Connect to frontend.
     - Change model `PatchPost`.
+- 2024.04.10:
+  - `
+    - BBBBBig change.
+    - Make params more flexible.
+    - Change return type to tuple in service level.

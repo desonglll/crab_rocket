@@ -2,8 +2,10 @@ use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-pub struct PostParam {
-    pub user_id: Option<i32>,
-    pub limit: Option<i32>,
-    pub offset: Option<i32>,
+pub struct PostInfo {
+    pub count: i64,
+}
+
+impl PostInfo {
+    pub fn new_empty() -> Self { PostInfo { count: -1 } }
 }

@@ -1,3 +1,4 @@
+use crate::models::info::task_info::TaskInfo;
 use crate::models::task::{NewTask, PatchTask, Task};
 use crate::routes::models::task_param::TaskParam;
 use crate::schema::tasks::dsl::*; //配合下面的 `tasks.filter()`
@@ -90,15 +91,25 @@ pub fn check_exist_task_by_id(conn: &mut PgConnection, t_id: i32) -> bool {
 pub fn fetch_tasks_by_params(
     conn: &mut PgConnection,
     params: &TaskParam,
-) -> Result<Vec<Task>, diesel::result::Error> {
+) -> (Result<Vec<Task>, diesel::result::Error>, TaskInfo) {
     let mut query = tasks.into_boxed();
     if let Some(uid) = params.user_id {
         if uid != 0 {
             query = query.filter(tasks::user_id.eq(uid));
         }
     }
-
-    query.load::<Task>(conn)
+    if let Some(limit) = params.limit {
+        if limit != 0 {
+            query = query.limit(limit.into());
+        }
+    }
+    if let Some(offset) = params.offset {
+        if offset != 0 {
+            query = query.offset(offset.into());
+        }
+    }
+    let count: i64 = tasks.count().first(conn).expect("Error counting tasks");
+    (query.load::<Task>(conn), TaskInfo { count: count })
 }
 #[cfg(test)]
 mod tests {
@@ -153,7 +164,6 @@ mod tests {
                 let put_task: PatchTask = PatchTask::new(
                     "title for put 1".to_string(),
                     "new content for put".to_string().into(),
-                    Some(chrono::Local::now().naive_utc()),
                     Some(4),
                 );
                 match update_task_by_id(&mut conn, t_id, &put_task) {
@@ -201,8 +211,12 @@ mod tests {
     fn test_fetch_tasks_by_params() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let param: TaskParam = TaskParam { user_id: Some(2) };
-                match fetch_tasks_by_params(&mut conn, &param) {
+                let param: TaskParam = TaskParam {
+                    user_id: Some(2),
+                    limit: Some(10),
+                    offset: Some(0),
+                };
+                match fetch_tasks_by_params(&mut conn, &param).0 {
                     Ok(filtered_tasks) => println!("{filtered_tasks:?}"),
                     Err(_) => println!("Err"),
                 }

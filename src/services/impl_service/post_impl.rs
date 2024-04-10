@@ -1,4 +1,8 @@
-use crate::{establish_pg_connection, mappers::post_mapper, models::post::Post};
+use crate::{
+    establish_pg_connection,
+    mappers::post_mapper,
+    models::{info::post_info::PostInfo, post::Post},
+};
 
 impl crate::services::post_service::GetPost for Post {
     // GOOD:
@@ -89,10 +93,28 @@ impl crate::services::post_service::GetPost for Post {
     }
     fn filter_posts_by_params(
         params: &crate::routes::models::post_param::PostParam,
-    ) -> Result<Vec<Post>, Box<dyn std::error::Error>> {
+    ) -> (Result<Vec<Post>, Box<dyn std::error::Error>>, PostInfo) {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::fetch_posts_by_params(&mut conn, params) {
-                Ok(updated_post) => Ok(updated_post),
+            Ok(mut conn) => match post_mapper::fetch_posts_by_params(&mut conn, params).0 {
+                Ok(updated_post) => (
+                    Ok(updated_post),
+                    post_mapper::fetch_posts_by_params(&mut conn, params).1,
+                ),
+                Err(e) => {
+                    println!("{e:?}");
+                    (Err(Box::new(e)), PostInfo::new_empty())
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                (Err(Box::new(e)), PostInfo::new_empty())
+            }
+        }
+    }
+    fn get_count() -> Result<i64, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match post_mapper::get_count(&mut conn) {
+                Ok(count) => Ok(count),
                 Err(e) => {
                     println!("{e:?}");
                     Err(Box::new(e))
@@ -171,8 +193,12 @@ mod test {
         use crate::models::post::Post;
         use crate::routes::models::post_param::PostParam;
         use crate::services::post_service::GetPost;
-        let params = PostParam { user_id: Some(2) };
-        match Post::filter_posts_by_params(&params) {
+        let params = PostParam {
+            user_id: Some(2),
+            offset: Some(0),
+            limit: Some(0),
+        };
+        match Post::filter_posts_by_params(&params).0 {
             Ok(posts) => {
                 println!("{posts:?}");
             }
