@@ -12,13 +12,13 @@ diesel::table! {
         last_update -> Nullable<Timestamp>,
         #[max_length = 255]
         description -> Nullable<Varchar>,
-        #[max_length = 255]
-        budget -> Nullable<Varchar>,
+        budget -> Nullable<Int4>,
         number_of_employees -> Nullable<Int4>,
         parent_department_id -> Nullable<Int4>,
         #[max_length = 255]
         email -> Nullable<Varchar>,
-        phone_number -> Nullable<Int4>,
+        #[max_length = 255]
+        phone_number -> Nullable<Varchar>,
         #[max_length = 255]
         address -> Nullable<Varchar>,
         #[max_length = 255]
@@ -34,20 +34,23 @@ diesel::table! {
     employee_table (employee_id) {
         employee_id -> Int4,
         #[max_length = 255]
-        first_name -> Varchar,
+        first_name -> Nullable<Varchar>,
         #[max_length = 255]
-        last_name -> Varchar,
+        last_name -> Nullable<Varchar>,
+        #[max_length = 255]
+        employee_name -> Varchar,
         #[max_length = 1]
         gender -> Nullable<Bpchar>,
         date_of_birth -> Nullable<Timestamp>,
         hire_date -> Nullable<Timestamp>,
         #[max_length = 255]
         email -> Nullable<Varchar>,
-        phone_number -> Nullable<Int4>,
+        #[max_length = 255]
+        phone_number -> Nullable<Varchar>,
         department_id -> Nullable<Int4>,
         #[max_length = 255]
         job_title -> Nullable<Varchar>,
-        salary -> Nullable<Numeric>,
+        salary -> Nullable<Int4>,
         manager_id -> Nullable<Int4>,
         #[max_length = 255]
         address -> Nullable<Varchar>,
