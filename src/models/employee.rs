@@ -7,9 +7,9 @@ use rocket::serde::{Deserialize, Serialize};
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Employee {
     pub employee_id: i32,
-    pub employee_name: String,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
+    pub employee_name: String,
     pub gender: Option<String>,
     pub date_of_birth: Option<chrono::NaiveDateTime>,
     pub hire_date: Option<chrono::NaiveDateTime>,

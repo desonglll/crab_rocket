@@ -9,9 +9,11 @@ pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, dies
     let new_user = diesel::insert_into(users)
         .values(user)
         .returning(User::as_returning())
-        .get_result(conn)
-        .expect("Error saving new user");
-    Ok(new_user)
+        .get_result(conn);
+    match new_user {
+        Ok(new_user) => Ok(new_user),
+        Err(e) => Err(e),
+    }
 }
 
 // GOOD:

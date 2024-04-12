@@ -1,3 +1,4 @@
+pub mod employee_route;
 pub mod follow_route;
 pub mod models;
 pub mod post_route;

@@ -8,6 +8,7 @@
   - [Second Running](#second-running)
 - [🚦 Work Flow](#-work-flow)
   - [impl level](#impl-level)
+- [Develop Warning](#develop-warning)
 - [📖 Change Log](#-change-log)
 
 ## 🦀 Crab Rocket
@@ -77,6 +78,11 @@ diesel migration run
 ### impl level
 
 Handle all error in impl level, and print out the error detail in backend.
+
+## Develop Warning
+
+- The sequence of the fields in struct is absolutely the same with database.
+- Or Queryable will wrong.
 
 ## 📖 Change Log
 

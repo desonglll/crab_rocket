@@ -56,7 +56,8 @@ pub fn update_user_by_id(id: i32, user: Json<PatchUser>) -> Json<serde_json::Val
 #[delete("/user/<id>")]
 pub fn delete_user_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, updated_user) = user_controller::delete_user_by_id_controller(id);
-    let response = serde_json::from_value(json!({         "code":code,
+    let response = serde_json::from_value(json!({
+        "code":code,
         "message":message,
         "data":updated_user
     }))

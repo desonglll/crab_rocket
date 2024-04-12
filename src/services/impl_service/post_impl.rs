@@ -96,8 +96,8 @@ impl crate::services::post_service::GetPost for Post {
     ) -> (Result<Vec<Post>, Box<dyn std::error::Error>>, PostInfo) {
         match establish_pg_connection() {
             Ok(mut conn) => match post_mapper::fetch_posts_by_params(&mut conn, params).0 {
-                Ok(updated_post) => (
-                    Ok(updated_post),
+                Ok(filtered_post) => (
+                    Ok(filtered_post),
                     post_mapper::fetch_posts_by_params(&mut conn, params).1,
                 ),
                 Err(e) => {
