@@ -12,7 +12,7 @@ pub struct Upload<'r> {
 }
 
 #[post("/upload", data = "<upload>")]
-pub fn upload(upload: Form<Upload<'_>>) {
+pub fn single_upload(upload: Form<Upload<'_>>) {
     let upload = upload.into_inner();
 
     if upload.save {

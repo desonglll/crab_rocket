@@ -78,7 +78,7 @@ fn rocket() -> _ {
                 employee_route::get_employee_by_params,
                 employee_route::update_employee_by_id,
                 // upload
-                upload_route::upload
+                upload_route::single_upload
             ],
         )
         .attach(cors)

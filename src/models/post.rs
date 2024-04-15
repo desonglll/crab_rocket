@@ -1,6 +1,8 @@
 use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 
+use crate::utils::time::get_e8_time;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
@@ -115,6 +117,8 @@ pub struct PatchPost {
     pub body: Option<String>,
     pub user_id: Option<i32>,
     pub status: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PatchPost {
@@ -123,12 +127,16 @@ impl PatchPost {
         body: Option<String>,
         user_id: Option<i32>,
         status: Option<String>,
+        created_at: Option<chrono::NaiveDateTime>,
+        updated_at: Option<chrono::NaiveDateTime>,
     ) -> Self {
         PatchPost {
             title,
             body,
             user_id,
             status,
+            created_at,
+            updated_at,
         }
     }
 
@@ -138,6 +146,8 @@ impl PatchPost {
             body: None,
             user_id: None,
             status: None,
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
         }
     }
 }
@@ -149,6 +159,8 @@ impl Into<PatchPost> for NewPost {
             body: self.body,
             user_id: self.user_id,
             status: self.status,
+            created_at: self.created_at,
+            updated_at: self.updated_at,
         }
     }
 }

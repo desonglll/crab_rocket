@@ -43,6 +43,7 @@ pub fn update_user_by_id(
             users::bio.eq(user.bio.clone()),
             users::updated_at.eq(Some(get_e8_time())),
             users::mobile_phone.eq(user.mobile_phone.clone()),
+            users::created_at.eq(user.created_at.clone()),
         ))
         .get_result(conn)
 }
