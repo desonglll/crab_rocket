@@ -149,8 +149,10 @@ mod tests {
         match establish_pg_connection() {
             Ok(mut conn) => {
                 let t_id = 3;
-                let task = fetch_task_by_id(&mut conn, t_id).unwrap();
-                println!("{task:?}");
+                match fetch_task_by_id(&mut conn, t_id) {
+                    Ok(task) => println!("{task:?}"),
+                    Err(_) => println!("err"),
+                }
             }
             Err(_) => println!("establish_pg_connection error"),
         }

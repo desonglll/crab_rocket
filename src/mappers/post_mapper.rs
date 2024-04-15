@@ -71,9 +71,8 @@ pub fn fetch_posts_by_params(
             query = query.offset(offset.into());
         }
     }
-    let filtered_posts = query.order(posts::post_id.asc()).load::<Post>(conn);
+    let filtered_posts = query.order(posts::updated_at.desc()).load::<Post>(conn);
     let count: i64 = posts.count().first(conn).expect("Error counting posts");
-
     (filtered_posts, PostInfo { count })
 }
 pub fn get_count(conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {

@@ -1,6 +1,6 @@
 use crate::{
     models::{
-        employee::{Employee, NewEmployee},
+        employee::{Employee, NewEmployee, PatchEmployee},
         info::employee_info::EmployeeInfo,
     },
     routes::models::employee_param::EmployeeParam,
@@ -15,4 +15,8 @@ pub trait GetEmployee {
         Result<Vec<Employee>, Box<dyn std::error::Error>>,
         EmployeeInfo,
     );
+    fn update_employee_by_id(
+        id: i32,
+        emp: &PatchEmployee,
+    ) -> Result<Employee, Box<dyn std::error::Error>>;
 }

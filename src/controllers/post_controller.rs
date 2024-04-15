@@ -10,7 +10,21 @@ use crate::{
 pub fn insert_single_post_controller(post: &NewPost) -> (i32, &'static str, Post) {
     match Post::insert_single_post(post) {
         Ok(result) => (200, "INSERT POST OK", result),
-        Err(_) => (204, "INSERT POST ERROR", Post::new_empty()),
+        Err(e) => {
+            let error = e.downcast_ref::<diesel::result::Error>().unwrap();
+            match error {
+                diesel::result::Error::DatabaseError(error_kind, _) => {
+                    let error_message = match error_kind {
+                        diesel::result::DatabaseErrorKind::ForeignKeyViolation => {
+                            "ForeignKeyViolation"
+                        }
+                        _ => "unknow database error",
+                    };
+                    (204, error_message, Post::new_empty())
+                }
+                _ => (204, "unknow error", Post::new_empty()),
+            }
+        }
     }
 }
 

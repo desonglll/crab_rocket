@@ -1,7 +1,9 @@
 #[macro_use]
 extern crate rocket;
 
-use crab_rocket::routes::{employee_route, follow_route, post_route, task_route, user_route};
+use crab_rocket::routes::{
+    employee_route, follow_route, post_route, task_route, upload_route, user_route,
+};
 
 use rocket::http::Method;
 use rocket::routes;
@@ -73,7 +75,10 @@ fn rocket() -> _ {
                 // employee routes
                 employee_route::insert_single_employee,
                 employee_route::delete_employee_by_id,
-                employee_route::get_employee_by_params
+                employee_route::get_employee_by_params,
+                employee_route::update_employee_by_id,
+                // upload
+                upload_route::upload
             ],
         )
         .attach(cors)

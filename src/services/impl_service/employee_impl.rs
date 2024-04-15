@@ -1,6 +1,8 @@
 use crate::{
     establish_pg_connection,
-    mappers::employee_mapper::{self, delete_employee_by_id, insert_employee},
+    mappers::employee_mapper::{
+        self, delete_employee_by_id, insert_employee, update_employee_by_id,
+    },
     models::{
         employee::{Employee, NewEmployee},
         info::employee_info::EmployeeInfo,
@@ -59,6 +61,24 @@ impl GetEmployee for Employee {
             Err(e) => {
                 println!("{e:?}");
                 (Err(Box::new(e)), EmployeeInfo::new_empty())
+            }
+        }
+    }
+    fn update_employee_by_id(
+        id: i32,
+        emp: &crate::models::employee::PatchEmployee,
+    ) -> Result<Employee, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match update_employee_by_id(&mut conn, id, emp) {
+                Ok(updated_emp) => Ok(updated_emp),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
             }
         }
     }

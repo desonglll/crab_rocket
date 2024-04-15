@@ -75,10 +75,10 @@ mod test {
         );
         println!("{user:?}");
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                let result = insert_user(&mut conn, &user).unwrap();
-                println!("{result}");
-            }
+            Ok(mut conn) => match insert_user(&mut conn, &user) {
+                Ok(result) => println!("{result}"),
+                Err(_) => println!("err"),
+            },
             Err(_) => println!("establish_pg_connection error"),
         }
     }

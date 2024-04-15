@@ -1,6 +1,6 @@
 use crate::{
     models::{
-        employee::{Employee, NewEmployee},
+        employee::{Employee, NewEmployee, PatchEmployee},
         info::employee_info::EmployeeInfo,
     },
     routes::models::employee_param::EmployeeParam,
@@ -40,5 +40,14 @@ pub fn get_employee_by_params_controller(
             "GET EMPLOYEE BY PARAMS ERROR",
             (Vec::new(), EmployeeInfo::new_empty()),
         ),
+    }
+}
+pub fn update_employee_by_id_controller(
+    id: i32,
+    emp: &PatchEmployee,
+) -> (i32, &'static str, Employee) {
+    match Employee::update_employee_by_id(id, emp) {
+        Ok(updated_emp) => (200, "UPDATED EMPLOYEE OK", updated_emp),
+        Err(_) => (204, "UPDATED EMPLOYEE ERROR", Employee::new_empty("-1")),
     }
 }
