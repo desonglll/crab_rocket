@@ -16,6 +16,7 @@ pub struct Post {
     pub status: Option<String>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
+    pub username: Option<String>,
 }
 
 impl Post {
@@ -27,6 +28,7 @@ impl Post {
         status: Option<String>,
         created_at: Option<chrono::NaiveDateTime>,
         updated_at: Option<chrono::NaiveDateTime>,
+        username: Option<String>,
     ) -> Self {
         Post {
             post_id,
@@ -36,6 +38,7 @@ impl Post {
             status,
             created_at,
             updated_at,
+            username,
         }
     }
 
@@ -48,6 +51,7 @@ impl Post {
             status: None,
             created_at: None,
             updated_at: None,
+            username: None,
         }
     }
 }
@@ -185,6 +189,7 @@ mod tests {
                 chrono::NaiveDateTime::parse_from_str("2024-04-06 12:00:00", "%Y-%m-%d %H:%M:%S")
                     .unwrap(),
             ),
+            Some("mike".to_string()),
         );
 
         assert_eq!(post.post_id, 1);

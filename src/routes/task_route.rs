@@ -86,7 +86,7 @@ pub fn get_all_tasks() -> Json<serde_json::Value> {
 #[post("/task", data = "<task>")]
 pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
     let mut raw_task: NewTask = task.into_inner();
-    let (code, message, result_task): (i32, &'static str, Task) =
+    let (code, message, result_task): (i32, String, Task) =
         task_controller::insert_single_task_controller(&mut raw_task);
     let response = serde_json::from_value(json!({
         "code":code,

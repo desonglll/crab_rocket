@@ -3,38 +3,38 @@ use crate::{
     services::user_service::GetUser,
 };
 
-pub fn insert_single_user_controller(user: &NewUser) -> (i32, &'static str, User) {
+pub fn insert_single_user_controller(user: &NewUser) -> (i32, String, User) {
     match User::insert_single_user(user) {
-        Ok(result) => (200, "INSERT OK", result),
-        Err(_) => (204, "INSERT ERROR", User::new_empty()),
+        Ok(result) => (200, "INSERT OK".to_string(), result),
+        Err(e) => (204, e.to_string(), User::new_empty()),
     }
 }
 
-pub fn get_all_users_controller() -> (i32, &'static str, Vec<User>) {
+pub fn get_all_users_controller() -> (i32, String, Vec<User>) {
     match User::get_all_users() {
-        Ok(all_users) => (200, "GET ALL USERS OK", all_users),
-        Err(_) => (204, "GET ALL USERS ERROR", Vec::new()),
+        Ok(all_users) => (200, String::from("GET ALL USERS OK"), all_users),
+        Err(e) => (204, e.to_string(), Vec::new()),
     }
 }
 
-pub fn get_user_by_id_controller(id: i32) -> (i32, &'static str, User) {
+pub fn get_user_by_id_controller(id: i32) -> (i32, String, User) {
     match User::get_user_by_id(id) {
-        Ok(user) => (200, "GET USER BY ID OK", user),
-        Err(_) => (204, "GET USER BY ID ERRPR", User::new_empty()),
+        Ok(user) => (200, String::from("GET USER BY ID OK"), user),
+        Err(e) => (204, e.to_string(), User::new_empty()),
     }
 }
 
-pub fn update_user_by_id_controller(id: i32, user: &PatchUser) -> (i32, &'static str, User) {
+pub fn update_user_by_id_controller(id: i32, user: &PatchUser) -> (i32, String, User) {
     match User::update_user_by_id(id, user) {
-        Ok(updated_user) => (200, "UPDATED USER OK", updated_user),
-        Err(_) => (204, "UPDATED USER ERROR", User::new_empty()),
+        Ok(updated_user) => (200, String::from("UPDATED USER OK"), updated_user),
+        Err(e) => (204, e.to_string(), User::new_empty()),
     }
 }
 
-pub fn delete_user_by_id_controller(id: i32) -> (i32, &'static str, User) {
+pub fn delete_user_by_id_controller(id: i32) -> (i32, String, User) {
     match User::delete_user_by_id(id) {
-        Ok(deleted_user) => (200, "DELETE USER OK", deleted_user),
-        Err(_) => (204, "DELETE USER ERROR", User::new_empty()),
+        Ok(deleted_user) => (200, String::from("DELETE USER OK"), deleted_user),
+        Err(e) => (204, e.to_string(), User::new_empty()),
     }
 }
 #[cfg(test)]

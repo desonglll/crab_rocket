@@ -45,3 +45,7 @@
     - BBBBBig change.
     - Make params more flexible.
     - Change return type to tuple in service level.
+- 2024.04.16:
+  - `
+    - Change response format of controllers.
+    - Add some trigger.
