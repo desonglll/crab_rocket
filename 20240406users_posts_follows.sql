@@ -59,6 +59,7 @@ CREATE TABLE "posts" (
   "status" varchar(255) DEFAULT 'unknow status',
   "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+  "username" varchar(255),
   PRIMARY KEY ("post_id")
 );
 
@@ -96,5 +97,6 @@ ALTER TABLE "employee_table" ADD CONSTRAINT "mananger_id" FOREIGN KEY ("manager_
 ALTER TABLE "follows" ADD CONSTRAINT "following_user_id" FOREIGN KEY ("following_user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "follows" ADD CONSTRAINT "followed_user_id" FOREIGN KEY ("followed_user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "posts" ADD CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "posts" ADD CONSTRAINT "username" FOREIGN KEY ("username") REFERENCES "users" ("username");
 ALTER TABLE "tasks" ADD CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 

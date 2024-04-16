@@ -59,6 +59,7 @@ CREATE TABLE "posts" (
   "status" varchar(255) DEFAULT 'unknow status',
   "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+  "username" varchar(255),
   PRIMARY KEY ("post_id")
 );
 
@@ -96,5 +97,18 @@ ALTER TABLE "employee_table" ADD CONSTRAINT "mananger_id" FOREIGN KEY ("manager_
 ALTER TABLE "follows" ADD CONSTRAINT "following_user_id" FOREIGN KEY ("following_user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "follows" ADD CONSTRAINT "followed_user_id" FOREIGN KEY ("followed_user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "posts" ADD CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "posts" ADD CONSTRAINT "username" FOREIGN KEY ("username") REFERENCES "users" ("username");
 ALTER TABLE "tasks" ADD CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+CREATE OR REPLACE FUNCTION fill_username()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- 通过查询 users 表获取对应的用户名
+  SELECT username INTO NEW.username FROM users WHERE user_id = NEW.user_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER fill_username_trigger
+BEFORE INSERT ON posts
+FOR EACH ROW EXECUTE FUNCTION fill_username();

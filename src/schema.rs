@@ -39,8 +39,8 @@ diesel::table! {
         last_name -> Nullable<Varchar>,
         #[max_length = 255]
         employee_name -> Varchar,
-        #[max_length = 1]
-        gender -> Nullable<Bpchar>,
+        #[max_length = 255]
+        gender -> Nullable<Varchar>,
         date_of_birth -> Nullable<Timestamp>,
         hire_date -> Nullable<Timestamp>,
         #[max_length = 255]
@@ -85,6 +85,8 @@ diesel::table! {
         status -> Nullable<Varchar>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
+        #[max_length = 255]
+        username -> Nullable<Varchar>,
     }
 }
 
@@ -122,7 +124,6 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(posts -> users (user_id));
 diesel::joinable!(tasks -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
