@@ -1,7 +1,8 @@
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-#[derive(Selectable, Insertable, Debug, Serialize, Deserialize, Queryable)]
+#[derive(Selectable, Insertable, Debug, Serialize, Deserialize, Queryable, ToSchema)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crate::schema::employee_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -53,7 +54,7 @@ impl Employee {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::employee_table)]
@@ -102,7 +103,7 @@ impl NewEmployee {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::employee_table)]

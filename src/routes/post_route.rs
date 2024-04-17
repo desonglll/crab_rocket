@@ -14,7 +14,12 @@ pub struct PostQuery {
     pub category: Option<String>,
     // 其他可能的查询条件
 }
-
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Vec<Post>),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[get("/post")]
 pub fn get_all_posts() -> Json<serde_json::Value> {
     let (code, message, all_posts) = post_controller::get_all_posts_controller();
@@ -27,6 +32,12 @@ pub fn get_all_posts() -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Post),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[get("/post/<id>")]
 pub fn get_post_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, post) = post_controller::get_post_by_id_controller(id);
@@ -39,6 +50,12 @@ pub fn get_post_by_id(id: i32) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "update successfully", body = Post),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[patch("/post/<id>", data = "<post>")]
 pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Value> {
     let (code, message, updated_post) = post_controller::update_post_by_id_controller(id, &post);
@@ -51,6 +68,12 @@ pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Val
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "deleted successfully", body = Post),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[delete("/post/<id>")]
 pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, deleted_post) = post_controller::delete_post_by_id_controller(id);
@@ -63,6 +86,12 @@ pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "created successfully", body = Post),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/post", data = "<post>")]
 pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
     let (code, message, inserted_post) = post_controller::insert_single_post_controller(&post);
@@ -75,6 +104,12 @@ pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Vec<Post>),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/post/filter", data = "<params>")]
 pub fn get_posts_by_params(params: Json<PostParam>) -> Json<serde_json::Value> {
     let (code, message, (post, info)) = post_controller::get_post_by_params_controller(&params);

@@ -15,6 +15,12 @@ use serde_json::json;
 /// 例如PUT/items/1的意思是替換/items/1，如果已經存在就替換，沒有就新增。
 /// PUT必須包含items/1的所有屬性資料。
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Task),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[get("/task/<id>")]
 pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, task) = task_controller::get_task_by_id_controller(id);
@@ -27,6 +33,12 @@ pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "update successfully", body = Task),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[patch("/task/<id>", data = "<task>")]
 pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
     let (code, message, patched_task) =
@@ -39,6 +51,13 @@ pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Val
     .unwrap();
     Json(response)
 }
+
+#[utoipa::path(
+    responses(
+        (status = 200, description = "put successfully", body = Task),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[put("/task/<id>", data = "<task>")]
 pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
     //Convert a patch task json to a put task json which include `id`.
@@ -60,6 +79,13 @@ pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    params(("id", description = "delete id"),),
+    responses(
+        (status = 200, description = "delete successfully", body = Task),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[delete("/task/<id>")]
 pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, deleted_task) = task_controller::delete_task_by_id_controller(id);
@@ -72,6 +98,12 @@ pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Vec<Task>),
+        (status = NOT_FOUND, description = "not found")
+    )
+)]
 #[get("/task")]
 pub fn get_all_tasks() -> Json<serde_json::Value> {
     let (code, message, tasks) = task_controller::get_all_tasks_controller();
@@ -83,6 +115,12 @@ pub fn get_all_tasks() -> Json<serde_json::Value> {
     Json(serde_json::from_value(response).unwrap())
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "created successfully", body = Task),
+        (status = NOT_FOUND, description = "err") 
+    )
+)]
 #[post("/task", data = "<task>")]
 pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
     let mut raw_task: NewTask = task.into_inner();
@@ -96,6 +134,13 @@ pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
     .unwrap();
     Json(response)
 }
+
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Vec<Task>),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/task/filter", data = "<params>")]
 pub fn get_tasks_by_params(
     params: Json<crate::routes::models::task_param::TaskParam>,
@@ -113,6 +158,7 @@ pub fn get_tasks_by_params(
     .unwrap();
     Json(response)
 }
+
 #[get("/")]
 pub fn index() -> &'static str { "hello world!" }
 
@@ -131,5 +177,6 @@ pub fn demo() -> Json<serde_json::Value> {
     });
     Json(serde_json::from_value(j).unwrap())
 }
+
 #[options("/task/filter")]
 pub fn options_task_filter() -> Status { Status::Ok }

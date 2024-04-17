@@ -6,6 +6,12 @@ use crate::{
     models::user::{NewUser, PatchUser},
 };
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Vec<User>),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[get("/user")]
 pub fn get_all_users() -> Json<serde_json::Value> {
     let (code, message, all_users) = user_controller::get_all_users_controller();
@@ -17,6 +23,13 @@ pub fn get_all_users() -> Json<serde_json::Value> {
     .unwrap();
     Json(response)
 }
+
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = User),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[get("/user/<id>")]
 pub fn get_user_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, user) = user_controller::get_user_by_id_controller(id);
@@ -29,6 +42,12 @@ pub fn get_user_by_id(id: i32) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "created successfully", body = User),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/user", data = "<user>")]
 pub fn insert_single_user(user: Json<NewUser>) -> Json<serde_json::Value> {
     let (code, message, inserted_user) = user_controller::insert_single_user_controller(&user);
@@ -41,6 +60,12 @@ pub fn insert_single_user(user: Json<NewUser>) -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "updated successfully", body = User),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[patch("/user/<id>", data = "<user>")]
 pub fn update_user_by_id(id: i32, user: Json<PatchUser>) -> Json<serde_json::Value> {
     let (code, message, updated_user) = user_controller::update_user_by_id_controller(id, &user);
@@ -53,6 +78,12 @@ pub fn update_user_by_id(id: i32, user: Json<PatchUser>) -> Json<serde_json::Val
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "delete successfully", body = User),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[delete("/user/<id>")]
 pub fn delete_user_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, updated_user) = user_controller::delete_user_by_id_controller(id);

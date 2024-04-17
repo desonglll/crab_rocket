@@ -13,6 +13,8 @@ diesel = { version = "2.1.0", features = ["postgres", "chrono"] }
 dotenvy = "0.15"
 serde_json = "1.0.115"
 chrono-tz = "0.5"
+utoipa = { version = "4", features = ["rocket_extras"] }
+
 
 [profile.dev]
 opt-level = 0

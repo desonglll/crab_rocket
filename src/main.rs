@@ -2,7 +2,7 @@
 extern crate rocket;
 
 use crab_rocket::routes::{
-    employee_route, follow_route, post_route, task_route, upload_route, user_route,
+    common, employee_route, follow_route, post_route, task_route, upload_route, user_route,
 };
 
 use rocket::http::Method;
@@ -42,6 +42,7 @@ fn rocket() -> _ {
         .mount(
             "/",
             routes![
+                common::doc,
                 // task routes
                 task_route::index,
                 task_route::demo,

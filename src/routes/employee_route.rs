@@ -8,6 +8,12 @@ use crate::{
 };
 
 // for employee insert
+#[utoipa::path(
+    responses(
+        (status = 200, description = "created successfully", body = Employee),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/employee", data = "<employee>")]
 pub fn insert_single_employee(employee: Json<NewEmployee>) -> Json<serde_json::Value> {
     let (code, message, inserted_employee) =
@@ -22,6 +28,12 @@ pub fn insert_single_employee(employee: Json<NewEmployee>) -> Json<serde_json::V
 }
 
 // for employee delete
+#[utoipa::path(
+    responses(
+        (status = 200, description = "delete successfully", body = Employee),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[delete("/employee/<id>")]
 pub fn delete_employee_by_id(id: i32) -> Json<serde_json::Value> {
     let (code, message, updated_user) = employee_controller::delete_employee_by_id_controller(id);
@@ -35,6 +47,12 @@ pub fn delete_employee_by_id(id: i32) -> Json<serde_json::Value> {
 }
 
 // for employee filter by params
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Vec<Employee>),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/employee/filter", data = "<params>")]
 pub fn get_employee_by_params(params: Json<EmployeeParam>) -> Json<serde_json::Value> {
     let (code, message, (emp, info)) =
@@ -43,13 +61,20 @@ pub fn get_employee_by_params(params: Json<EmployeeParam>) -> Json<serde_json::V
         "code":code,
         "message":message,
         "data":{
-            "posts":emp,
+            "employees":emp,
             "info":info
         }
     }))
     .unwrap();
     Json(response)
 }
+
+#[utoipa::path(
+    responses(
+        (status = 200, description = "update successfully", body = Employee),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[patch("/employee/<id>", data = "<emp>")]
 pub fn update_employee_by_id(id: i32, emp: Json<PatchEmployee>) -> Json<serde_json::Value> {
     let (code, message, updated_emp) =

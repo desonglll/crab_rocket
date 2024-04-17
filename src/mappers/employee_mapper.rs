@@ -21,6 +21,7 @@ pub fn insert_employee(
         }
     }
 }
+
 // GOOD: a bug for Queryable
 // Found Reason: The sequence is incorent.
 pub fn delete_employee_by_id(
@@ -147,6 +148,7 @@ mod test {
             Err(_) => (),
         }
     }
+
     #[test]
     fn test_update_employee_by_id() {
         use super::*;

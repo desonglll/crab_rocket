@@ -2,6 +2,13 @@ use rocket::{delete, get, post, serde::json::Json};
 use serde_json::json;
 
 use crate::{controllers::follow_controller, models::follow::NewFollow};
+
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Follow),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[get("/follow")]
 pub fn get_all_follows() -> Json<serde_json::Value> {
     let (code, message, all_follows) = follow_controller::get_all_follows_controller();
@@ -14,6 +21,12 @@ pub fn get_all_follows() -> Json<serde_json::Value> {
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "found successfully", body = Vec<Follow>),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/follow/filter", data = "<params>")]
 pub fn get_follows_by_params(
     params: Json<crate::routes::models::follow_param::FollowParam>,
@@ -28,6 +41,12 @@ pub fn get_follows_by_params(
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "created successfully", body = Follow),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/follow", data = "<follow>")]
 pub fn insert_single_follow(follow: Json<NewFollow>) -> Json<serde_json::Value> {
     let (code, message, inserted_follow) = follow_controller::create_new_follow_controller(&follow);
@@ -40,6 +59,12 @@ pub fn insert_single_follow(follow: Json<NewFollow>) -> Json<serde_json::Value> 
     Json(response)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "delete successfully", body = Follow),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[delete("/follow", data = "<follow>")]
 pub fn delete_follow(follow: Json<NewFollow>) -> Json<serde_json::Value> {
     let (code, message, deleted_follow) = follow_controller::delete_follow_controller(&follow);

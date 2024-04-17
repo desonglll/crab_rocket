@@ -1,10 +1,11 @@
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use std::fmt::Display;
+use utoipa::ToSchema;
 
 use crate::utils::time::get_e8_time;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::tasks)]

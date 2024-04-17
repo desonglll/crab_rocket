@@ -11,8 +11,14 @@ pub struct Upload<'r> {
     pub file: TempFile<'r>,
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "upload successfully", body = String),
+        (status = NOT_FOUND, description = "not found") 
+    )
+)]
 #[post("/upload", data = "<upload>")]
-pub fn single_upload(upload: Form<Upload<'_>>) {
+pub fn single_upload(upload: Form<Upload<'_>>) -> String {
     let upload = upload.into_inner();
 
     if upload.save {
@@ -35,12 +41,15 @@ pub fn single_upload(upload: Form<Upload<'_>>) {
 
         // 将文件名追加到保存文件夹路径中
         save_path.push(file_name.dangerous_unsafe_unsanitized_raw().as_str());
+        let return_path = save_path.clone();
 
         // 尝试将临时文件移动到指定路径
         fs::rename(upload.file.path().unwrap(), save_path).expect("Failed to save file");
+        return_path.into_os_string().into_string().unwrap()
     } else {
         // 如果不保存文件，您可以选择删除临时文件
         std::fs::remove_file(upload.file.path().unwrap()).expect("Failed to remove file");
+        String::from("None")
     }
 }
 // 检查文件夹是否存在
