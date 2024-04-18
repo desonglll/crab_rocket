@@ -1,6 +1,7 @@
 pub mod common;
 pub mod employee_route;
 pub mod follow_route;
+pub mod info_route;
 pub mod models;
 pub mod post_route;
 pub mod role_route;

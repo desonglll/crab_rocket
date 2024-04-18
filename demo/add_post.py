@@ -1,6 +1,8 @@
-import requests
 import random
-import json
+from faker import Faker
+import requests
+
+fake = Faker()
 
 
 def send_post_request(url, data):
@@ -15,20 +17,9 @@ def send_post_request(url, data):
 
 
 def generate_random_data():
-    title = "".join(
-        random.choices(
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ",
-            k=random.randint(5, 20),
-        )
-    )
-    body = "".join(
-        random.choices(
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ",
-            k=random.randint(20, 100),
-        )
-    )
-    # user_id = random.randint(1, 100)
-    user_id = 1
+    title = fake.sentence(nb_words=random.randint(2, 6), variable_nb_words=True)
+    body = fake.paragraph(nb_sentences=random.randint(2, 6), variable_nb_sentences=True)
+    user_id = random.randint(1, 1)
     return {"title": title, "body": body, "user_id": user_id}
 
 
