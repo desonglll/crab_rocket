@@ -1,4 +1,3 @@
-use crate::models::info::task_info::TaskInfo;
 use crate::models::task::{NewTask, PatchTask, Task};
 use crate::routes::models::task_param::TaskParam;
 use crate::schema::tasks::dsl::*; //配合下面的 `tasks.filter()`
@@ -9,12 +8,17 @@ use diesel::prelude::*;
 /// Inserts a task into the database.
 /// GOOD:
 pub fn insert_task(conn: &mut PgConnection, task: &NewTask) -> Result<Task, diesel::result::Error> {
-    let inserted_task = diesel::insert_into(tasks::table)
+    match diesel::insert_into(tasks::table)
         .values(task)
         .returning(Task::as_returning())
         .get_result(conn)
-        .expect("Error saving new task");
-    Ok(inserted_task)
+    {
+        Ok(inserted_task) => Ok(inserted_task),
+        Err(e) => {
+            println!("{e:?}");
+            Err(e)
+        }
+    }
 }
 
 // GOOD:
@@ -23,12 +27,17 @@ pub fn insert_full_single_task(
     task: &Task,
 ) -> Result<Task, diesel::result::Error> {
     if !check_exist_task_by_id(conn, task.id) {
-        let inserted_task = diesel::insert_into(tasks::table)
+        match diesel::insert_into(tasks::table)
             .values(task)
             .returning(Task::as_returning())
             .get_result(conn)
-            .expect("Error saving new task");
-        Ok(inserted_task)
+        {
+            Ok(inserted_task) => Ok(inserted_task),
+            Err(e) => {
+                println!("{e:?}");
+                Err(e)
+            }
+        }
     } else {
         Err(diesel::result::Error::NotFound)
     }
@@ -91,7 +100,7 @@ pub fn check_exist_task_by_id(conn: &mut PgConnection, t_id: i32) -> bool {
 pub fn fetch_tasks_by_params(
     conn: &mut PgConnection,
     params: &TaskParam,
-) -> (Result<Vec<Task>, diesel::result::Error>, TaskInfo) {
+) -> Result<Vec<Task>, diesel::result::Error> {
     let mut query = tasks.into_boxed();
     if let Some(uid) = params.user_id {
         if uid != 0 {
@@ -108,8 +117,7 @@ pub fn fetch_tasks_by_params(
             query = query.offset(offset.into());
         }
     }
-    let count: i64 = tasks.count().first(conn).expect("Error counting tasks");
-    (query.load::<Task>(conn), TaskInfo { count: count })
+    query.load::<Task>(conn)
 }
 #[cfg(test)]
 mod tests {
@@ -218,7 +226,7 @@ mod tests {
                     limit: Some(10),
                     offset: Some(0),
                 };
-                match fetch_tasks_by_params(&mut conn, &param).0 {
+                match fetch_tasks_by_params(&mut conn, &param) {
                     Ok(filtered_tasks) => println!("{filtered_tasks:?}"),
                     Err(_) => println!("Err"),
                 }

@@ -39,6 +39,8 @@ CREATE TABLE "employee_table" (
   "postal_code" varchar(255) DEFAULT '',
   "valid" bool DEFAULT true,
   "last_update" timestamp DEFAULT CURRENT_TIMESTAMP,
+  "role_name" varchar(255) DEFAULT NULL,
+  "role_id" int4 DEFAULT NULL,
   PRIMARY KEY ("employee_id"),
   CONSTRAINT "employee_name" UNIQUE ("employee_name")
 );
@@ -61,6 +63,17 @@ CREATE TABLE "posts" (
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "username" varchar(255),
   PRIMARY KEY ("post_id")
+);
+
+CREATE TABLE "role_table" (
+  "role_id" serial,
+  "role_name" varchar(255) NOT NULL,
+  "description" varchar(255) DEFAULT '',
+  "permissions" varchar(255) DEFAULT '',
+  "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("role_id"),
+  CONSTRAINT "role_name" UNIQUE ("role_name")
 );
 
 CREATE TABLE "tasks" (
@@ -94,6 +107,8 @@ ALTER TABLE "department_table" ADD CONSTRAINT "mananger_id" FOREIGN KEY ("manage
 ALTER TABLE "department_table" ADD CONSTRAINT "parent_department_id" FOREIGN KEY ("parent_department_id") REFERENCES "department_table" ("department_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "employee_table" ADD CONSTRAINT "department_id" FOREIGN KEY ("department_id") REFERENCES "department_table" ("department_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "employee_table" ADD CONSTRAINT "mananger_id" FOREIGN KEY ("manager_id") REFERENCES "employee_table" ("employee_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "employee_table" ADD CONSTRAINT "role_name" FOREIGN KEY ("role_name") REFERENCES "role_table" ("role_name") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "employee_table" ADD CONSTRAINT "role_id" FOREIGN KEY ("role_id") REFERENCES "role_table" ("role_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "follows" ADD CONSTRAINT "following_user_id" FOREIGN KEY ("following_user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "follows" ADD CONSTRAINT "followed_user_id" FOREIGN KEY ("followed_user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "posts" ADD CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;

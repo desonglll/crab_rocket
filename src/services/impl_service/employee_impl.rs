@@ -3,10 +3,7 @@ use crate::{
     mappers::employee_mapper::{
         self, delete_employee_by_id, insert_employee, update_employee_by_id,
     },
-    models::{
-        employee::{Employee, NewEmployee},
-        info::employee_info::EmployeeInfo,
-    },
+    models::employee::{Employee, NewEmployee},
     services::employee_service::GetEmployee,
 };
 
@@ -43,24 +40,18 @@ impl GetEmployee for Employee {
     }
     fn filter_employee_by_params(
         params: &crate::routes::models::employee_param::EmployeeParam,
-    ) -> (
-        Result<Vec<Employee>, Box<dyn std::error::Error>>,
-        crate::models::info::employee_info::EmployeeInfo,
-    ) {
+    ) -> Result<Vec<Employee>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match employee_mapper::fetch_employee_by_params(&mut conn, params).0 {
-                Ok(filtered_emp) => (
-                    Ok(filtered_emp),
-                    employee_mapper::fetch_employee_by_params(&mut conn, params).1,
-                ),
+            Ok(mut conn) => match employee_mapper::fetch_employee_by_params(&mut conn, params) {
+                Ok(filtered_emp) => Ok(filtered_emp),
                 Err(e) => {
                     println!("{e:?}");
-                    (Err(Box::new(e)), EmployeeInfo::new_empty())
+                    Err(Box::new(e))
                 }
             },
             Err(e) => {
                 println!("{e:?}");
-                (Err(Box::new(e)), EmployeeInfo::new_empty())
+                Err(Box::new(e))
             }
         }
     }

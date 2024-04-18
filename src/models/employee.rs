@@ -26,6 +26,8 @@ pub struct Employee {
     pub postal_code: Option<String>,
     pub valid: Option<bool>,
     pub last_update: Option<chrono::NaiveDateTime>,
+    pub role_name: Option<String>,
+    pub role_id: Option<i32>,
 }
 
 impl Employee {
@@ -50,6 +52,8 @@ impl Employee {
             postal_code: None,
             valid: None,
             last_update: None,
+            role_name: None,
+            role_id: None,
         }
     }
 }
@@ -77,6 +81,8 @@ pub struct NewEmployee {
     pub state: Option<String>,
     pub postal_code: Option<String>,
     pub valid: Option<bool>,
+    pub role_name: Option<String>,
+    pub role_id: Option<i32>,
 }
 
 impl NewEmployee {
@@ -99,6 +105,8 @@ impl NewEmployee {
             state: None,
             postal_code: None,
             valid: None,
+            role_name: None,
+            role_id: None,
         }
     }
 }
@@ -126,6 +134,8 @@ pub struct PatchEmployee {
     pub state: Option<String>,
     pub postal_code: Option<String>,
     pub valid: Option<bool>,
+    pub role_name: Option<String>,
+    pub role_id: Option<i32>,
 }
 
 impl PatchEmployee {
@@ -148,6 +158,8 @@ impl PatchEmployee {
             state: None,
             postal_code: None,
             valid: None,
+            role_name: None,
+            role_id: None,
         }
     }
 }

@@ -1,8 +1,4 @@
-use crate::{
-    establish_pg_connection,
-    mappers::post_mapper,
-    models::{info::post_info::PostInfo, post::Post},
-};
+use crate::{establish_pg_connection, mappers::post_mapper, models::post::Post};
 
 impl crate::services::post_service::GetPost for Post {
     // GOOD:
@@ -93,21 +89,18 @@ impl crate::services::post_service::GetPost for Post {
     }
     fn filter_posts_by_params(
         params: &crate::routes::models::post_param::PostParam,
-    ) -> (Result<Vec<Post>, Box<dyn std::error::Error>>, PostInfo) {
+    ) -> Result<Vec<Post>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::fetch_posts_by_params(&mut conn, params).0 {
-                Ok(filtered_post) => (
-                    Ok(filtered_post),
-                    post_mapper::fetch_posts_by_params(&mut conn, params).1,
-                ),
+            Ok(mut conn) => match post_mapper::fetch_posts_by_params(&mut conn, params) {
+                Ok(filtered_post) => Ok(filtered_post),
                 Err(e) => {
                     println!("{e:?}");
-                    (Err(Box::new(e)), PostInfo::new_empty())
+                    Err(Box::new(e))
                 }
             },
             Err(e) => {
                 println!("{e:?}");
-                (Err(Box::new(e)), PostInfo::new_empty())
+                Err(Box::new(e))
             }
         }
     }
@@ -198,7 +191,7 @@ mod test {
             offset: Some(0),
             limit: Some(0),
         };
-        match Post::filter_posts_by_params(&params).0 {
+        match Post::filter_posts_by_params(&params) {
             Ok(posts) => {
                 println!("{posts:?}");
             }

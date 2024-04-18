@@ -112,14 +112,11 @@ pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
 )]
 #[post("/post/filter", data = "<params>")]
 pub fn get_posts_by_params(params: Json<PostParam>) -> Json<serde_json::Value> {
-    let (code, message, (post, info)) = post_controller::get_post_by_params_controller(&params);
+    let (code, message, post) = post_controller::get_post_by_params_controller(&params);
     let response = serde_json::from_value(json!({
         "code":code,
         "message":message,
-        "data":{
-            "posts":post,
-            "info":info
-        }
+        "data":post,
     }))
     .unwrap();
     Json(response)

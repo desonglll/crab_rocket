@@ -1,4 +1,3 @@
-use crate::models::info::post_info::PostInfo;
 use crate::models::post::{NewPost, PatchPost, Post};
 use crate::routes::models::post_param::PostParam;
 use crate::schema::posts::dsl::*; //配合下面的 `posts.filter()`
@@ -54,7 +53,7 @@ pub fn delete_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diese
 pub fn fetch_posts_by_params(
     conn: &mut PgConnection,
     params: &PostParam,
-) -> (Result<Vec<Post>, diesel::result::Error>, PostInfo) {
+) -> Result<Vec<Post>, diesel::result::Error> {
     let mut query = posts.into_boxed();
 
     if let Some(uid) = params.user_id {
@@ -73,8 +72,7 @@ pub fn fetch_posts_by_params(
         }
     }
     let filtered_posts = query.order(posts::updated_at.desc()).load::<Post>(conn);
-    let count: i64 = posts.count().first(conn).expect("Error counting posts");
-    (filtered_posts, PostInfo { count })
+    filtered_posts
 }
 pub fn get_count(conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
     let count: i64 = posts.count().first(conn).expect("Error counting posts");
@@ -189,7 +187,7 @@ mod tests {
             offset: None,
         };
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_posts_by_params(&mut conn, &params).0 {
+            Ok(mut conn) => match fetch_posts_by_params(&mut conn, &params) {
                 Ok(u_posts) => {
                     println!("{u_posts:?}")
                 }

@@ -1,8 +1,5 @@
 use crate::{
-    models::{
-        info::post_info::PostInfo,
-        post::{NewPost, PatchPost, Post},
-    },
+    models::post::{NewPost, PatchPost, Post},
     routes::models::post_param::PostParam,
     services::post_service::GetPost,
 };
@@ -56,20 +53,12 @@ pub fn delete_post_by_id_controller(id: i32) -> (i32, String, Post) {
     }
 }
 
-pub fn get_post_by_params_controller(params: &PostParam) -> (i32, String, (Vec<Post>, PostInfo)) {
-    match Post::filter_posts_by_params(params).0 {
-        Ok(filtered_posts) => (
-            200,
-            String::from("GET POST BY PARAMS OK"),
-            (filtered_posts, Post::filter_posts_by_params(params).1),
-        ),
+pub fn get_post_by_params_controller(params: &PostParam) -> (i32, String, Vec<Post>) {
+    match Post::filter_posts_by_params(params) {
+        Ok(filtered_posts) => (200, String::from("GET POST BY PARAMS OK"), filtered_posts),
         Err(e) => {
             println!("{e:?}");
-            (
-                204,
-                String::from("GET POST BY PARAMS ERROR"),
-                (Vec::new(), PostInfo::new_empty()),
-            )
+            (204, String::from("GET POST BY PARAMS ERROR"), Vec::new())
         }
     }
 }

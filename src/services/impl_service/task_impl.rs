@@ -1,6 +1,5 @@
 use crate::establish_pg_connection;
 use crate::mappers::task_mapper;
-use crate::models::info::task_info::TaskInfo;
 use crate::models::task::{NewTask, Task};
 use crate::services::task_service;
 impl task_service::GetTask for Task {
@@ -117,35 +116,29 @@ impl task_service::GetTask for Task {
     }
     fn filter_tasks_by_params(
         params: &crate::routes::models::task_param::TaskParam,
-    ) -> (Result<Vec<Task>, Box<dyn std::error::Error>>, TaskInfo) {
+    ) -> Result<Vec<Task>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                match task_mapper::fetch_tasks_by_params(&mut conn, params).0 {
+                match task_mapper::fetch_tasks_by_params(&mut conn, params) {
                     Ok(filtered_tasks) => {
                         if filtered_tasks.len() != 0 {
-                            (
-                                Ok(filtered_tasks),
-                                task_mapper::fetch_tasks_by_params(&mut conn, params).1,
-                            )
+                            Ok(filtered_tasks)
                         } else {
                             println!("Empty query.");
-                            (
-                                Err(Box::new(diesel::result::Error::NotFound)),
-                                TaskInfo::new_empty(),
-                            )
+                            Err(Box::new(diesel::result::Error::NotFound))
                         }
                     }
                     Err(e) => {
                         // panic!("oWo! Please add task first!");
 
                         println!("{e:?}");
-                        (Err(Box::new(e)), TaskInfo::new_empty())
+                        Err(Box::new(e))
                     }
                 }
             }
             Err(e) => {
                 println!("{e:?}");
-                (Err(Box::new(e)), TaskInfo::new_empty())
+                Err(Box::new(e))
             }
         }
     }

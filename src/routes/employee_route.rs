@@ -55,15 +55,11 @@ pub fn delete_employee_by_id(id: i32) -> Json<serde_json::Value> {
 )]
 #[post("/employee/filter", data = "<params>")]
 pub fn get_employee_by_params(params: Json<EmployeeParam>) -> Json<serde_json::Value> {
-    let (code, message, (emp, info)) =
-        employee_controller::get_employee_by_params_controller(&params);
+    let (code, message, emp) = employee_controller::get_employee_by_params_controller(&params);
     let response = serde_json::from_value(json!({
         "code":code,
         "message":message,
-        "data":{
-            "employees":emp,
-            "info":info
-        }
+        "data":emp,
     }))
     .unwrap();
     Json(response)

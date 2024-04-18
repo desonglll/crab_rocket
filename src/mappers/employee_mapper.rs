@@ -1,5 +1,4 @@
 use crate::models::employee::{Employee, NewEmployee, PatchEmployee};
-use crate::models::info::employee_info::EmployeeInfo;
 use crate::routes::models::employee_param::EmployeeParam;
 use crate::schema::employee_table::{self, dsl::*};
 use crate::utils::time::get_e8_time;
@@ -64,6 +63,8 @@ pub fn update_employee_by_id(
             employee_table::postal_code.eq(emp.postal_code.clone()),
             employee_table::valid.eq(emp.valid.clone()),
             employee_table::last_update.eq(get_e8_time()),
+            employee_table::role_name.eq(emp.role_name.clone()),
+            employee_table::role_id.eq(emp.role_id.clone()),
         ))
         .get_result(conn)
 }
@@ -71,7 +72,7 @@ pub fn update_employee_by_id(
 pub fn fetch_employee_by_params(
     conn: &mut PgConnection,
     params: &EmployeeParam,
-) -> (Result<Vec<Employee>, diesel::result::Error>, EmployeeInfo) {
+) -> Result<Vec<Employee>, diesel::result::Error> {
     let mut query = employee_table.into_boxed();
 
     if let Some(emp_id) = params.employee_id {
@@ -92,11 +93,8 @@ pub fn fetch_employee_by_params(
     let filtered_emp = query
         .order(employee_table::employee_id.asc())
         .load::<Employee>(conn);
-    let count: i64 = employee_table
-        .count()
-        .first(conn)
-        .expect("Error counting employees");
-    (filtered_emp, EmployeeInfo { count })
+
+    filtered_emp
 }
 
 #[cfg(test)]
@@ -139,7 +137,7 @@ mod test {
             offset: None,
         };
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_employee_by_params(&mut conn, &params).0 {
+            Ok(mut conn) => match fetch_employee_by_params(&mut conn, &params) {
                 Ok(u_posts) => {
                     println!("{u_posts:?}")
                 }
@@ -172,6 +170,8 @@ mod test {
             state: Some("Anystate".to_string()),
             postal_code: Some("12345".to_string()),
             valid: Some(true),
+            role_name: Some("admin".to_string()),
+            role_id: Some(1),
         };
         match establish_pg_connection() {
             Ok(mut conn) => match update_employee_by_id(&mut conn, 5, &updated_emp) {

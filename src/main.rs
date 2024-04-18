@@ -2,7 +2,8 @@
 extern crate rocket;
 
 use crab_rocket::routes::{
-    common, employee_route, follow_route, post_route, task_route, upload_route, user_route,
+    common, employee_route, follow_route, post_route, role_route, task_route, upload_route,
+    user_route,
 };
 
 use rocket::http::Method;
@@ -79,7 +80,10 @@ fn rocket() -> _ {
                 employee_route::get_employee_by_params,
                 employee_route::update_employee_by_id,
                 // upload
-                upload_route::single_upload
+                upload_route::single_upload,
+                // role routes
+                role_route::insert_role,
+                role_route::get_all_roles
             ],
         )
         .attach(cors)

@@ -62,6 +62,9 @@ diesel::table! {
         postal_code -> Nullable<Varchar>,
         valid -> Nullable<Bool>,
         last_update -> Nullable<Timestamp>,
+        #[max_length = 255]
+        role_name -> Nullable<Varchar>,
+        role_id -> Nullable<Int4>,
     }
 }
 
@@ -87,6 +90,20 @@ diesel::table! {
         updated_at -> Nullable<Timestamp>,
         #[max_length = 255]
         username -> Nullable<Varchar>,
+    }
+}
+
+diesel::table! {
+    role_table (role_id) {
+        role_id -> Int4,
+        #[max_length = 255]
+        role_name -> Varchar,
+        #[max_length = 255]
+        description -> Nullable<Varchar>,
+        #[max_length = 255]
+        permissions -> Nullable<Varchar>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
     }
 }
 
@@ -131,6 +148,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     employee_table,
     follows,
     posts,
+    role_table,
     tasks,
     users,
 );
