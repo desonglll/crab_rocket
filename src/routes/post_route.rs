@@ -122,4 +122,6 @@ pub fn get_posts_by_params(params: Json<PostParam>) -> Json<serde_json::Value> {
     Json(response)
 }
 #[options("/post/filter")]
-pub fn options_post_filter() -> Status { Status::Ok }
+pub fn options_post_filter() -> Status {
+    Status::Ok
+}

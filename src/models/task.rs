@@ -55,8 +55,12 @@ impl Task {
         }
     }
 
-    pub fn get_title(&self) -> String { self.title.clone() }
-    pub fn get_content(&self) -> Option<String> { self.content.clone() }
+    pub fn get_title(&self) -> String {
+        self.title.clone()
+    }
+    pub fn get_content(&self) -> Option<String> {
+        self.content.clone()
+    }
 }
 
 impl Display for Task {

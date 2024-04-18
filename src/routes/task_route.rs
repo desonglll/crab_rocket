@@ -157,7 +157,9 @@ pub fn get_tasks_by_params(
 }
 
 #[get("/")]
-pub fn index() -> &'static str { "hello world!" }
+pub fn index() -> &'static str {
+    "hello world!"
+}
 
 #[get("/test")]
 pub fn demo() -> Json<serde_json::Value> {
@@ -176,4 +178,6 @@ pub fn demo() -> Json<serde_json::Value> {
 }
 
 #[options("/task/filter")]
-pub fn options_task_filter() -> Status { Status::Ok }
+pub fn options_task_filter() -> Status {
+    Status::Ok
+}

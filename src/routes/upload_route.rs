@@ -53,4 +53,6 @@ pub fn single_upload(upload: Form<Upload<'_>>) -> String {
     }
 }
 // 检查文件夹是否存在
-fn folder_exists(path: &str) -> bool { fs::metadata(path).is_ok() }
+fn folder_exists(path: &str) -> bool {
+    fs::metadata(path).is_ok()
+}
