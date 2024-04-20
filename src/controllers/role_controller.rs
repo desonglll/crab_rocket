@@ -6,7 +6,7 @@ use crate::{
 pub fn insert_role_controller(new_role: &mut NewRole) -> (i32, String, Role) {
     match Role::insert_role(&new_role.clone()) {
         Ok(result_task) => (201, String::from("Created"), result_task),
-        Err(e) => (204, e.to_string(), Role::new_empty()),
+        Err(e) => (204, e.to_string(), Role::default()),
     }
 }
 

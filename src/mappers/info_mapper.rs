@@ -13,12 +13,7 @@ pub fn get_info(conn: &mut PgConnection) -> Result<Info, diesel::result::Error> 
     let task_count: i64 = tasks.select(count_star()).first(conn)?;
     let user_count: i64 = users.select(count_star()).first(conn)?;
 
-    let info = Info {
-        post_count,
-        employee_count,
-        task_count,
-        user_count,
-    };
+    let info = Info::new(post_count, employee_count, task_count, user_count);
     Ok(info)
 }
 

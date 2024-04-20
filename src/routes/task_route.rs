@@ -61,13 +61,13 @@ pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Val
 #[put("/task/<id>", data = "<task>")]
 pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
     //Convert a patch task json to a put task json which include `id`.
-    let put_task = PutTask {
+    let put_task = PutTask::new(
         id,
-        title: task.title.clone(),
-        content: task.content.clone(),
-        updated_at: Some(get_e8_time()),
-        user_id: task.user_id,
-    };
+        task.title().to_string(),
+        task.content().clone(),
+        Some(get_e8_time()),
+        task.user_id(),
+    );
     let (code, message, task) = task_controller::put_task_by_id_controller(id, &put_task.into());
     println!("{task:?}");
     let response = serde_json::from_value(json!({

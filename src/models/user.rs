@@ -3,25 +3,23 @@ use rocket::serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use utoipa::ToSchema;
 
-use crate::utils::time::get_e8_time;
-
-#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
-    pub user_id: i32,
-    pub username: String,
-    pub role: Option<String>,
-    pub created_at: Option<chrono::NaiveDateTime>,
-    pub email: Option<String>,
-    pub password: String,
-    pub fullname: Option<String>,
-    pub avatar_url: Option<String>,
-    pub bio: Option<String>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
-    pub mobile_phone: String,
+    user_id: i32,
+    username: String,
+    role: Option<String>,
+    created_at: Option<chrono::NaiveDateTime>,
+    email: Option<String>,
+    password: String,
+    fullname: Option<String>,
+    avatar_url: Option<String>,
+    bio: Option<String>,
+    updated_at: Option<chrono::NaiveDateTime>,
+    mobile_phone: String,
 }
 
 impl User {
@@ -38,7 +36,7 @@ impl User {
         updated_at: Option<chrono::NaiveDateTime>,
         mobile_phone: String,
     ) -> Self {
-        User {
+        Self {
             user_id,
             username,
             role,
@@ -52,21 +50,71 @@ impl User {
             mobile_phone,
         }
     }
-
-    pub fn new_empty() -> Self {
-        User {
-            user_id: -1,
-            username: String::from(""),
-            role: Some(String::from("")),
-            created_at: Some(get_e8_time()),
-            email: Some(String::from("")),
-            password: String::from(""),
-            fullname: Some(String::from("")),
-            avatar_url: Some(String::from("")),
-            bio: Some(String::from("")),
-            updated_at: Some(get_e8_time()),
-            mobile_phone: String::from(""),
-        }
+    pub fn user_id(&self) -> i32 {
+        self.user_id
+    }
+    pub fn username(&self) -> &str {
+        &self.username
+    }
+    pub fn role(&self) -> &Option<String> {
+        &self.role
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn email(&self) -> &Option<String> {
+        &self.email
+    }
+    pub fn password(&self) -> &str {
+        &self.password
+    }
+    pub fn fullname(&self) -> &Option<String> {
+        &self.fullname
+    }
+    pub fn avatar_url(&self) -> &Option<String> {
+        &self.avatar_url
+    }
+    pub fn bio(&self) -> &Option<String> {
+        &self.bio
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn mobile_phone(&self) -> &str {
+        &self.mobile_phone
+    }
+    pub fn set_user_id(&mut self, user_id: i32) {
+        self.user_id = user_id;
+    }
+    pub fn set_username(&mut self, username: String) {
+        self.username = username;
+    }
+    pub fn set_role(&mut self, role: Option<String>) {
+        self.role = role;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_email(&mut self, email: Option<String>) {
+        self.email = email;
+    }
+    pub fn set_password(&mut self, password: String) {
+        self.password = password;
+    }
+    pub fn set_fullname(&mut self, fullname: Option<String>) {
+        self.fullname = fullname;
+    }
+    pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
+        self.avatar_url = avatar_url;
+    }
+    pub fn set_bio(&mut self, bio: Option<String>) {
+        self.bio = bio;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
+    }
+    pub fn set_mobile_phone(&mut self, mobile_phone: String) {
+        self.mobile_phone = mobile_phone;
     }
 }
 
@@ -88,26 +136,10 @@ impl Display for User {
         )
     }
 }
-impl Into<PatchUser> for User {
-    fn into(self) -> PatchUser {
-        PatchUser {
-            username: self.username,
-            role: self.role,
-            created_at: self.created_at,
-            email: self.email,
-            password: self.password,
-            fullname: self.fullname,
-            avatar_url: self.avatar_url,
-            bio: self.bio,
-            updated_at: self.updated_at,
-            mobile_phone: self.mobile_phone,
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
-#[derive(Queryable, Selectable, Insertable)]
+#[derive(Queryable, Selectable, Insertable, Default)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewUser {
@@ -136,7 +168,7 @@ impl NewUser {
         updated_at: Option<chrono::NaiveDateTime>,
         mobile_phone: String,
     ) -> Self {
-        NewUser {
+        Self {
             username,
             role,
             created_at,
@@ -149,41 +181,84 @@ impl NewUser {
             mobile_phone,
         }
     }
-}
-
-impl Into<PatchUser> for NewUser {
-    fn into(self) -> PatchUser {
-        PatchUser {
-            username: self.username,
-            role: self.role,
-            created_at: self.created_at,
-            email: self.email,
-            password: self.password,
-            fullname: self.fullname,
-            avatar_url: self.avatar_url,
-            bio: self.bio,
-            updated_at: self.updated_at,
-            mobile_phone: self.mobile_phone,
-        }
+    pub fn username(&self) -> &str {
+        &self.username
+    }
+    pub fn role(&self) -> &Option<String> {
+        &self.role
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn email(&self) -> &Option<String> {
+        &self.email
+    }
+    pub fn password(&self) -> &str {
+        &self.password
+    }
+    pub fn fullname(&self) -> &Option<String> {
+        &self.fullname
+    }
+    pub fn avatar_url(&self) -> &Option<String> {
+        &self.avatar_url
+    }
+    pub fn bio(&self) -> &Option<String> {
+        &self.bio
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn mobile_phone(&self) -> &str {
+        &self.mobile_phone
+    }
+    pub fn set_username(&mut self, username: String) {
+        self.username = username;
+    }
+    pub fn set_role(&mut self, role: Option<String>) {
+        self.role = role;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_email(&mut self, email: Option<String>) {
+        self.email = email;
+    }
+    pub fn set_password(&mut self, password: String) {
+        self.password = password;
+    }
+    pub fn set_fullname(&mut self, fullname: Option<String>) {
+        self.fullname = fullname;
+    }
+    pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
+        self.avatar_url = avatar_url;
+    }
+    pub fn set_bio(&mut self, bio: Option<String>) {
+        self.bio = bio;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
+    }
+    pub fn set_mobile_phone(&mut self, mobile_phone: String) {
+        self.mobile_phone = mobile_phone;
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchUser {
-    pub username: String,
-    pub role: Option<String>,
-    pub created_at: Option<chrono::NaiveDateTime>,
-    pub email: Option<String>,
-    pub password: String,
-    pub fullname: Option<String>,
-    pub avatar_url: Option<String>,
-    pub bio: Option<String>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
-    pub mobile_phone: String,
+    username: String,
+    role: Option<String>,
+    created_at: Option<chrono::NaiveDateTime>,
+    email: Option<String>,
+    password: String,
+    fullname: Option<String>,
+    avatar_url: Option<String>,
+    bio: Option<String>,
+    updated_at: Option<chrono::NaiveDateTime>,
+    mobile_phone: String,
 }
 
 impl PatchUser {
@@ -199,7 +274,7 @@ impl PatchUser {
         updated_at: Option<chrono::NaiveDateTime>,
         mobile_phone: String,
     ) -> Self {
-        PatchUser {
+        Self {
             username,
             role,
             created_at,
@@ -212,25 +287,71 @@ impl PatchUser {
             mobile_phone,
         }
     }
-
-    pub fn new_empty() -> Self {
-        PatchUser {
-            username: String::from(""),
-            role: Some(String::from("")),
-            created_at: Some(get_e8_time()),
-            email: Some(String::from("")),
-            password: String::from(""),
-            fullname: Some(String::from("")),
-            avatar_url: Some(String::from("")),
-            bio: Some(String::from("")),
-            updated_at: Some(get_e8_time()),
-            mobile_phone: String::from(""),
-        }
+    pub fn username(&self) -> &str {
+        &self.username
+    }
+    pub fn role(&self) -> &Option<String> {
+        &self.role
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn email(&self) -> &Option<String> {
+        &self.email
+    }
+    pub fn password(&self) -> &str {
+        &self.password
+    }
+    pub fn fullname(&self) -> &Option<String> {
+        &self.fullname
+    }
+    pub fn avatar_url(&self) -> &Option<String> {
+        &self.avatar_url
+    }
+    pub fn bio(&self) -> &Option<String> {
+        &self.bio
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn mobile_phone(&self) -> &str {
+        &self.mobile_phone
+    }
+    pub fn set_username(&mut self, username: String) {
+        self.username = username;
+    }
+    pub fn set_role(&mut self, role: Option<String>) {
+        self.role = role;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_email(&mut self, email: Option<String>) {
+        self.email = email;
+    }
+    pub fn set_password(&mut self, password: String) {
+        self.password = password;
+    }
+    pub fn set_fullname(&mut self, fullname: Option<String>) {
+        self.fullname = fullname;
+    }
+    pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
+        self.avatar_url = avatar_url;
+    }
+    pub fn set_bio(&mut self, bio: Option<String>) {
+        self.bio = bio;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
+    }
+    pub fn set_mobile_phone(&mut self, mobile_phone: String) {
+        self.mobile_phone = mobile_phone;
     }
 }
+
+
 #[cfg(test)]
 mod test {
-
     #[test]
     fn test_user_new() {
         use super::User;

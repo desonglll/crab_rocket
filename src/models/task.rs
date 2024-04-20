@@ -5,29 +5,18 @@ use utoipa::ToSchema;
 
 use crate::utils::time::get_e8_time;
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::tasks)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Task {
-    pub id: i32,
-    pub title: String,
-    pub content: Option<String>,
-    pub created_at: Option<chrono::NaiveDateTime>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
-    pub user_id: Option<i32>,
-}
-
-#[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
-#[serde(crate = "rocket::serde")]
-#[diesel(table_name = crate::schema::tasks)]
-pub struct NewTask {
-    pub title: String,
-    pub content: Option<String>,
-    pub created_at: Option<chrono::NaiveDateTime>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
-    pub user_id: Option<i32>,
+    id: i32,
+    title: String,
+    content: Option<String>,
+    created_at: Option<chrono::NaiveDateTime>,
+    updated_at: Option<chrono::NaiveDateTime>,
+    user_id: Option<i32>,
 }
 
 impl Task {
@@ -38,28 +27,44 @@ impl Task {
             content,
             created_at: Some(get_e8_time()),
             updated_at: Some(get_e8_time()),
-            user_id, /* created_at:
-                      * Some(chrono::Local::now().with_timezone(&Shanghai).naive_utc()),
-                      * updated_at:
-                      * Some(chrono::Local::now().with_timezone(&Shanghai).naive_utc()), */
+            user_id,
         }
     }
-    pub fn new_empty() -> Self {
-        Task {
-            id: -1,
-            title: String::new(),
-            content: String::new().into(),
-            created_at: Some(get_e8_time()),
-            updated_at: Some(get_e8_time()),
-            user_id: Some(-1),
-        }
+    pub fn id(&self) -> i32 {
+        self.id
     }
-
-    pub fn get_title(&self) -> String {
-        self.title.clone()
+    pub fn title(&self) -> &str {
+        &self.title
     }
-    pub fn get_content(&self) -> Option<String> {
-        self.content.clone()
+    pub fn content(&self) -> &Option<String> {
+        &self.content
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn user_id(&self) -> Option<i32> {
+        self.user_id
+    }
+    pub fn set_id(&mut self, id: i32) {
+        self.id = id;
+    }
+    pub fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+    pub fn set_content(&mut self, content: Option<String>) {
+        self.content = content;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
+    }
+    pub fn set_user_id(&mut self, user_id: Option<i32>) {
+        self.user_id = user_id;
     }
 }
 
@@ -75,6 +80,17 @@ impl Display for Task {
             self.updated_at.unwrap()
         )
     }
+}
+
+#[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+#[diesel(table_name = crate::schema::tasks)]
+pub struct NewTask {
+    title: String,
+    content: Option<String>,
+    created_at: Option<chrono::NaiveDateTime>,
+    updated_at: Option<chrono::NaiveDateTime>,
+    user_id: Option<i32>,
 }
 
 impl NewTask {
@@ -93,15 +109,45 @@ impl NewTask {
             user_id,
         }
     }
+    pub fn title(&self) -> &str {
+        &self.title
+    }
+    pub fn content(&self) -> &Option<String> {
+        &self.content
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn user_id(&self) -> Option<i32> {
+        self.user_id
+    }
+    pub fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+    pub fn set_content(&mut self, content: Option<String>) {
+        self.content = content;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
+    }
+    pub fn set_user_id(&mut self, user_id: Option<i32>) {
+        self.user_id = user_id;
+    }
 }
 
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crate::schema::tasks)]
 pub struct PatchTask {
-    pub title: String,
-    pub content: Option<String>,
-    pub user_id: Option<i32>,
+    title: String,
+    content: Option<String>,
+    user_id: Option<i32>,
 }
 
 impl PatchTask {
@@ -111,6 +157,24 @@ impl PatchTask {
             content,
             user_id,
         }
+    }
+    pub fn title(&self) -> &str {
+        &self.title
+    }
+    pub fn content(&self) -> &Option<String> {
+        &self.content
+    }
+    pub fn user_id(&self) -> Option<i32> {
+        self.user_id
+    }
+    pub fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+    pub fn set_content(&mut self, content: Option<String>) {
+        self.content = content;
+    }
+    pub fn set_user_id(&mut self, user_id: Option<i32>) {
+        self.user_id = user_id;
     }
 }
 
@@ -123,6 +187,7 @@ impl Into<PatchTask> for Task {
         }
     }
 }
+
 impl Into<NewTask> for Task {
     fn into(self) -> NewTask {
         NewTask {
@@ -139,28 +204,46 @@ impl Into<NewTask> for Task {
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crate::schema::tasks)]
 pub struct PutTask {
-    pub id: i32,
-    pub title: String,
-    pub content: Option<String>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
-    pub user_id: Option<i32>,
+    id: i32,
+    title: String,
+    content: Option<String>,
+    updated_at: Option<chrono::NaiveDateTime>,
+    user_id: Option<i32>,
 }
 
 impl PutTask {
-    pub fn new(
-        id: i32,
-        title: String,
-        content: Option<String>,
-        updated_at: Option<chrono::NaiveDateTime>,
-        user_id: Option<i32>,
-    ) -> Self {
-        PutTask {
-            id,
-            title,
-            content,
-            updated_at,
-            user_id,
-        }
+    pub fn id(&self) -> i32 {
+        self.id
+    }
+    pub fn title(&self) -> &str {
+        &self.title
+    }
+    pub fn content(&self) -> &Option<String> {
+        &self.content
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn user_id(&self) -> Option<i32> {
+        self.user_id
+    }
+    pub fn set_id(&mut self, id: i32) {
+        self.id = id;
+    }
+    pub fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+    pub fn set_content(&mut self, content: Option<String>) {
+        self.content = content;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
+    }
+    pub fn set_user_id(&mut self, user_id: Option<i32>) {
+        self.user_id = user_id;
+    }
+    pub fn new(id: i32, title: String, content: Option<String>, updated_at: Option<chrono::NaiveDateTime>, user_id: Option<i32>) -> Self {
+        Self { id, title, content, updated_at, user_id }
     }
 }
 
@@ -175,6 +258,7 @@ impl Into<PutTask> for Task {
         }
     }
 }
+
 impl Into<PatchTask> for PutTask {
     fn into(self) -> PatchTask {
         PatchTask {
@@ -184,6 +268,7 @@ impl Into<PatchTask> for PutTask {
         }
     }
 }
+
 impl Into<NewTask> for PutTask {
     fn into(self) -> NewTask {
         NewTask {
@@ -208,6 +293,7 @@ impl Into<Task> for PutTask {
         }
     }
 }
+
 #[cfg(test)]
 mod test {
     #[test]

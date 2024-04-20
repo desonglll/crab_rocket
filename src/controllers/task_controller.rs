@@ -25,22 +25,22 @@ pub fn get_task_by_id_controller(id: i32) -> (i32, String, Task) {
         Ok(task) => (200, String::from("OK"), task),
         Err(e) => {
             println!("{e:?}");
-            (200, e.to_string(), Task::new_empty())
+            (200, e.to_string(), Task::default())
         }
     }
 }
 
 pub fn insert_single_task_controller(raw_task: &mut NewTask) -> (i32, String, Task) {
     // Handle None date time
-    if raw_task.created_at == None {
-        raw_task.created_at = Some(get_e8_time());
+    if raw_task.created_at() == None {
+        raw_task.set_created_at(Some(get_e8_time()));
     }
-    if raw_task.updated_at == None {
-        raw_task.updated_at = Some(get_e8_time());
+    if raw_task.updated_at() == None {
+        raw_task.set_updated_at(Some(get_e8_time()));
     }
     match Task::insert_single_task(&raw_task.clone()) {
         Ok(result_task) => (201, String::from("Created"), result_task),
-        Err(e) => (204, e.to_string(), Task::new_empty()),
+        Err(e) => (204, e.to_string(), Task::default()),
     }
 }
 
@@ -55,7 +55,7 @@ pub fn put_task_by_id_controller(
                 println!("Update all fields.");
                 match Task::update_task_by_id(id, &task.clone().into()) {
                     Ok(task) => (200, String::from("PUT OK"), task),
-                    Err(e) => (204, e.to_string(), Task::new_empty()),
+                    Err(e) => (204, e.to_string(), Task::default()),
                 }
             } else {
                 // Insert a new task if not exists.
@@ -64,11 +64,11 @@ pub fn put_task_by_id_controller(
                     Ok(inserted_new_task) => {
                         (200, String::from("PUT -> INSERT NEW OK"), inserted_new_task)
                     }
-                    Err(e) => (204, e.to_string(), Task::new_empty()),
+                    Err(e) => (204, e.to_string(), Task::default()),
                 }
             }
         }
-        Err(e) => (504, e.to_string(), Task::new_empty()),
+        Err(e) => (504, e.to_string(), Task::default()),
     }
 }
 pub fn update_task_by_id_controller(
@@ -77,14 +77,14 @@ pub fn update_task_by_id_controller(
 ) -> (i32, String, Task) {
     match Task::update_task_by_id(id, patch_task) {
         Ok(patched_task) => (200, String::from("PATCH OK"), patched_task),
-        Err(e) => (204, e.to_string(), Task::new_empty()),
+        Err(e) => (204, e.to_string(), Task::default()),
     }
 }
 
 pub fn delete_task_by_id_controller(id: i32) -> (i32, String, Task) {
     match Task::delete_task_by_id(id) {
         Ok(deleted_task) => (204, String::from("Deleted"), deleted_task),
-        Err(e) => (204, e.to_string(), Task::new_empty()),
+        Err(e) => (204, e.to_string(), Task::default()),
     }
 }
 pub fn get_tasks_by_params_controller(params: &TaskParam) -> (i32, String, Vec<Task>) {

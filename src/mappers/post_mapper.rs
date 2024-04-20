@@ -36,11 +36,11 @@ pub fn update_post_by_id(
 ) -> Result<Post, diesel::result::Error> {
     diesel::update(posts.filter(post_id.eq(id)))
         .set((
-            posts::title.eq(post.title.clone()),
-            posts::body.eq(post.body.clone()),
-            posts::user_id.eq(post.user_id),
-            posts::status.eq(post.status.clone()),
-            posts::created_at.eq(post.created_at.clone()),
+            posts::title.eq(post.title()),
+            posts::body.eq(post.body()),
+            posts::user_id.eq(post.user_id()),
+            posts::status.eq(post.status()),
+            posts::created_at.eq(post.created_at()),
             posts::updated_at.eq(get_e8_time()),
         ))
         .get_result(conn)

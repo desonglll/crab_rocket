@@ -7,7 +7,7 @@ use crate::{
 pub fn create_new_follow_controller(follow: &NewFollow) -> (i32, String, Follow) {
     match Follow::create_new_follow(follow) {
         Ok(inserted_follow) => (200, String::from("CREATE NEW FOLLOW OK"), inserted_follow),
-        Err(e) => (204, e.to_string(), Follow::new_empty()),
+        Err(e) => (204, e.to_string(), Follow::default()),
     }
 }
 
@@ -21,7 +21,7 @@ pub fn get_all_follows_controller() -> (i32, String, Vec<Follow>) {
 pub fn delete_follow_controller(follow: &NewFollow) -> (i32, String, Follow) {
     match Follow::delete_follow(follow) {
         Ok(deleted_follow) => (200, String::from("DELETE FOLLOW OK"), deleted_follow),
-        Err(e) => (204, e.to_string(), Follow::new_empty()),
+        Err(e) => (204, e.to_string(), Follow::default()),
     }
 }
 
@@ -40,7 +40,7 @@ mod test {
 
     #[test]
     fn test_create_new_follow_controller() {
-        let follow = NewFollow::new(2, 3);
+        let follow = NewFollow::new(2, 3, None);
         let (code, message, inserted_follow) = create_new_follow_controller(&follow);
         println!("{code}\n{message}\n{inserted_follow:?}\n");
     }

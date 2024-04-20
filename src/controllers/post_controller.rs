@@ -9,7 +9,7 @@ pub fn insert_single_post_controller(post: &NewPost) -> (i32, String, Post) {
         Ok(result) => (200, String::from("INSERT POST OK"), result),
         Err(e) => {
             println!("{e:?}");
-            (204, e.to_string(), Post::new_empty())
+            (204, e.to_string(), Post::default())
         }
     }
 }
@@ -29,7 +29,7 @@ pub fn get_post_by_id_controller(id: i32) -> (i32, String, Post) {
         Ok(post) => (200, String::from("GET POST BY ID OK"), post),
         Err(e) => {
             println!("{e:?}");
-            (204, e.to_string(), Post::new_empty())
+            (204, e.to_string(), Post::default())
         }
     }
 }
@@ -39,7 +39,7 @@ pub fn update_post_by_id_controller(id: i32, post: &PatchPost) -> (i32, String, 
         Ok(updated_post) => (200, String::from("UPDATE POST BY ID OK"), updated_post),
         Err(e) => {
             println!("{e:?}");
-            (204, e.to_string(), Post::new_empty())
+            (204, e.to_string(), Post::default())
         }
     }
 }
@@ -48,7 +48,7 @@ pub fn delete_post_by_id_controller(id: i32) -> (i32, String, Post) {
         Ok(deleted_post) => (200, String::from("DELETE POST BY ID OK"), deleted_post),
         Err(e) => {
             println!("{e:?}");
-            (204, e.to_string(), Post::new_empty())
+            (204, e.to_string(), Post::default())
         }
     }
 }

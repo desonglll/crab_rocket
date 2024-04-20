@@ -45,26 +45,26 @@ pub fn update_employee_by_id(
 ) -> Result<Employee, diesel::result::Error> {
     diesel::update(employee_table.filter(employee_id.eq(id)))
         .set((
-            employee_table::first_name.eq(emp.first_name.clone()),
-            employee_table::last_name.eq(emp.last_name.clone()),
-            employee_table::employee_name.eq(emp.employee_name.clone()),
-            employee_table::gender.eq(emp.gender.clone()),
-            employee_table::date_of_birth.eq(emp.date_of_birth.clone()),
-            employee_table::hire_date.eq(emp.hire_date.clone()),
-            employee_table::email.eq(emp.email.clone()),
-            employee_table::phone_number.eq(emp.phone_number.clone()),
-            employee_table::department_id.eq(emp.department_id.clone()),
-            employee_table::job_title.eq(emp.job_title.clone()),
-            employee_table::salary.eq(emp.salary.clone()),
-            employee_table::manager_id.eq(emp.manager_id.clone()),
-            employee_table::address.eq(emp.address.clone()),
-            employee_table::city.eq(emp.city.clone()),
-            employee_table::state.eq(emp.state.clone()),
-            employee_table::postal_code.eq(emp.postal_code.clone()),
-            employee_table::valid.eq(emp.valid.clone()),
+            employee_table::first_name.eq(emp.first_name()),
+            employee_table::last_name.eq(emp.last_name()),
+            employee_table::employee_name.eq(emp.employee_name()),
+            employee_table::gender.eq(emp.gender()),
+            employee_table::date_of_birth.eq(emp.date_of_birth()),
+            employee_table::hire_date.eq(emp.hire_date()),
+            employee_table::email.eq(emp.email()),
+            employee_table::phone_number.eq(emp.phone_number()),
+            employee_table::department_id.eq(emp.department_id()),
+            employee_table::job_title.eq(emp.job_title()),
+            employee_table::salary.eq(emp.salary()),
+            employee_table::manager_id.eq(emp.manager_id()),
+            employee_table::address.eq(emp.address()),
+            employee_table::city.eq(emp.city()),
+            employee_table::state.eq(emp.state()),
+            employee_table::postal_code.eq(emp.postal_code()),
+            employee_table::valid.eq(emp.valid()),
             employee_table::last_update.eq(get_e8_time()),
-            employee_table::role_name.eq(emp.role_name.clone()),
-            employee_table::role_id.eq(emp.role_id.clone()),
+            employee_table::role_name.eq(emp.role_name()),
+            employee_table::role_id.eq(emp.role_id()),
         ))
         .get_result(conn)
 }
@@ -108,7 +108,7 @@ mod test {
 
     #[test]
     fn test_insert_employee() {
-        let new_employee = NewEmployee::new_empty("mike");
+        let new_employee = NewEmployee::default();
         match establish_pg_connection() {
             Ok(mut conn) => match insert_employee(&mut conn, &new_employee) {
                 Ok(inserted_employee) => println!("{inserted_employee:?}"),
@@ -152,27 +152,27 @@ mod test {
         use super::*;
         use crate::utils::time::get_e8_time;
 
-        let updated_emp = crate::models::employee::PatchEmployee {
-            employee_name: "John Doe".to_string(),
-            first_name: Some("John".to_string()),
-            last_name: Some("Doe".to_string()),
-            gender: Some("M".to_string()),
-            date_of_birth: Some(get_e8_time()),
-            hire_date: Some(get_e8_time()),
-            email: Some("john.doe@example.com".to_string()),
-            phone_number: Some("+1234567890".to_string()),
-            department_id: Some(1),
-            job_title: Some("Software Engineer".to_string()),
-            salary: Some(1),
-            manager_id: Some(6),
-            address: Some("123 Main St".to_string()),
-            city: Some("Anytown".to_string()),
-            state: Some("Anystate".to_string()),
-            postal_code: Some("12345".to_string()),
-            valid: Some(true),
-            role_name: Some("admin".to_string()),
-            role_id: Some(1),
-        };
+        let updated_emp = crate::models::employee::PatchEmployee::new(
+            "John Doe".to_string(),
+            Some("John".to_string()),
+            Some("Doe".to_string()),
+            Some("M".to_string()),
+            Some(get_e8_time()),
+            Some(get_e8_time()),
+            Some("john.doe@example.com".to_string()),
+            Some("+1234567890".to_string()),
+            Some(1),
+            Some("Software Engineer".to_string()),
+            Some(1),
+            Some(6),
+            Some("123 Main St".to_string()),
+            Some("Anytown".to_string()),
+            Some("Anystate".to_string()),
+            Some("12345".to_string()),
+            Some(true),
+            Some("admin".to_string()),
+            Some(1),
+        );
         match establish_pg_connection() {
             Ok(mut conn) => match update_employee_by_id(&mut conn, 5, &updated_emp) {
                 Ok(updated_emp) => {

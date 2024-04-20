@@ -2,22 +2,20 @@ use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::utils::time::get_e8_time;
-
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::posts)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Post {
-    pub post_id: i32,
-    pub title: Option<String>,
-    pub body: Option<String>,
-    pub user_id: Option<i32>,
-    pub status: Option<String>,
-    pub created_at: Option<chrono::NaiveDateTime>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
-    pub username: Option<String>,
+    post_id: i32,
+    title: Option<String>,
+    body: Option<String>,
+    user_id: Option<i32>,
+    status: Option<String>,
+    created_at: Option<chrono::NaiveDateTime>,
+    updated_at: Option<chrono::NaiveDateTime>,
+    username: Option<String>,
 }
 
 impl Post {
@@ -31,7 +29,7 @@ impl Post {
         updated_at: Option<chrono::NaiveDateTime>,
         username: Option<String>,
     ) -> Self {
-        Post {
+        Self {
             post_id,
             title,
             body,
@@ -42,18 +40,53 @@ impl Post {
             username,
         }
     }
-
-    pub fn new_empty() -> Self {
-        Post {
-            post_id: 0,
-            title: None,
-            body: None,
-            user_id: None,
-            status: None,
-            created_at: None,
-            updated_at: None,
-            username: None,
-        }
+    pub fn post_id(&self) -> i32 {
+        self.post_id
+    }
+    pub fn title(&self) -> &Option<String> {
+        &self.title
+    }
+    pub fn body(&self) -> &Option<String> {
+        &self.body
+    }
+    pub fn user_id(&self) -> Option<i32> {
+        self.user_id
+    }
+    pub fn status(&self) -> &Option<String> {
+        &self.status
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn username(&self) -> &Option<String> {
+        &self.username
+    }
+    pub fn set_post_id(&mut self, post_id: i32) {
+        self.post_id = post_id;
+    }
+    pub fn set_title(&mut self, title: Option<String>) {
+        self.title = title;
+    }
+    pub fn set_body(&mut self, body: Option<String>) {
+        self.body = body;
+    }
+    pub fn set_user_id(&mut self, user_id: Option<i32>) {
+        self.user_id = user_id;
+    }
+    pub fn set_status(&mut self, status: Option<String>) {
+        self.status = status;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
+    }
+    pub fn set_username(&mut self, username: Option<String>) {
+        self.username = username;
     }
 }
 
@@ -66,8 +99,7 @@ impl Post {
 //   "created_at": "2024-04-07T08:30:00",
 //   "updated_at": "2024-04-07T08:30:00"
 // }
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::posts)]
@@ -90,7 +122,7 @@ impl NewPost {
         created_at: Option<chrono::NaiveDateTime>,
         updated_at: Option<chrono::NaiveDateTime>,
     ) -> Self {
-        NewPost {
+        Self {
             title,
             body,
             user_id,
@@ -99,31 +131,56 @@ impl NewPost {
             updated_at,
         }
     }
-
-    pub fn new_empty() -> Self {
-        NewPost {
-            title: None,
-            body: None,
-            user_id: None,
-            status: None,
-            created_at: None,
-            updated_at: None,
-        }
+    pub fn title(&self) -> &Option<String> {
+        &self.title
+    }
+    pub fn body(&self) -> &Option<String> {
+        &self.body
+    }
+    pub fn user_id(&self) -> Option<i32> {
+        self.user_id
+    }
+    pub fn status(&self) -> &Option<String> {
+        &self.status
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn set_title(&mut self, title: Option<String>) {
+        self.title = title;
+    }
+    pub fn set_body(&mut self, body: Option<String>) {
+        self.body = body;
+    }
+    pub fn set_user_id(&mut self, user_id: Option<i32>) {
+        self.user_id = user_id;
+    }
+    pub fn set_status(&mut self, status: Option<String>) {
+        self.status = status;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::posts)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchPost {
-    pub title: Option<String>,
-    pub body: Option<String>,
-    pub user_id: Option<i32>,
-    pub status: Option<String>,
-    pub created_at: Option<chrono::NaiveDateTime>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
+    title: Option<String>,
+    body: Option<String>,
+    user_id: Option<i32>,
+    status: Option<String>,
+    created_at: Option<chrono::NaiveDateTime>,
+    updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PatchPost {
@@ -135,7 +192,7 @@ impl PatchPost {
         created_at: Option<chrono::NaiveDateTime>,
         updated_at: Option<chrono::NaiveDateTime>,
     ) -> Self {
-        PatchPost {
+        Self {
             title,
             body,
             user_id,
@@ -144,16 +201,41 @@ impl PatchPost {
             updated_at,
         }
     }
-
-    pub fn new_empty() -> Self {
-        PatchPost {
-            title: None,
-            body: None,
-            user_id: None,
-            status: None,
-            created_at: Some(get_e8_time()),
-            updated_at: Some(get_e8_time()),
-        }
+    pub fn title(&self) -> &Option<String> {
+        &self.title
+    }
+    pub fn body(&self) -> &Option<String> {
+        &self.body
+    }
+    pub fn user_id(&self) -> Option<i32> {
+        self.user_id
+    }
+    pub fn status(&self) -> &Option<String> {
+        &self.status
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.updated_at
+    }
+    pub fn set_title(&mut self, title: Option<String>) {
+        self.title = title;
+    }
+    pub fn set_body(&mut self, body: Option<String>) {
+        self.body = body;
+    }
+    pub fn set_user_id(&mut self, user_id: Option<i32>) {
+        self.user_id = user_id;
+    }
+    pub fn set_status(&mut self, status: Option<String>) {
+        self.status = status;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
+        self.updated_at = updated_at;
     }
 }
 
@@ -204,7 +286,7 @@ mod tests {
 
     #[test]
     fn test_post_new_empty() {
-        let post = Post::new_empty();
+        let post = Post::default();
 
         assert_eq!(post.post_id, 0);
         assert_eq!(post.title, None);
@@ -248,7 +330,7 @@ mod tests {
 
     #[test]
     fn test_new_post_new_empty() {
-        let new_post = NewPost::new_empty();
+        let new_post = NewPost::default();
         assert_eq!(new_post.title, None);
         assert_eq!(new_post.body, None);
         assert_eq!(new_post.user_id, None);

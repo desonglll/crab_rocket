@@ -2,9 +2,7 @@ use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::utils::time::get_e8_time;
-
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::follows)]
@@ -17,41 +15,84 @@ pub struct Follow {
 }
 
 impl Follow {
-    pub fn new(follow_id: i32, following_user_id: i32, followed_user_id: i32) -> Self {
-        Follow {
-            follow_id,
-            followed_user_id,
+    pub fn new(
+        following_user_id: i32,
+        followed_user_id: i32,
+        created_at: Option<chrono::NaiveDateTime>,
+        follow_id: i32,
+    ) -> Self {
+        Self {
             following_user_id,
-            created_at: Some(get_e8_time()),
+            followed_user_id,
+            created_at,
+            follow_id,
         }
     }
-    pub fn new_empty() -> Self {
-        Follow {
-            follow_id: -1,
-            followed_user_id: 0,
-            following_user_id: 0,
-            created_at: Some(get_e8_time()),
-        }
+    pub fn following_user_id(&self) -> i32 {
+        self.following_user_id
+    }
+    pub fn followed_user_id(&self) -> i32 {
+        self.followed_user_id
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn follow_id(&self) -> i32 {
+        self.follow_id
+    }
+    pub fn set_following_user_id(&mut self, following_user_id: i32) {
+        self.following_user_id = following_user_id;
+    }
+    pub fn set_followed_user_id(&mut self, followed_user_id: i32) {
+        self.followed_user_id = followed_user_id;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
+    }
+    pub fn set_follow_id(&mut self, follow_id: i32) {
+        self.follow_id = follow_id;
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::follows)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewFollow {
-    pub following_user_id: i32,
-    pub followed_user_id: i32,
-    pub created_at: Option<chrono::NaiveDateTime>,
+    following_user_id: i32,
+    followed_user_id: i32,
+    created_at: Option<chrono::NaiveDateTime>,
 }
 
 impl NewFollow {
-    pub fn new(following_user_id: i32, followed_user_id: i32) -> Self {
-        NewFollow {
-            followed_user_id,
+    pub fn new(
+        following_user_id: i32,
+        followed_user_id: i32,
+        created_at: Option<chrono::NaiveDateTime>,
+    ) -> Self {
+        Self {
             following_user_id,
-            created_at: Some(get_e8_time()),
+            followed_user_id,
+            created_at,
         }
+    }
+    pub fn following_user_id(&self) -> i32 {
+        self.following_user_id
+    }
+    pub fn followed_user_id(&self) -> i32 {
+        self.followed_user_id
+    }
+    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
+        self.created_at
+    }
+    pub fn set_following_user_id(&mut self, following_user_id: i32) {
+        self.following_user_id = following_user_id;
+    }
+    pub fn set_followed_user_id(&mut self, followed_user_id: i32) {
+        self.followed_user_id = followed_user_id;
+    }
+    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
+        self.created_at = created_at;
     }
 }

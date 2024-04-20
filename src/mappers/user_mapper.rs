@@ -34,16 +34,16 @@ pub fn update_user_by_id(
 ) -> Result<User, diesel::result::Error> {
     diesel::update(users.filter(user_id.eq(id)))
         .set((
-            users::username.eq(user.username.clone()),
-            users::password.eq(user.password.clone()),
-            users::role.eq(user.role.clone()),
-            users::email.eq(user.email.clone()),
-            users::fullname.eq(user.fullname.clone()),
-            users::avatar_url.eq(user.avatar_url.clone()),
-            users::bio.eq(user.bio.clone()),
+            users::username.eq(user.username()),
+            users::password.eq(user.password()),
+            users::role.eq(user.role()),
+            users::email.eq(user.email()),
+            users::fullname.eq(user.fullname()),
+            users::avatar_url.eq(user.avatar_url()),
+            users::bio.eq(user.bio()),
             users::updated_at.eq(Some(get_e8_time())),
-            users::mobile_phone.eq(user.mobile_phone.clone()),
-            users::created_at.eq(user.created_at.clone()),
+            users::mobile_phone.eq(user.mobile_phone()),
+            users::created_at.eq(user.created_at()),
         ))
         .get_result(conn)
 }
@@ -54,6 +54,7 @@ pub fn delete_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diese
 }
 #[cfg(test)]
 mod test {
+    use crate::models::user::PatchUser;
 
     #[test]
     fn test_insert_user() {
@@ -114,12 +115,11 @@ mod test {
 
     #[test]
     fn test_update_user_by_id() {
-        use crate::models::user::User;
         match crate::establish_pg_connection() {
             Ok(mut conn) => {
                 let id = 1;
-                let user = User::new_empty();
-                match crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user.into()) {
+                let user = PatchUser::default();
+                match crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user) {
                     Ok(res) => println!("{res}"),
                     Err(_) => println!("Err"),
                 }

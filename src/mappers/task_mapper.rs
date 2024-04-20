@@ -26,7 +26,7 @@ pub fn insert_full_single_task(
     conn: &mut PgConnection,
     task: &Task,
 ) -> Result<Task, diesel::result::Error> {
-    if !check_exist_task_by_id(conn, task.id) {
+    if !check_exist_task_by_id(conn, task.id()) {
         match diesel::insert_into(tasks::table)
             .values(task)
             .returning(Task::as_returning())
@@ -48,7 +48,9 @@ pub fn insert_full_single_task(
 pub fn fetch_all_tasks(conn: &mut PgConnection) -> Result<Vec<Task>, diesel::result::Error> {
     // sort
     // https://docs.diesel.rs/master/diesel/query_dsl/trait.QueryDsl.html#method.order_by
-    tasks::table.order(tasks::id.asc()).load::<Task>(conn)
+    tasks::table
+        .order(tasks::updated_at.desc())
+        .load::<Task>(conn)
 }
 
 /// ## Fetch task by id
@@ -73,10 +75,10 @@ pub fn update_task_by_id(
 ) -> Result<Task, diesel::result::Error> {
     diesel::update(tasks.filter(id.eq(t_id)))
         .set((
-            tasks::title.eq(task.title.clone()),
-            tasks::content.eq(task.content.clone()),
+            tasks::title.eq(task.title()),
+            tasks::content.eq(task.content()),
             tasks::updated_at.eq(Some(get_e8_time())), //Update time
-            tasks::user_id.eq(task.user_id),
+            tasks::user_id.eq(task.user_id()),
         ))
         .get_result(conn)
 }
@@ -117,7 +119,7 @@ pub fn fetch_tasks_by_params(
             query = query.offset(offset.into());
         }
     }
-    query.load::<Task>(conn)
+    query.order(tasks::updated_at.desc()).load::<Task>(conn)
 }
 #[cfg(test)]
 mod tests {

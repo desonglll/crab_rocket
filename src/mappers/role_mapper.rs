@@ -36,11 +36,11 @@ mod test {
         match establish_pg_connection() {
             Ok(mut conn) => {
                 // 创建一个新的 NewPost 实例
-                let new_role = NewRole {
-                    role_name: String::from("admin"),
-                    description: Some(String::from("Administrator role with full access")),
-                    permissions: Some(String::from("admin:full_access,user:view,post:edit")),
-                };
+                let new_role = NewRole::new(
+                    String::from("admin"),
+                    Some(String::from("Administrator role with full access")),
+                    Some(String::from("admin:full_access,user:view,post:edit")),
+                );
                 let _ = insert_role(&mut conn, &new_role);
             }
             Err(_) => (),

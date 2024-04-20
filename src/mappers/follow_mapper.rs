@@ -9,7 +9,7 @@ pub fn create_new_follow(
     follow: &NewFollow,
 ) -> Result<Follow, diesel::result::Error> {
     // check if exist before ccreate.
-    if !check_exist_follow(conn, follow.following_user_id, follow.followed_user_id) {
+    if !check_exist_follow(conn, follow.following_user_id(), follow.followed_user_id()) {
         match diesel::insert_into(follows::table)
             .values(follow)
             .returning(Follow::as_returning())
@@ -55,12 +55,12 @@ pub fn delete_follow(
     conn: &mut PgConnection,
     follow: &NewFollow,
 ) -> Result<Follow, diesel::result::Error> {
-    if check_exist_follow(conn, follow.following_user_id, follow.followed_user_id) {
+    if check_exist_follow(conn, follow.following_user_id(), follow.followed_user_id()) {
         diesel::delete(
             follows.filter(
                 follows::following_user_id
-                    .eq(follow.following_user_id)
-                    .and(follows::followed_user_id.eq(follow.followed_user_id)),
+                    .eq(follow.following_user_id())
+                    .and(follows::followed_user_id.eq(follow.followed_user_id())),
             ),
         )
         .get_result(conn)
@@ -103,7 +103,7 @@ mod test {
     fn test_create_new_follow() {
         use super::create_new_follow;
         use crate::{establish_pg_connection, models::follow::NewFollow};
-        let follow = NewFollow::new(1, 3);
+        let follow = NewFollow::new(1, 3, None);
         match establish_pg_connection() {
             Ok(mut conn) => match create_new_follow(&mut conn, &follow) {
                 Ok(inserted_follow) => println!("{inserted_follow:?}"),
@@ -134,7 +134,7 @@ mod test {
     #[test]
     fn test_delete_follow() {
         use crate::establish_pg_connection;
-        let follow = NewFollow::new(3, 2);
+        let follow = NewFollow::new(3, 2, None);
         match establish_pg_connection() {
             Ok(mut conn) => {
                 let deleted_follow = delete_follow(&mut conn, &follow);
