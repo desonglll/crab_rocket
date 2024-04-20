@@ -1,4 +1,4 @@
-use rocket::{delete, get, patch, post, serde::json::Json};
+use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 use serde_json::json;
 
 use crate::{
@@ -94,4 +94,8 @@ pub fn delete_user_by_id(id: i32) -> Json<serde_json::Value> {
     }))
     .unwrap();
     Json(response)
+}
+#[options("/user")]
+pub fn options_user_filter() -> Status {
+    Status::Ok
 }

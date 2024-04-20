@@ -62,6 +62,7 @@ fn rocket() -> _ {
                 user_route::get_user_by_id,
                 user_route::update_user_by_id,
                 user_route::delete_user_by_id,
+                user_route::options_user_filter,
                 // post routes
                 post_route::insert_single_post,
                 post_route::get_all_posts,

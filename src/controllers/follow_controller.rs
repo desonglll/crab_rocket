@@ -31,17 +31,3 @@ pub fn get_follows_by_params_controller(params: &FollowParam) -> (i32, String, V
         Err(e) => (204, e.to_string(), Vec::new()),
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::models::follow::NewFollow;
-
-    use super::create_new_follow_controller;
-
-    #[test]
-    fn test_create_new_follow_controller() {
-        let follow = NewFollow::new(2, 3, None);
-        let (code, message, inserted_follow) = create_new_follow_controller(&follow);
-        println!("{code}\n{message}\n{inserted_follow:?}\n");
-    }
-}

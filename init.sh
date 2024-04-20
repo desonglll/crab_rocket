@@ -1,3 +1,3 @@
 diesel setup
 diesel migration run
-diesel migration redo
+# diesel migration redo
