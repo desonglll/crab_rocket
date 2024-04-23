@@ -30,6 +30,7 @@ pub struct Employee {
     role_id: Option<i32>,
 }
 
+
 impl Employee {
     pub fn new(
         employee_id: i32,
