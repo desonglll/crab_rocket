@@ -1,0 +1,12 @@
+image: crab_rocket
+tasks:
+  build:
+    command: |
+      source $HOME/.cargo/env
+      cargo build
+  run:
+    dependencies:
+      - build
+    command: |
+      source $HOME/.cargo/env
+      cargo run

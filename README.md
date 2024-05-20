@@ -10,6 +10,7 @@
   - [impl level](#impl-level)
 - [Develop Warning](#develop-warning)
 - [📖 Change Log](#-change-log)
+- [Docker](#docker)
 
 ## 🦀 Crab Rocket
 
@@ -87,3 +88,11 @@ Handle all error in impl level, and print out the error detail in backend.
 ## 📖 Change Log
 
 [Change Log](./CHANGELOG.md)
+
+## Docker
+
+`cargo install toast`
+
+`docker build -t crab_rocket .`
+
+`toast`

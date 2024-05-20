@@ -13,7 +13,6 @@ use rocket_cors::{AllowedHeaders, AllowedOrigins};
 #[launch]
 fn rocket() -> _ {
     let allowed_origins = AllowedOrigins::All;
-
     // You can also deserialize this
     let cors = rocket_cors::CorsOptions {
         allowed_origins,

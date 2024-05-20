@@ -20,7 +20,7 @@ def generate_random_data():
     title = fake.sentence(nb_words=random.randint(2, 6), variable_nb_words=True)
     body = fake.paragraph(nb_sentences=random.randint(2, 6), variable_nb_sentences=True)
     user_id = random.randint(1, 1)
-    return {"title": title, "body": body, "user_id": user_id}
+    return {"title": title, "body": body, "user_id": 3}
 
 
 if __name__ == "__main__":
