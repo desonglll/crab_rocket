@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate rocket;
 
+use std::env;
+use dotenvy::dotenv;
 use crab_rocket::routes::{
     common, employee_route, follow_route, info_route, post_route, role_route, task_route,
     upload_route, user_route,
@@ -12,6 +14,10 @@ use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 #[launch]
 fn rocket() -> _ {
+    // Clear environment variable before running.
+    env::remove_var("DATABASE_URL");
+    dotenv().ok();
+
     let allowed_origins = AllowedOrigins::All;
     // You can also deserialize this
     let cors = rocket_cors::CorsOptions {

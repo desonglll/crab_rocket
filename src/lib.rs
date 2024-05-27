@@ -7,13 +7,9 @@ pub mod services;
 pub mod utils;
 
 use diesel::prelude::*;
-use dotenvy::dotenv;
 use std::env;
 
 pub fn establish_pg_connection() -> Result<PgConnection, diesel::result::ConnectionError> {
-    // Clear environment variable before running.
-    env::remove_var("DATABASE_URL");
-    dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     match PgConnection::establish(&database_url) {
