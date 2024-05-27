@@ -10,7 +10,8 @@
   - [impl level](#impl-level)
 - [Develop Warning](#develop-warning)
 - [📖 Change Log](#-change-log)
-- [Docker](#docker)
+- [Docker toast](#docker-toast)
+- [Docker Compose to run Postgres](#docker-compose-to-run-postgres)
 
 ## 🦀 Crab Rocket
 
@@ -89,10 +90,25 @@ Handle all error in impl level, and print out the error detail in backend.
 
 [Change Log](./CHANGELOG.md)
 
-## Docker
+## Docker toast
 
 `cargo install toast`
 
 `docker build -t crab_rocket .`
 
 `toast`
+
+## Docker Compose to run Postgres
+
+```yml
+version: "3.1"
+
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: changemeinpred!
+```
