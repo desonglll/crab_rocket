@@ -119,12 +119,33 @@ diesel::table! {
 }
 
 diesel::table! {
-    users (user_id) {
+    user_permission (id) {
+        id -> Int4,
+        role_id -> Int4,
+        #[max_length = 255]
+        permission_name -> Varchar,
+        permission_description -> Nullable<Text>,
+        #[max_length = 255]
+        resource -> Varchar,
+        #[max_length = 50]
+        action -> Varchar,
+        is_active -> Nullable<Bool>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+        #[max_length = 255]
+        created_by -> Nullable<Varchar>,
+        #[max_length = 255]
+        updated_by -> Nullable<Varchar>,
+        notes -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    user_table (user_id) {
         user_id -> Int4,
         #[max_length = 255]
         username -> Varchar,
-        #[max_length = 255]
-        role -> Nullable<Varchar>,
+        role -> Nullable<Int4>,
         created_at -> Nullable<Timestamp>,
         #[max_length = 255]
         email -> Nullable<Varchar>,
@@ -141,7 +162,9 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(tasks -> users (user_id));
+diesel::joinable!(tasks -> user_table (user_id));
+diesel::joinable!(user_permission -> role_table (role_id));
+diesel::joinable!(user_table -> role_table (role));
 
 diesel::allow_tables_to_appear_in_same_query!(
     department_table,
@@ -150,5 +173,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     posts,
     role_table,
     tasks,
-    users,
+    user_permission,
+    user_table,
 );

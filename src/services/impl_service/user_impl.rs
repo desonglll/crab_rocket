@@ -85,9 +85,9 @@ impl user_service::GetUser for User {
         }
     }
 }
+
 #[cfg(test)]
 mod test {
-
     #[test]
     fn test_insert_single_user() {
         use crate::services::user_service::GetUser;
@@ -97,7 +97,7 @@ mod test {
         };
         let user = NewUser::new(
             "username".to_string(),
-            Some(String::from("role")),
+            Some(1),
             Some(get_e8_time()),
             Some(String::from("email")),
             "password".to_string(),

@@ -6,12 +6,12 @@ use utoipa::ToSchema;
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::users)]
+#[diesel(table_name = crate::schema::user_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
     user_id: i32,
     username: String,
-    role: Option<String>,
+    role: Option<i32>,
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
@@ -26,7 +26,7 @@ impl User {
     pub fn new(
         user_id: i32,
         username: String,
-        role: Option<String>,
+        role: Option<i32>,
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
@@ -56,7 +56,7 @@ impl User {
     pub fn username(&self) -> &str {
         &self.username
     }
-    pub fn role(&self) -> &Option<String> {
+    pub fn role(&self) -> &Option<i32> {
         &self.role
     }
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
@@ -89,7 +89,7 @@ impl User {
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
-    pub fn set_role(&mut self, role: Option<String>) {
+    pub fn set_role(&mut self, role: Option<i32>) {
         self.role = role;
     }
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
@@ -140,11 +140,11 @@ impl Display for User {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable, Default)]
-#[diesel(table_name = crate::schema::users)]
+#[diesel(table_name = crate::schema::user_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewUser {
     username: String,
-    role: Option<String>,
+    role: Option<i32>,
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
@@ -158,7 +158,7 @@ pub struct NewUser {
 impl NewUser {
     pub fn new(
         username: String,
-        role: Option<String>,
+        role: Option<i32>,
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
@@ -184,7 +184,7 @@ impl NewUser {
     pub fn username(&self) -> &str {
         &self.username
     }
-    pub fn role(&self) -> &Option<String> {
+    pub fn role(&self) -> &Option<i32> {
         &self.role
     }
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
@@ -214,7 +214,7 @@ impl NewUser {
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
-    pub fn set_role(&mut self, role: Option<String>) {
+    pub fn set_role(&mut self, role: Option<i32>) {
         self.role = role;
     }
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
@@ -246,11 +246,11 @@ impl NewUser {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::users)]
+#[diesel(table_name = crate::schema::user_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchUser {
     username: String,
-    role: Option<String>,
+    role: Option<i32>,
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
@@ -264,7 +264,7 @@ pub struct PatchUser {
 impl PatchUser {
     pub fn new(
         username: String,
-        role: Option<String>,
+        role: Option<i32>,
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
@@ -290,7 +290,7 @@ impl PatchUser {
     pub fn username(&self) -> &str {
         &self.username
     }
-    pub fn role(&self) -> &Option<String> {
+    pub fn role(&self) -> &Option<i32> {
         &self.role
     }
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
@@ -320,7 +320,7 @@ impl PatchUser {
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
-    pub fn set_role(&mut self, role: Option<String>) {
+    pub fn set_role(&mut self, role: Option<i32>) {
         self.role = role;
     }
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
@@ -359,7 +359,7 @@ mod test {
         let user = User::new(
             1,
             "john_doe".to_string(),
-            Some("admin".to_string()),
+            Some(1),
             Some(get_e8_time()),
             Some("john.doe@example.com".to_string()),
             "password_hash".to_string(),
