@@ -18,7 +18,9 @@ pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, dies
 
 // GOOD:
 pub fn fetch_all_users(conn: &mut PgConnection) -> Result<Vec<User>, diesel::result::Error> {
-    user_table.order(user_table::user_id.asc()).load::<User>(conn)
+    user_table
+        .order(user_table::user_id.asc())
+        .load::<User>(conn)
 }
 
 // GOOD:
@@ -36,7 +38,7 @@ pub fn update_user_by_id(
         .set((
             user_table::username.eq(user.username()),
             user_table::password.eq(user.password()),
-            user_table::role.eq(user.role()),
+            user_table::role_id.eq(user.role_id()),
             user_table::email.eq(user.email()),
             user_table::fullname.eq(user.fullname()),
             user_table::avatar_url.eq(user.avatar_url()),

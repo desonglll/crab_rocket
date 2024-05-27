@@ -11,7 +11,7 @@ use utoipa::ToSchema;
 pub struct User {
     user_id: i32,
     username: String,
-    role: Option<i32>,
+    role_id: Option<i32>,
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
@@ -26,7 +26,7 @@ impl User {
     pub fn new(
         user_id: i32,
         username: String,
-        role: Option<i32>,
+        role_id: Option<i32>,
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
@@ -39,7 +39,7 @@ impl User {
         Self {
             user_id,
             username,
-            role,
+            role_id,
             created_at,
             email,
             password,
@@ -57,7 +57,7 @@ impl User {
         &self.username
     }
     pub fn role(&self) -> &Option<i32> {
-        &self.role
+        &self.role_id
     }
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
@@ -89,8 +89,8 @@ impl User {
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
-    pub fn set_role(&mut self, role: Option<i32>) {
-        self.role = role;
+    pub fn set_role_id(&mut self, role: Option<i32>) {
+        self.role_id = role;
     }
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
@@ -125,7 +125,7 @@ impl Display for User {
             "User ID: {}\nUsername: {}\nRole: {:?}\nCreated At: {:?}\nEmail: {:?}\nFullname: {:?}\nAvatar URL: {:?}\nBio: {:?}\nUpdated At: {:?}\nMobile Phone: {}",
             self.user_id,
             self.username,
-            self.role.clone().unwrap(),
+            self.role_id.unwrap(),
             self.created_at.unwrap(),
             self.email,
             self.fullname.clone().unwrap(),
@@ -144,7 +144,7 @@ impl Display for User {
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewUser {
     username: String,
-    role: Option<i32>,
+    role_id: Option<i32>,
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
@@ -158,7 +158,7 @@ pub struct NewUser {
 impl NewUser {
     pub fn new(
         username: String,
-        role: Option<i32>,
+        role_id: Option<i32>,
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
@@ -170,7 +170,7 @@ impl NewUser {
     ) -> Self {
         Self {
             username,
-            role,
+            role_id,
             created_at,
             email,
             password,
@@ -184,8 +184,8 @@ impl NewUser {
     pub fn username(&self) -> &str {
         &self.username
     }
-    pub fn role(&self) -> &Option<i32> {
-        &self.role
+    pub fn role_id(&self) -> &Option<i32> {
+        &self.role_id
     }
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
@@ -214,8 +214,8 @@ impl NewUser {
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
-    pub fn set_role(&mut self, role: Option<i32>) {
-        self.role = role;
+    pub fn set_role_id(&mut self, role: Option<i32>) {
+        self.role_id = role;
     }
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
@@ -250,7 +250,7 @@ impl NewUser {
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchUser {
     username: String,
-    role: Option<i32>,
+    role_id: Option<i32>,
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
@@ -264,7 +264,7 @@ pub struct PatchUser {
 impl PatchUser {
     pub fn new(
         username: String,
-        role: Option<i32>,
+        role_id: Option<i32>,
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
@@ -276,7 +276,7 @@ impl PatchUser {
     ) -> Self {
         Self {
             username,
-            role,
+            role_id,
             created_at,
             email,
             password,
@@ -290,8 +290,8 @@ impl PatchUser {
     pub fn username(&self) -> &str {
         &self.username
     }
-    pub fn role(&self) -> &Option<i32> {
-        &self.role
+    pub fn role_id(&self) -> &Option<i32> {
+        &self.role_id
     }
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
@@ -320,8 +320,8 @@ impl PatchUser {
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
-    pub fn set_role(&mut self, role: Option<i32>) {
-        self.role = role;
+    pub fn set_role_id(&mut self, role: Option<i32>) {
+        self.role_id = role;
     }
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
@@ -348,7 +348,6 @@ impl PatchUser {
         self.mobile_phone = mobile_phone;
     }
 }
-
 
 #[cfg(test)]
 mod test {

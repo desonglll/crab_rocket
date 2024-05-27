@@ -145,7 +145,7 @@ diesel::table! {
         user_id -> Int4,
         #[max_length = 255]
         username -> Varchar,
-        role -> Nullable<Int4>,
+        role_id -> Nullable<Int4>,
         created_at -> Nullable<Timestamp>,
         #[max_length = 255]
         email -> Nullable<Varchar>,
@@ -164,7 +164,7 @@ diesel::table! {
 
 diesel::joinable!(tasks -> user_table (user_id));
 diesel::joinable!(user_permission -> role_table (role_id));
-diesel::joinable!(user_table -> role_table (role));
+diesel::joinable!(user_table -> role_table (role_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     department_table,
