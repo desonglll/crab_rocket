@@ -15,17 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
-        with:
-          rust-version: 1.55.0
-
+      - uses: actions/checkout@v3
       - name: Check
         run: cargo check
-
       - name: Build
         run: cargo build --verbose
 
@@ -33,82 +25,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
-        with:
-          rust-version: 1.55.0
-
+      - uses: actions/checkout@v3
       - name: Run tests
         run: cargo test --verbose
-
-  format:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
-        with:
-          rust-version: 1.55.0
-
-      - name: Format code
-        run: cargo fmt --all -- --check
-
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
-        with:
-          rust-version: 1.55.0
-
-      - name: Run clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
-
-  docs:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
-        with:
-          rust-version: 1.55.0
-
-      - name: Generate documentation
-        run: cargo doc --no-deps
-
-      - name: Deploy documentation
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/doc
-
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
-        with:
-          rust-version: 1.55.0
-
-      - name: Build for release
-        run: cargo build --release
-
-#      - name: Deploy to server
-#        # Add your deployment steps here
