@@ -4,10 +4,10 @@
 - [Development](#development)
 - [🔧 Compile Released Version](#-compile-released-version)
 - [🚀 Running Executive Binary File](#-running-executive-binary-file)
-  - [First Running](#first-running)
-  - [Second Running](#second-running)
+    - [First Running](#first-running)
+    - [Second Running](#second-running)
 - [🚦 Work Flow](#-work-flow)
-  - [impl level](#impl-level)
+    - [impl level](#impl-level)
 - [Develop Warning](#develop-warning)
 - [📖 Change Log](#-change-log)
 - [Docker toast](#docker-toast)
@@ -66,6 +66,12 @@ diesel migration run
 
 ```shell
 ./hello_rocket
+```
+
+### Reset Database
+
+```shell
+diesel database reset
 ```
 
 ## 🚦 Work Flow
