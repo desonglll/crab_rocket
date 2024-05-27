@@ -20,8 +20,10 @@ jobs:
         run: cargo check
       - name: Build
         run: cargo build --verbose
+      - name: Setting environment variable
+        run: export DATABASE_URL=postgres://postgres:password@localhost:15432/hello_rocket
       - name: Run tests
-        run: cargo test -- --test-threads=1 --test-args "--exact -- DATABASE_URL=postgres://postgres:password@localhost:15432/hello_rocket"
+        run: cargo test --verbose
       - name: Run
         run: cargo run
 
