@@ -1,7 +1,7 @@
-use crate::{
-    models::role::{NewRole, Role},
-    schema::role_table,
-};
+use crate::models::role::{NewRole, Role};
+use crate::schema::role_table::dsl::*; //配合下面的 `posts.filter()`
+use crate::schema::role_table::{self};
+use crate::utils::time::get_e8_time;
 use diesel::prelude::*;
 
 pub fn insert_role(
@@ -25,6 +25,31 @@ pub fn fetch_all_roles(conn: &mut PgConnection) -> Result<Vec<Role>, diesel::res
     role_table::table
         .order(role_table::role_id.asc())
         .load::<Role>(conn)
+}
+
+pub fn delete_role_by_id(conn: &mut PgConnection, id: i32) -> Result<Role, diesel::result::Error> {
+    diesel::delete(role_table.filter(role_id.eq(id))).get_result(conn)
+}
+
+pub fn fetch_role_by_id(conn: &mut PgConnection, id: i32) -> Result<Role, diesel::result::Error> {
+    // 配合 use crate::schema::posts::dsl::*;
+    role_table.filter(role_id.eq(id)).first(conn)
+}
+
+pub fn update_role_by_id(
+    conn: &mut PgConnection,
+    id: i32,
+    role: &crate::models::role::PatchRole,
+) -> Result<Role, diesel::result::Error> {
+    diesel::update(role_table.filter(role_id.eq(id)))
+        .set((
+            role_name.eq(role.role_name()),
+            description.eq(role.description()),
+            permissions.eq(role.permissions()),
+            created_at.eq(role.created_at()),
+            updated_at.eq(get_e8_time()),
+        ))
+        .get_result(conn)
 }
 
 #[cfg(test)]

@@ -242,8 +242,20 @@ impl PutTask {
     pub fn set_user_id(&mut self, user_id: Option<i32>) {
         self.user_id = user_id;
     }
-    pub fn new(id: i32, title: String, content: Option<String>, updated_at: Option<chrono::NaiveDateTime>, user_id: Option<i32>) -> Self {
-        Self { id, title, content, updated_at, user_id }
+    pub fn new(
+        id: i32,
+        title: String,
+        content: Option<String>,
+        updated_at: Option<chrono::NaiveDateTime>,
+        user_id: Option<i32>,
+    ) -> Self {
+        Self {
+            id,
+            title,
+            content,
+            updated_at,
+            user_id,
+        }
     }
 }
 

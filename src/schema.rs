@@ -78,6 +78,27 @@ diesel::table! {
 }
 
 diesel::table! {
+    permission_table (id) {
+        id -> Int4,
+        #[max_length = 255]
+        permission_name -> Varchar,
+        permission_description -> Nullable<Text>,
+        #[max_length = 255]
+        resource -> Varchar,
+        #[max_length = 50]
+        action -> Varchar,
+        is_active -> Nullable<Bool>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+        #[max_length = 255]
+        created_by -> Nullable<Varchar>,
+        #[max_length = 255]
+        updated_by -> Nullable<Varchar>,
+        notes -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     posts (post_id) {
         post_id -> Int4,
         #[max_length = 255]
@@ -119,28 +140,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    user_permission (id) {
-        id -> Int4,
-        role_id -> Int4,
-        #[max_length = 255]
-        permission_name -> Varchar,
-        permission_description -> Nullable<Text>,
-        #[max_length = 255]
-        resource -> Varchar,
-        #[max_length = 50]
-        action -> Varchar,
-        is_active -> Nullable<Bool>,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
-        #[max_length = 255]
-        created_by -> Nullable<Varchar>,
-        #[max_length = 255]
-        updated_by -> Nullable<Varchar>,
-        notes -> Nullable<Text>,
-    }
-}
-
-diesel::table! {
     user_table (user_id) {
         user_id -> Int4,
         #[max_length = 255]
@@ -163,16 +162,15 @@ diesel::table! {
 }
 
 diesel::joinable!(tasks -> user_table (user_id));
-diesel::joinable!(user_permission -> role_table (role_id));
 diesel::joinable!(user_table -> role_table (role_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     department_table,
     employee_table,
     follows,
+    permission_table,
     posts,
     role_table,
     tasks,
-    user_permission,
     user_table,
 );

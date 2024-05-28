@@ -2,6 +2,7 @@ pub mod employee_service;
 pub mod follow_service;
 pub mod impl_service;
 pub mod info_service;
+pub mod permission_service;
 pub mod post_service;
 pub mod role_service;
 pub mod task_service;

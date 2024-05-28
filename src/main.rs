@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate rocket;
 
-use std::env;
-use dotenvy::dotenv;
 use crab_rocket::routes::{
-    common, employee_route, follow_route, info_route, post_route, role_route, task_route,
-    upload_route, user_route,
+    common, employee_route, follow_route, info_route, permission_route, post_route, role_route,
+    task_route, upload_route, user_route,
 };
+use dotenvy::dotenv;
+use std::env;
 
 use rocket::http::Method;
 use rocket::routes;
@@ -29,9 +29,9 @@ fn rocket() -> _ {
             Method::Put,
             Method::Delete,
         ]
-            .into_iter()
-            .map(From::from)
-            .collect(),
+        .into_iter()
+        .map(From::from)
+        .collect(),
         allowed_headers: AllowedHeaders::some(&[
             "Content-Type",
             "Authorization",
@@ -42,8 +42,8 @@ fn rocket() -> _ {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()
-        .unwrap();
+    .to_cors()
+    .unwrap();
     rocket::build()
         .mount(
             "/",
@@ -90,7 +90,12 @@ fn rocket() -> _ {
                 upload_route::single_upload,
                 // role routes
                 role_route::insert_role,
-                role_route::get_all_roles
+                role_route::get_all_roles,
+                role_route::delete_role_by_id,
+                role_route::get_role_by_id,
+                role_route::update_role_by_id,
+                // permission routes
+                permission_route::get_all_permissions
             ],
         )
         .attach(cors)
