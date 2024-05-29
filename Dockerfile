@@ -1,21 +1,19 @@
-# 使用 Ubuntu 基础镜像
-FROM ubuntu:latest
+# 使用官方的Rust镜像作为基础镜像
+FROM rust:latest
 
+# 设置工作目录
+WORKDIR /crab_rocket
 
-# 更新软件包列表并安装基本工具
-RUN apt-get update && apt-get install -y curl build-essential libpq-dev
-
-# 安装 Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
+RUN apt-get update && apt-get install -y postgresql-client
+# 复制项目的Cargo.toml和Cargo.lock文件到工作目录
+COPY . ./
+# 构建依赖，利用Docker缓存机制加快构建速度
+# RUN cargo build --release
 # 设置环境变量
-ENV PATH="/root/.cargo/bin:${PATH}"
+ENV DATABASE_URL=postgres://postgres:password@host.docker.internal:15432/hello_rocket
 
-# 创建工作目录
-WORKDIR /app
+# 编译项目
+RUN cargo install --path .
 
-# 复制当前目录内容到镜像的工作目录中
-COPY . .
-
-# 编译和运行项目
-RUN . $HOME/.cargo/env && cargo build && cargo run
+# 设置容器启动时的默认命令
+CMD ["crab_rocket"]
