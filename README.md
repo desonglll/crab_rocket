@@ -4,10 +4,12 @@
 - [Development](#development)
 - [🔧 Compile Released Version](#-compile-released-version)
 - [🚀 Running Executive Binary File](#-running-executive-binary-file)
-    - [First Running](#first-running)
-    - [Second Running](#second-running)
+  - [First Running](#first-running)
+  - [Second Running](#second-running)
+  - [Reset Database](#reset-database)
+- [Run with Dockerfile](#run-with-dockerfile)
 - [🚦 Work Flow](#-work-flow)
-    - [impl level](#impl-level)
+  - [impl level](#impl-level)
 - [Develop Warning](#develop-warning)
 - [📖 Change Log](#-change-log)
 - [Docker toast](#docker-toast)
@@ -72,6 +74,13 @@ diesel migration run
 
 ```shell
 diesel database reset
+```
+
+## Run with Dockerfile
+
+```shell
+docker build -t crab_rocket .
+docker run --name crab_rocket_demo --rm -p 8000:8000 crab_rocket
 ```
 
 ## 🚦 Work Flow

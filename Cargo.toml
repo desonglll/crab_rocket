@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 chrono = { version = "0.4.19", features = ["serde"] }
-rocket = { version = "0.5.0", features = ["json"] }
+rocket = { version = "0.5.1", features = ["json"] }
 rocket_cors = "0.6.0"
 diesel = { version = "2.1.0", features = ["postgres", "chrono"] }
 # Need to enable `chrono` feature to handle DateTime.
