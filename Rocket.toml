@@ -3,3 +3,7 @@
 address = "0.0.0.0"
 # limits = { form = "5 MiB", json = "5 MiB" }
 [global.limits]
+forms = 13107200
+form = 13107200
+file = 13107200
+data-form = 13107200

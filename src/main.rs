@@ -3,8 +3,8 @@ extern crate rocket;
 
 use crab_rocket::{
     routes::{
-        common, employee_route, file_route, follow_route, info_route, permission_route, post_route,
-        role_route, task_route, user_route,
+        bin_file_route, common, employee_route, follow_route, form_file_route, info_route,
+        permission_route, post_route, role_route, task_route, user_route,
     },
     utils,
 };
@@ -51,9 +51,10 @@ fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![
             common::doc,
-            file_route::files,
-            file_route::retrieve,
-            file_route::upload,
+            bin_file_route::files,
+            bin_file_route::retrieve,
+            bin_file_route::upload_bin,
+            form_file_route::upload,
             info_route::get_info,
             // task routes
             task_route::index,
