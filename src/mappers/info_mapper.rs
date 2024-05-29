@@ -26,16 +26,18 @@ mod test {
     #[test]
     fn test_get_info() {
         match establish_pg_connection() {
-            Ok(mut conn) => match get_info(&mut conn) {
-                Ok(data) => {
-                    println!("{data:?}");
-                    ()
+            Ok(mut conn) => {
+                match get_info(&mut conn) {
+                    Ok(data) => {
+                        println!("{data:?}");
+                        ()
+                    }
+                    Err(e) => {
+                        println!("{e:?}");
+                        ()
+                    }
                 }
-                Err(e) => {
-                    println!("{e:?}");
-                    ()
-                }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 ()

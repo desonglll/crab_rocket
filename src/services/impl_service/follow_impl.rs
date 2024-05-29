@@ -9,13 +9,15 @@ use crate::{
 impl GetFollow for Follow {
     fn create_new_follow(follow: &NewFollow) -> Result<Follow, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match follow_mapper::create_new_follow(&mut conn, &follow) {
-                Ok(inserted_follow) => Ok(inserted_follow),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match follow_mapper::create_new_follow(&mut conn, &follow) {
+                    Ok(inserted_follow) => Ok(inserted_follow),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
@@ -25,13 +27,15 @@ impl GetFollow for Follow {
 
     fn get_all_follows() -> Result<Vec<Follow>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match follow_mapper::fetch_all_follows(&mut conn) {
-                Ok(all_follows) => Ok(all_follows),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match follow_mapper::fetch_all_follows(&mut conn) {
+                    Ok(all_follows) => Ok(all_follows),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
@@ -41,13 +45,15 @@ impl GetFollow for Follow {
 
     fn delete_follow(follow: &NewFollow) -> Result<Follow, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match follow_mapper::delete_follow(&mut conn, follow) {
-                Ok(deleted_follow) => Ok(deleted_follow),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match follow_mapper::delete_follow(&mut conn, follow) {
+                    Ok(deleted_follow) => Ok(deleted_follow),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
@@ -59,13 +65,15 @@ impl GetFollow for Follow {
         params: &FollowParam,
     ) -> Result<Vec<Follow>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match follow_mapper::fetch_follows_by_params(&mut conn, params) {
-                Ok(follows) => Ok(follows),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match follow_mapper::fetch_follows_by_params(&mut conn, params) {
+                    Ok(follows) => Ok(follows),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))

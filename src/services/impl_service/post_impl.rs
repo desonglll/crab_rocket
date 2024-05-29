@@ -6,13 +6,15 @@ impl crate::services::post_service::GetPost for Post {
         post: &crate::models::post::NewPost,
     ) -> Result<Post, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::insert_post(&mut conn, &post) {
-                Ok(inserted_post) => Ok(inserted_post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match post_mapper::insert_post(&mut conn, &post) {
+                    Ok(inserted_post) => Ok(inserted_post),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
@@ -23,13 +25,15 @@ impl crate::services::post_service::GetPost for Post {
     // GOOD:
     fn get_all_posts() -> Result<Vec<Post>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::fetch_all_posts(&mut conn) {
-                Ok(all_posts) => Ok(all_posts),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match post_mapper::fetch_all_posts(&mut conn) {
+                    Ok(all_posts) => Ok(all_posts),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
@@ -39,13 +43,15 @@ impl crate::services::post_service::GetPost for Post {
 
     fn get_post_by_id(id: i32) -> Result<Post, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::fetch_post_by_id(&mut conn, id) {
-                Ok(post) => Ok(post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match post_mapper::fetch_post_by_id(&mut conn, id) {
+                    Ok(post) => Ok(post),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
@@ -58,13 +64,15 @@ impl crate::services::post_service::GetPost for Post {
         post: &crate::models::post::PatchPost,
     ) -> Result<Post, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::update_post_by_id(&mut conn, id, post) {
-                Ok(updated_post) => Ok(updated_post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match post_mapper::update_post_by_id(&mut conn, id, post) {
+                    Ok(updated_post) => Ok(updated_post),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
@@ -74,45 +82,53 @@ impl crate::services::post_service::GetPost for Post {
 
     fn delete_post_by_id(id: i32) -> Result<Post, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::delete_post_by_id(&mut conn, id) {
-                Ok(deleted_post) => Ok(deleted_post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match post_mapper::delete_post_by_id(&mut conn, id) {
+                    Ok(deleted_post) => Ok(deleted_post),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
             }
         }
     }
+
     fn filter_posts_by_params(
         params: &crate::routes::models::post_param::PostParam,
     ) -> Result<Vec<Post>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::fetch_posts_by_params(&mut conn, params) {
-                Ok(filtered_post) => Ok(filtered_post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match post_mapper::fetch_posts_by_params(&mut conn, params) {
+                    Ok(filtered_post) => Ok(filtered_post),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
             }
         }
     }
+
     fn get_count() -> Result<i64, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match post_mapper::get_count(&mut conn) {
-                Ok(count) => Ok(count),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match post_mapper::get_count(&mut conn) {
+                    Ok(count) => Ok(count),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))

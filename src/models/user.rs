@@ -50,69 +50,91 @@ impl User {
             mobile_phone,
         }
     }
+
     pub fn user_id(&self) -> i32 {
         self.user_id
     }
+
     pub fn username(&self) -> &str {
         &self.username
     }
+
     pub fn role(&self) -> &Option<i32> {
         &self.role_id
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn email(&self) -> &Option<String> {
         &self.email
     }
+
     pub fn password(&self) -> &str {
         &self.password
     }
+
     pub fn fullname(&self) -> &Option<String> {
         &self.fullname
     }
+
     pub fn avatar_url(&self) -> &Option<String> {
         &self.avatar_url
     }
+
     pub fn bio(&self) -> &Option<String> {
         &self.bio
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn mobile_phone(&self) -> &str {
         &self.mobile_phone
     }
+
     pub fn set_user_id(&mut self, user_id: i32) {
         self.user_id = user_id;
     }
+
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
+
     pub fn set_role_id(&mut self, role: Option<i32>) {
         self.role_id = role;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_email(&mut self, email: Option<String>) {
         self.email = email;
     }
+
     pub fn set_password(&mut self, password: String) {
         self.password = password;
     }
+
     pub fn set_fullname(&mut self, fullname: Option<String>) {
         self.fullname = fullname;
     }
+
     pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
         self.avatar_url = avatar_url;
     }
+
     pub fn set_bio(&mut self, bio: Option<String>) {
         self.bio = bio;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }
+
     pub fn set_mobile_phone(&mut self, mobile_phone: String) {
         self.mobile_phone = mobile_phone;
     }
@@ -181,63 +203,83 @@ impl NewUser {
             mobile_phone,
         }
     }
+
     pub fn username(&self) -> &str {
         &self.username
     }
+
     pub fn role_id(&self) -> &Option<i32> {
         &self.role_id
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn email(&self) -> &Option<String> {
         &self.email
     }
+
     pub fn password(&self) -> &str {
         &self.password
     }
+
     pub fn fullname(&self) -> &Option<String> {
         &self.fullname
     }
+
     pub fn avatar_url(&self) -> &Option<String> {
         &self.avatar_url
     }
+
     pub fn bio(&self) -> &Option<String> {
         &self.bio
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn mobile_phone(&self) -> &str {
         &self.mobile_phone
     }
+
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
+
     pub fn set_role_id(&mut self, role: Option<i32>) {
         self.role_id = role;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_email(&mut self, email: Option<String>) {
         self.email = email;
     }
+
     pub fn set_password(&mut self, password: String) {
         self.password = password;
     }
+
     pub fn set_fullname(&mut self, fullname: Option<String>) {
         self.fullname = fullname;
     }
+
     pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
         self.avatar_url = avatar_url;
     }
+
     pub fn set_bio(&mut self, bio: Option<String>) {
         self.bio = bio;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }
+
     pub fn set_mobile_phone(&mut self, mobile_phone: String) {
         self.mobile_phone = mobile_phone;
     }
@@ -287,63 +329,83 @@ impl PatchUser {
             mobile_phone,
         }
     }
+
     pub fn username(&self) -> &str {
         &self.username
     }
+
     pub fn role_id(&self) -> &Option<i32> {
         &self.role_id
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn email(&self) -> &Option<String> {
         &self.email
     }
+
     pub fn password(&self) -> &str {
         &self.password
     }
+
     pub fn fullname(&self) -> &Option<String> {
         &self.fullname
     }
+
     pub fn avatar_url(&self) -> &Option<String> {
         &self.avatar_url
     }
+
     pub fn bio(&self) -> &Option<String> {
         &self.bio
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn mobile_phone(&self) -> &str {
         &self.mobile_phone
     }
+
     pub fn set_username(&mut self, username: String) {
         self.username = username;
     }
+
     pub fn set_role_id(&mut self, role: Option<i32>) {
         self.role_id = role;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_email(&mut self, email: Option<String>) {
         self.email = email;
     }
+
     pub fn set_password(&mut self, password: String) {
         self.password = password;
     }
+
     pub fn set_fullname(&mut self, fullname: Option<String>) {
         self.fullname = fullname;
     }
+
     pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
         self.avatar_url = avatar_url;
     }
+
     pub fn set_bio(&mut self, bio: Option<String>) {
         self.bio = bio;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }
+
     pub fn set_mobile_phone(&mut self, mobile_phone: String) {
         self.mobile_phone = mobile_phone;
     }

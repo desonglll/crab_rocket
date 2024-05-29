@@ -30,39 +30,51 @@ impl Task {
             user_id,
         }
     }
+
     pub fn id(&self) -> i32 {
         self.id
     }
+
     pub fn title(&self) -> &str {
         &self.title
     }
+
     pub fn content(&self) -> &Option<String> {
         &self.content
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn user_id(&self) -> Option<i32> {
         self.user_id
     }
+
     pub fn set_id(&mut self, id: i32) {
         self.id = id;
     }
+
     pub fn set_title(&mut self, title: String) {
         self.title = title;
     }
+
     pub fn set_content(&mut self, content: Option<String>) {
         self.content = content;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }
+
     pub fn set_user_id(&mut self, user_id: Option<i32>) {
         self.user_id = user_id;
     }
@@ -109,33 +121,43 @@ impl NewTask {
             user_id,
         }
     }
+
     pub fn title(&self) -> &str {
         &self.title
     }
+
     pub fn content(&self) -> &Option<String> {
         &self.content
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn user_id(&self) -> Option<i32> {
         self.user_id
     }
+
     pub fn set_title(&mut self, title: String) {
         self.title = title;
     }
+
     pub fn set_content(&mut self, content: Option<String>) {
         self.content = content;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }
+
     pub fn set_user_id(&mut self, user_id: Option<i32>) {
         self.user_id = user_id;
     }
@@ -158,21 +180,27 @@ impl PatchTask {
             user_id,
         }
     }
+
     pub fn title(&self) -> &str {
         &self.title
     }
+
     pub fn content(&self) -> &Option<String> {
         &self.content
     }
+
     pub fn user_id(&self) -> Option<i32> {
         self.user_id
     }
+
     pub fn set_title(&mut self, title: String) {
         self.title = title;
     }
+
     pub fn set_content(&mut self, content: Option<String>) {
         self.content = content;
     }
+
     pub fn set_user_id(&mut self, user_id: Option<i32>) {
         self.user_id = user_id;
     }
@@ -215,33 +243,43 @@ impl PutTask {
     pub fn id(&self) -> i32 {
         self.id
     }
+
     pub fn title(&self) -> &str {
         &self.title
     }
+
     pub fn content(&self) -> &Option<String> {
         &self.content
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn user_id(&self) -> Option<i32> {
         self.user_id
     }
+
     pub fn set_id(&mut self, id: i32) {
         self.id = id;
     }
+
     pub fn set_title(&mut self, title: String) {
         self.title = title;
     }
+
     pub fn set_content(&mut self, content: Option<String>) {
         self.content = content;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }
+
     pub fn set_user_id(&mut self, user_id: Option<i32>) {
         self.user_id = user_id;
     }
+
     pub fn new(
         id: i32,
         title: String,
@@ -310,12 +348,7 @@ impl Into<Task> for PutTask {
 mod test {
     #[test]
     fn test_task_new() {
-        let task = super::Task::new(
-            1,
-            "title".to_string(),
-            "content".to_string().into(),
-            Some(4),
-        );
+        let task = super::Task::new(1, "title".to_string(), "content".to_string().into(), Some(4));
         println!("{task}");
 
         let fixed_dt = crate::utils::time::get_e8_time();

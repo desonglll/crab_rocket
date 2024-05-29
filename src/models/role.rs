@@ -34,39 +34,51 @@ impl Role {
             updated_at,
         }
     }
+
     pub fn role_id(&self) -> i32 {
         self.role_id
     }
+
     pub fn role_name(&self) -> &str {
         &self.role_name
     }
+
     pub fn description(&self) -> &Option<String> {
         &self.description
     }
+
     pub fn permissions(&self) -> &Option<String> {
         &self.permissions
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn set_role_id(&mut self, role_id: i32) {
         self.role_id = role_id;
     }
+
     pub fn set_role_name(&mut self, role_name: String) {
         self.role_name = role_name;
     }
+
     pub fn set_description(&mut self, description: Option<String>) {
         self.description = description;
     }
+
     pub fn set_permissions(&mut self, permissions: Option<String>) {
         self.permissions = permissions;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }
@@ -95,21 +107,27 @@ impl NewRole {
             permissions,
         }
     }
+
     pub fn role_name(&self) -> &str {
         &self.role_name
     }
+
     pub fn description(&self) -> &Option<String> {
         &self.description
     }
+
     pub fn permissions(&self) -> &Option<String> {
         &self.permissions
     }
+
     pub fn set_role_name(&mut self, role_name: String) {
         self.role_name = role_name;
     }
+
     pub fn set_description(&mut self, description: Option<String>) {
         self.description = description;
     }
+
     pub fn set_permissions(&mut self, permissions: Option<String>) {
         self.permissions = permissions;
     }
@@ -144,33 +162,43 @@ impl PatchRole {
             updated_at,
         }
     }
+
     pub fn role_name(&self) -> &str {
         &self.role_name
     }
+
     pub fn description(&self) -> &Option<String> {
         &self.description
     }
+
     pub fn permissions(&self) -> &Option<String> {
         &self.permissions
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
         self.updated_at
     }
+
     pub fn set_role_name(&mut self, role_name: String) {
         self.role_name = role_name;
     }
+
     pub fn set_description(&mut self, description: Option<String>) {
         self.description = description;
     }
+
     pub fn set_permissions(&mut self, permissions: Option<String>) {
         self.permissions = permissions;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
         self.updated_at = updated_at;
     }

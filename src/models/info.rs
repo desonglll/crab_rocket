@@ -18,27 +18,35 @@ impl Info {
             user_count,
         }
     }
+
     pub fn post_count(&self) -> i64 {
         self.post_count
     }
+
     pub fn employee_count(&self) -> i64 {
         self.employee_count
     }
+
     pub fn task_count(&self) -> i64 {
         self.task_count
     }
+
     pub fn user_count(&self) -> i64 {
         self.user_count
     }
+
     pub fn set_post_count(&mut self, post_count: i64) {
         self.post_count = post_count;
     }
+
     pub fn set_employee_count(&mut self, employee_count: i64) {
         self.employee_count = employee_count;
     }
+
     pub fn set_task_count(&mut self, task_count: i64) {
         self.task_count = task_count;
     }
+
     pub fn set_user_count(&mut self, user_count: i64) {
         self.user_count = user_count;
     }

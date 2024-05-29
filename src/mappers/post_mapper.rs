@@ -114,12 +114,14 @@ mod tests {
         use super::*;
         use crate::establish_pg_connection; // 建立数据库连接
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_all_posts(&mut conn) {
-                Ok(all_posts) => {
-                    println!("{all_posts:?}")
+            Ok(mut conn) => {
+                match fetch_all_posts(&mut conn) {
+                    Ok(all_posts) => {
+                        println!("{all_posts:?}")
+                    }
+                    Err(_) => (),
                 }
-                Err(_) => (),
-            },
+            }
             Err(_) => (),
         }
     }
@@ -129,12 +131,14 @@ mod tests {
         use super::*;
         use crate::establish_pg_connection; // 建立数据库连接
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_post_by_id(&mut conn, 1) {
-                Ok(post) => {
-                    println!("{post:?}")
+            Ok(mut conn) => {
+                match fetch_post_by_id(&mut conn, 1) {
+                    Ok(post) => {
+                        println!("{post:?}")
+                    }
+                    Err(_) => (),
                 }
-                Err(_) => (),
-            },
+            }
             Err(_) => (),
         }
     }
@@ -152,12 +156,14 @@ mod tests {
             Some(chrono::Utc::now().naive_utc()), // 使用当前时间作为更新时间
         );
         match establish_pg_connection() {
-            Ok(mut conn) => match update_post_by_id(&mut conn, 4, &new_post.into()) {
-                Ok(updated_post) => {
-                    println!("{updated_post:?}")
+            Ok(mut conn) => {
+                match update_post_by_id(&mut conn, 4, &new_post.into()) {
+                    Ok(updated_post) => {
+                        println!("{updated_post:?}")
+                    }
+                    Err(_) => (),
                 }
-                Err(_) => (),
-            },
+            }
             Err(_) => (),
         }
     }
@@ -167,12 +173,14 @@ mod tests {
         use super::*;
         use crate::establish_pg_connection; // 建立数据库连接
         match establish_pg_connection() {
-            Ok(mut conn) => match delete_post_by_id(&mut conn, 1) {
-                Ok(deleted_post) => {
-                    println!("{deleted_post:?}")
+            Ok(mut conn) => {
+                match delete_post_by_id(&mut conn, 1) {
+                    Ok(deleted_post) => {
+                        println!("{deleted_post:?}")
+                    }
+                    Err(_) => (),
                 }
-                Err(_) => (),
-            },
+            }
             Err(_) => (),
         }
     }
@@ -187,12 +195,14 @@ mod tests {
             offset: None,
         };
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_posts_by_params(&mut conn, &params) {
-                Ok(u_posts) => {
-                    println!("{u_posts:?}")
+            Ok(mut conn) => {
+                match fetch_posts_by_params(&mut conn, &params) {
+                    Ok(u_posts) => {
+                        println!("{u_posts:?}")
+                    }
+                    Err(_) => (),
                 }
-                Err(_) => (),
-            },
+            }
             Err(_) => (),
         }
     }

@@ -18,7 +18,7 @@ use serde_json::json;
 #[utoipa::path(
     responses(
         (status = 200, description = "found successfully", body = Task),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[get("/task/<id>")]
@@ -36,7 +36,7 @@ pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
 #[utoipa::path(
     responses(
         (status = 200, description = "update successfully", body = Task),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[patch("/task/<id>", data = "<task>")]
@@ -55,7 +55,7 @@ pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Val
 #[utoipa::path(
     responses(
         (status = 200, description = "put successfully", body = Task),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[put("/task/<id>", data = "<task>")]
@@ -83,7 +83,7 @@ pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
     params(("id", description = "delete id"),),
     responses(
         (status = 200, description = "delete successfully", body = Task),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[delete("/task/<id>")]
@@ -118,7 +118,7 @@ pub fn get_all_tasks() -> Json<serde_json::Value> {
 #[utoipa::path(
     responses(
         (status = 200, description = "created successfully", body = Task),
-        (status = NOT_FOUND, description = "err") 
+        (status = NOT_FOUND, description = "err")
     )
 )]
 #[post("/task", data = "<task>")]
@@ -138,7 +138,7 @@ pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
 #[utoipa::path(
     responses(
         (status = 200, description = "found successfully", body = Vec<Task>),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[post("/task/filter", data = "<params>")]

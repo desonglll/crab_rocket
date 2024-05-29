@@ -28,27 +28,35 @@ impl Follow {
             follow_id,
         }
     }
+
     pub fn following_user_id(&self) -> i32 {
         self.following_user_id
     }
+
     pub fn followed_user_id(&self) -> i32 {
         self.followed_user_id
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn follow_id(&self) -> i32 {
         self.follow_id
     }
+
     pub fn set_following_user_id(&mut self, following_user_id: i32) {
         self.following_user_id = following_user_id;
     }
+
     pub fn set_followed_user_id(&mut self, followed_user_id: i32) {
         self.followed_user_id = followed_user_id;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }
+
     pub fn set_follow_id(&mut self, follow_id: i32) {
         self.follow_id = follow_id;
     }
@@ -77,21 +85,27 @@ impl NewFollow {
             created_at,
         }
     }
+
     pub fn following_user_id(&self) -> i32 {
         self.following_user_id
     }
+
     pub fn followed_user_id(&self) -> i32 {
         self.followed_user_id
     }
+
     pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
         self.created_at
     }
+
     pub fn set_following_user_id(&mut self, following_user_id: i32) {
         self.following_user_id = following_user_id;
     }
+
     pub fn set_followed_user_id(&mut self, followed_user_id: i32) {
         self.followed_user_id = followed_user_id;
     }
+
     pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
         self.created_at = created_at;
     }

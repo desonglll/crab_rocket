@@ -105,13 +105,15 @@ mod test {
         use crate::{establish_pg_connection, models::follow::NewFollow};
         let follow = NewFollow::new(1, 3, None);
         match establish_pg_connection() {
-            Ok(mut conn) => match create_new_follow(&mut conn, &follow) {
-                Ok(inserted_follow) => println!("{inserted_follow:?}"),
-                Err(e) => {
-                    println!("{e:?}");
-                    ()
+            Ok(mut conn) => {
+                match create_new_follow(&mut conn, &follow) {
+                    Ok(inserted_follow) => println!("{inserted_follow:?}"),
+                    Err(e) => {
+                        println!("{e:?}");
+                        ()
+                    }
                 }
-            },
+            }
             Err(_) => (),
         }
     }

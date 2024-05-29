@@ -22,9 +22,7 @@ pub fn insert_role(
 }
 
 pub fn fetch_all_roles(conn: &mut PgConnection) -> Result<Vec<Role>, diesel::result::Error> {
-    role_table::table
-        .order(role_table::role_id.asc())
-        .load::<Role>(conn)
+    role_table::table.order(role_table::role_id.asc()).load::<Role>(conn)
 }
 
 pub fn delete_role_by_id(conn: &mut PgConnection, id: i32) -> Result<Role, diesel::result::Error> {
@@ -77,13 +75,15 @@ mod test {
         use super::*;
         use crate::establish_pg_connection; // 建立数据库连接
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_all_roles(&mut conn) {
-                Ok(roles) => {
-                    println!("{roles:?}");
-                    ()
+            Ok(mut conn) => {
+                match fetch_all_roles(&mut conn) {
+                    Ok(roles) => {
+                        println!("{roles:?}");
+                        ()
+                    }
+                    Err(_) => (),
                 }
-                Err(_) => (),
-            },
+            }
             Err(_) => (),
         }
     }

@@ -48,9 +48,7 @@ pub fn insert_full_single_task(
 pub fn fetch_all_tasks(conn: &mut PgConnection) -> Result<Vec<Task>, diesel::result::Error> {
     // sort
     // https://docs.diesel.rs/master/diesel/query_dsl/trait.QueryDsl.html#method.order_by
-    tasks::table
-        .order(tasks::updated_at.desc())
-        .load::<Task>(conn)
+    tasks::table.order(tasks::updated_at.desc()).load::<Task>(conn)
 }
 
 /// ## Fetch task by id
@@ -204,12 +202,7 @@ mod tests {
     fn test_insert_full_single_task() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let task = Task::new(
-                    1,
-                    "title".to_string(),
-                    "content".to_string().into(),
-                    Some(4),
-                );
+                let task = Task::new(1, "title".to_string(), "content".to_string().into(), Some(4));
                 match insert_full_single_task(&mut conn, &task) {
                     Ok(res) => println!("{res:?}"),
                     Err(_) => println!("Err"),

@@ -6,19 +6,22 @@ impl task_service::GetTask for Task {
     // GOOD:
     fn insert_single_task(task: &NewTask) -> Result<Task, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match task_mapper::insert_task(&mut conn, task) {
-                Ok(inserted_task) => Ok(inserted_task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match task_mapper::insert_task(&mut conn, task) {
+                    Ok(inserted_task) => Ok(inserted_task),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
             }
         }
     }
+
     // GOOD:
     fn get_all_tasks() -> Result<Vec<Task>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
@@ -46,74 +49,87 @@ impl task_service::GetTask for Task {
             }
         }
     }
+
     // GOOD:
     fn get_task_by_id(t_id: i32) -> Result<Task, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match task_mapper::fetch_task_by_id(&mut conn, t_id) {
-                Ok(task) => Ok(task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match task_mapper::fetch_task_by_id(&mut conn, t_id) {
+                    Ok(task) => Ok(task),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
             }
         }
     }
+
     // GOOD:
     fn update_task_by_id(
         t_id: i32,
         task: &crate::models::task::PatchTask,
     ) -> Result<Task, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match task_mapper::update_task_by_id(&mut conn, t_id, &task) {
-                Ok(task) => Ok(task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match task_mapper::update_task_by_id(&mut conn, t_id, &task) {
+                    Ok(task) => Ok(task),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
             }
         }
     }
+
     /// ## Service impl
     /// GOOD:
     fn delete_task_by_id(t_id: i32) -> Result<Task, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match task_mapper::delete_task_by_id(&mut conn, t_id) {
-                Ok(deleted_task) => Ok(deleted_task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match task_mapper::delete_task_by_id(&mut conn, t_id) {
+                    Ok(deleted_task) => Ok(deleted_task),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
             }
         }
     }
+
     // GOOD:
     fn insert_full_single_task(task: &Task) -> Result<Task, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
-            Ok(mut conn) => match task_mapper::insert_full_single_task(&mut conn, task) {
-                Ok(inserted_full_task) => Ok(inserted_full_task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
+            Ok(mut conn) => {
+                match task_mapper::insert_full_single_task(&mut conn, task) {
+                    Ok(inserted_full_task) => Ok(inserted_full_task),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
                 }
-            },
+            }
             Err(e) => {
                 println!("{e:?}");
                 Err(Box::new(e))
             }
         }
     }
+
     fn filter_tasks_by_params(
         params: &crate::routes::models::task_param::TaskParam,
     ) -> Result<Vec<Task>, Box<dyn std::error::Error>> {
@@ -195,12 +211,7 @@ mod tests {
     }
     #[test]
     fn test_insert_full_single_task() {
-        let task = Task::new(
-            2,
-            "title1".to_string(),
-            "content".to_string().into(),
-            Some(4),
-        );
+        let task = Task::new(2, "title1".to_string(), "content".to_string().into(), Some(4));
         let inserted_task = Task::insert_full_single_task(&task);
         println!("{inserted_task:?}");
     }

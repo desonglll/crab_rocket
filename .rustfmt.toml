@@ -1,41 +1,15 @@
-# # Rustfmt configuration options
-# # https://rust-lang.github.io/rustfmt/?version=v1.6.0&search=
-# # Control how wide lines can be before they are automatically wrapped.
-# max_width = 100
-# wrap_comments = true
-# comment_width = 80
-
-# # Use 4 spaces for indentation.
-# tab_spaces = 4
-
-# # Use tabs instead of spaces for indentation.
-# # use_tabs = false
-
-# # Add a space after the opening brace and before the closing brace for blocks.
-# # eg. fn main() { ... }
-# # brace_style = "AlwaysNextLine"
-
-# # If true, aligns the parameters of a function declaration vertically.
-# fn_single_line = true
-
-# # Use a trailing comma after the last element in a block or list.
-# # eg. [ 1, 2, 3, ]
-# # trailing_comma = "Vertical"
-
-# # Use a space after the colon in struct fields.
-# # struct_field_colon_separator = true
-
-# # If true, align the parameters of a function declaration vertically.
-# # fn_single_line = false
-
-# # Control the spaces around the colon in match arms.
-# # colon_spaces = true
-
-# # Control how `match` arms are formatted.
-# # match_arm_blocks = false
-
-# # Use a blank line after a function body.
-# # blank_lines_after_item = 1
-
-# # Control the use of spaces in if and match constructs.
-# # control_brace_style = true
+brace_style = "PreferSameLine"
+enum_discrim_align_threshold = 100
+force_explicit_abi = false
+force_multiline_blocks = true
+format_code_in_doc_comments = true
+format_macro_matchers = true
+max_width = 100
+newline_style = "Unix"
+normalize_doc_attributes = true
+overflow_delimited_expr = true
+reorder_impl_items = true
+struct_lit_single_line = false
+use_field_init_shorthand = true
+use_small_heuristics = "Off"
+use_try_shorthand = true
