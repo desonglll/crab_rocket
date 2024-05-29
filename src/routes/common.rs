@@ -41,8 +41,6 @@ employee_route::insert_single_employee,
 employee_route::delete_employee_by_id,
 employee_route::get_employee_by_params,
 employee_route::update_employee_by_id,
-// upload
-upload_route::single_upload
 ),
 components(schemas(Task, User, Post, Follow, Employee, PatchEmployee, NewEmployee, EmployeeParam))
 )]

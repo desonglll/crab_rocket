@@ -14,7 +14,7 @@ dotenvy = "0.15"
 serde_json = "1.0.115"
 chrono-tz = "0.5"
 utoipa = { version = "4", features = ["rocket_extras"] }
-
+rand = "*"
 
 [profile.dev]
 opt-level = 0

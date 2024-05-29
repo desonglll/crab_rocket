@@ -1,9 +1,12 @@
 #[macro_use]
 extern crate rocket;
 
-use crab_rocket::routes::{
-    common, employee_route, follow_route, info_route, permission_route, post_route, role_route,
-    task_route, upload_route, user_route,
+use crab_rocket::{
+    routes::{
+        common, employee_route, file_route, follow_route, info_route, permission_route, post_route,
+        role_route, task_route, user_route,
+    },
+    utils,
 };
 use dotenvy::dotenv;
 use rocket::http::Method;
@@ -16,6 +19,8 @@ fn rocket() -> _ {
     // Clear environment variable before running.
     env::remove_var("DATABASE_URL");
     dotenv().ok();
+
+    utils::preload::run_preload();
 
     let allowed_origins = AllowedOrigins::All;
     // You can also deserialize this
@@ -46,6 +51,9 @@ fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![
             common::doc,
+            file_route::files,
+            file_route::retrieve,
+            file_route::upload,
             info_route::get_info,
             // task routes
             task_route::index,
@@ -83,8 +91,6 @@ fn rocket() -> _ {
             employee_route::delete_employee_by_id,
             employee_route::get_employee_by_params,
             employee_route::update_employee_by_id,
-            // upload
-            upload_route::single_upload,
             // role routes
             role_route::insert_role,
             role_route::get_all_roles,

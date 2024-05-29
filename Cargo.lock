@@ -214,6 +214,7 @@ dependencies = [
  "chrono-tz",
  "diesel",
  "dotenvy",
+ "rand",
  "rocket",
  "rocket_cors",
  "serde_json",
