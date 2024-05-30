@@ -2,5 +2,5 @@
 .DS_Store
 files
 tasks.sqlite
-upload
-static
+/upload
+/static

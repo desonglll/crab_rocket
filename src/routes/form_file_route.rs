@@ -2,16 +2,13 @@ use std::path::Path;
 
 use rocket::form::{Form, FromForm};
 use rocket::fs::TempFile;
-// use rocket::http::uri::Absolute;
 use rocket::post;
 
-// const HOST: Absolute<'static> = uri!("http://localhost:8000");
 #[derive(FromForm)]
 pub struct Upload<'r> {
     save: bool,
     file: TempFile<'r>,
 }
-
 #[post("/upload", data = "<upload>")]
 pub async fn upload(upload: Form<Upload<'_>>) -> std::io::Result<String> {
     let upload_data = upload.into_inner();
@@ -21,14 +18,15 @@ pub async fn upload(upload: Form<Upload<'_>>) -> std::io::Result<String> {
         // 例如：
         let mut file = upload_data.file;
         let root = concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload");
+        println!("root: {:?}", root);
         let file_name = file.raw_name().unwrap().dangerous_unsafe_unsanitized_raw().to_string();
+        println!("filename: {:?}", file_name);
         let file_path = Path::new(root).join(file_name.clone());
+        println!("file_path: {:?}", file_path.clone().to_str());
+
         file.persist_to(file_path.clone()).await?;
 
-        unimplemented!();
-        Ok(String::from(
-            Path::new("http://localhost:8000/retrieve/").join(file_name.clone()).to_str().unwrap(),
-        ))
+        Ok(String::from(file_path.to_str().unwrap()))
     } else {
         Ok(String::new())
     }
