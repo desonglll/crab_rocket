@@ -32,7 +32,10 @@ pub async fn upload(upload: Form<Upload<'_>>) -> Result<Json<ResponseData>, std:
             println!("filename: {:?}", file_name);
             let file_path = Path::new(root).join(file_name.clone());
             println!("file_path: {:?}", file_path.clone().to_str());
-            f.persist_to(file_path.clone()).await?;
+            // 在Linux系统上，不同的文件系统或挂载点之间无法直接进行文件移动操作 (rename)，因此会产生这个错误
+            // 这里我们使用 copy_to 代替 persist_to
+            // f.persist_to(file_path.clone()).await?;
+            f.copy_to(file_path.clone()).await?;
             paths.push(String::from(file_name))
         }
         Ok(Json(ResponseData {

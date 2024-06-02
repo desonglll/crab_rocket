@@ -2,6 +2,9 @@
 - [🧩 Project Dependencies](#-project-dependencies)
 - [⚙️ Requirement](#️-requirement)
 - [Development](#development)
+- [Using cross](#using-cross)
+  - [Install](#install)
+  - [Usage](#usage)
 - [🔧 Compile Released Version](#-compile-released-version)
 - [🚀 Running Executive Binary File](#-running-executive-binary-file)
   - [First Running](#first-running)
@@ -42,6 +45,29 @@ diesel setup
 diesel migration redo
 diesel migration run
 cargo run
+```
+
+## Using cross
+### Install
+
+```shell
+cargo install cross --git https://github.com/cross-rs/cross
+```
+### Usage
+```shell
+# (ONCE PER BOOT, on Linux)
+# Start the Docker daemon, if it's not already running using systemd
+# on WSL2 and other systems using SysVinit, use `sudo service docker start`.
+$ sudo systemctl start docker
+
+# MAGIC! This Just Works
+$ cross build --target aarch64-unknown-linux-gnu
+
+# EVEN MORE MAGICAL! This also Just Works
+$ cross test --target mips64-unknown-linux-gnuabi64
+
+# Obviously, this also Just Works
+$ cross rustc --target powerpc-unknown-linux-gnu --release -- -C lto
 ```
 
 ## 🔧 Compile Released Version
