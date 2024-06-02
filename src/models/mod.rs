@@ -1,4 +1,5 @@
 pub mod employee;
+pub mod files;
 pub mod follow;
 pub mod info;
 pub mod permission;

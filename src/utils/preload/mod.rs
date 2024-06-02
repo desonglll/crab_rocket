@@ -1,4 +1,4 @@
 pub mod mkdir;
 pub fn run_preload() {
-    println!("{:?}", mkdir::make_directory("upload"));
+    println!("Created {:?} folder successfully!", mkdir::make_directory("upload").unwrap());
 }

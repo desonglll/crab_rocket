@@ -5,9 +5,9 @@ edition = "2021"
 
 [dependencies]
 chrono = { version = "0.4.19", features = ["serde"] }
-rocket = { version = "0.5.1", features = ["json"] }
+rocket = { version = "0.5.1", features = ["json", "uuid"] }
 rocket_cors = "0.6.0"
-diesel = { version = "2.1.0", features = ["postgres", "chrono"] }
+diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
 # Need to enable `chrono` feature to handle DateTime.
 # https://docs.diesel.rs/master/diesel/sql_types/struct.Datetime.html
 dotenvy = "0.15"
