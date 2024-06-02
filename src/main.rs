@@ -52,9 +52,10 @@ fn rocket() -> _ {
         .mount("/", routes![
             common::doc,
             bin_file_route::files,
-            bin_file_route::retrieve,
+            bin_file_route::retrieve_bin,
             bin_file_route::upload_bin,
             form_file_route::upload,
+            form_file_route::retrieve,
             info_route::get_info,
             // task routes
             task_route::index,

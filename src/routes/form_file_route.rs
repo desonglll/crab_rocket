@@ -2,7 +2,7 @@ use std::path::Path;
 
 use rocket::form::{Form, FromForm};
 use rocket::fs::TempFile;
-use rocket::post;
+use rocket::{get, post};
 
 #[derive(FromForm)]
 pub struct Upload<'r> {
@@ -11,6 +11,7 @@ pub struct Upload<'r> {
 }
 #[post("/upload", data = "<upload>")]
 pub async fn upload(upload: Form<Upload<'_>>) -> std::io::Result<String> {
+    println!("{:?}", upload.file);
     let upload_data = upload.into_inner();
     if upload_data.save {
         // 如果 save 字段为 true，保存文件
@@ -26,8 +27,18 @@ pub async fn upload(upload: Form<Upload<'_>>) -> std::io::Result<String> {
 
         file.persist_to(file_path.clone()).await?;
 
-        Ok(String::from(file_path.to_str().unwrap()))
+        Ok(String::from(file_name))
     } else {
         Ok(String::new())
     }
+}
+#[get("/retrieve/<path>")]
+pub async fn retrieve(path: &str) -> Option<rocket::fs::NamedFile> {
+    rocket::fs::NamedFile::open(format!(
+        "{}/{}",
+        concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload"),
+        path
+    ))
+    .await
+    .ok()
 }

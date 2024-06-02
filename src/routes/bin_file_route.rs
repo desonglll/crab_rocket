@@ -44,12 +44,12 @@ impl<'a> FromParam<'a> for PasteId<'a> {
         }
     }
 }
-#[get("/file/<file..>")]
+#[get("/static_file/<file..>")]
 pub async fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join(file)).await.ok()
 }
-#[get("/retrieve/<id>")]
-pub async fn retrieve(id: PasteId<'_>) -> Option<rocket::fs::NamedFile> {
+#[get("/retrieve_bin/<id>")]
+pub async fn retrieve_bin(id: PasteId<'_>) -> Option<rocket::fs::NamedFile> {
     rocket::fs::NamedFile::open(id.file_path()).await.ok()
 }
 #[post("/upload_bin", data = "<paste>")]
@@ -58,5 +58,5 @@ pub async fn upload_bin(paste: Data<'_>) -> std::io::Result<String> {
     let id = PasteId::new(3);
     let path = id.file_path();
     paste.open(128.megabytes()).into_file(path).await?; //设置文件大小限制
-    Ok(uri!(HOST, retrieve(id)).to_string())
+    Ok(uri!(HOST, retrieve_bin(id)).to_string())
 }
