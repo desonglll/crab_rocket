@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE files (
+CREATE TABLE file_table (
     id UUID PRIMARY KEY,
     file_name VARCHAR NOT NULL,
     file_url VARCHAR NOT NULL,

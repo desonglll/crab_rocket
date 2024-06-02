@@ -1,19 +1,21 @@
 use chrono::NaiveDateTime;
-use diesel::{Insertable, Queryable};
-use rocket::serde::uuid::Uuid;
+use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
-#[derive(Queryable, Serialize, Deserialize)]
+use uuid::Uuid; // 添加这一行
+
+#[derive(Insertable, Serialize, Deserialize, Selectable, Debug, Queryable, Default)]
 #[serde(crate = "rocket::serde")]
+#[diesel(table_name = crate::schema::file_table)]
 pub struct File {
     pub id: Uuid,
     pub file_name: String,
     pub file_url: String,
-    pub uploaded_at: NaiveDateTime,
+    pub uploaded_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Insertable, Serialize, Deserialize, Selectable, Debug, Queryable, Default)]
 #[serde(crate = "rocket::serde")]
-#[diesel(table_name = crate::schema::files)]
+#[diesel(table_name = crate::schema::file_table)]
 pub struct NewFile<'a> {
     pub id: Uuid,
     pub file_name: &'a str,

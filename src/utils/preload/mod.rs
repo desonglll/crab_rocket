@@ -1,4 +1,15 @@
 pub mod mkdir;
 pub fn run_preload() {
-    println!("Created {:?} folder successfully!", mkdir::make_directory("upload").unwrap());
+    match mkdir::make_directory("upload") {
+        Ok(_) => {
+            println!("Created upload successfully");
+        }
+        Err(e) => {
+            if e.to_string() == "File exists (os error 17)" {
+                println!("Directory `upload` already exists.");
+            } else {
+                println!("{:?}", e.to_string());
+            }
+        }
+    }
 }

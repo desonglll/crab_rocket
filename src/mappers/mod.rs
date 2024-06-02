@@ -1,4 +1,5 @@
 pub mod employee_mapper;
+pub mod file_mapper;
 pub mod follow_mapper;
 pub mod info_mapper;
 pub mod permission_mapper;

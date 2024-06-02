@@ -1,4 +1,5 @@
 pub mod employee_service;
+pub mod file_service;
 pub mod follow_service;
 pub mod impl_service;
 pub mod info_service;

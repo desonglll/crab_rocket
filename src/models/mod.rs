@@ -6,4 +6,5 @@ pub mod permission;
 pub mod post;
 pub mod role;
 pub mod task;
+pub mod upload;
 pub mod user;

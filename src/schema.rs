@@ -69,7 +69,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    files (id) {
+    file_table (id) {
         id -> Uuid,
         file_name -> Varchar,
         file_url -> Varchar,
@@ -176,7 +176,7 @@ diesel::joinable!(user_table -> role_table (role_id));
 diesel::allow_tables_to_appear_in_same_query!(
     department_table,
     employee_table,
-    files,
+    file_table,
     follows,
     permission_table,
     posts,

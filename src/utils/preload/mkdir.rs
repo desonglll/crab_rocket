@@ -5,17 +5,7 @@ use std::{fs, path::Path};
 pub fn make_directory(path: &str) -> Result<String, std::io::Error> {
     match fs::create_dir(Path::new(path)) {
         Ok(_) => Ok(String::from(path)),
-        Err(err) => {
-            if err.to_string() == "File exists (os error 17)" {
-                // println!("Delete exists directory {:?}", path);
-                // fs::remove_dir_all(path)?;
-                // fs::create_dir(Path::new(path))?;
-                // Ok(String::from(path))
-                Err(err)
-            } else {
-                Err(err)
-            }
-        }
+        Err(err) => Err(err),
     }
 }
 
