@@ -4,6 +4,7 @@
 - [Development](#development)
 - [Using cross](#using-cross)
   - [Install](#install)
+  - [Add dependencies](#add-dependencies)
   - [Usage](#usage)
 - [🔧 Compile Released Version](#-compile-released-version)
 - [🚀 Running Executive Binary File](#-running-executive-binary-file)
@@ -52,6 +53,21 @@ cargo run
 
 ```shell
 cargo install cross --git https://github.com/cross-rs/cross
+```
+查看支持的所有目标平台
+你可以使用以下命令来查看Rust编译器支持的所有目标平台：
+
+```sh
+rustc --print target-list
+```
+
+### Add dependencies
+
+安装特定目标平台的工具链
+在使用cross之前，你可能需要安装特定目标平台的工具链。你可以使用以下命令来安装它们：
+
+```shell
+rustup target add aarch64-apple-darwin
 ```
 ### Usage
 ```shell
