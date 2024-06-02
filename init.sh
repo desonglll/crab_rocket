@@ -1,3 +1,3 @@
 diesel setup
+diesel database reset
 diesel migration run
-# diesel migration redo

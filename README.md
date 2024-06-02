@@ -7,6 +7,7 @@
   - [Add dependencies](#add-dependencies)
   - [Usage](#usage)
 - [🔧 Compile Released Version](#-compile-released-version)
+- [Install](#install-1)
 - [🚀 Running Executive Binary File](#-running-executive-binary-file)
   - [First Running](#first-running)
   - [Second Running](#second-running)
@@ -90,6 +91,12 @@ $ cross rustc --target powerpc-unknown-linux-gnu --release -- -C lto
 
 ```shell
 cargo build --release
+```
+
+## Install
+
+```shell
+cargo install --path .
 ```
 
 ## 🚀 Running Executive Binary File
