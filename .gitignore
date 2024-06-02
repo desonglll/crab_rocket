@@ -1,6 +1,6 @@
 /target
 .DS_Store
-# /files
+/files
 tasks.sqlite
-# /upload
+/upload
 /static
