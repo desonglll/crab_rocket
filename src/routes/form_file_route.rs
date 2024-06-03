@@ -27,3 +27,15 @@ pub async fn retrieve(uuid: Uuid) -> Option<rocket::fs::NamedFile> {
     println!("{:?}", uuid);
     retrieve_file_controller(uuid).await
 }
+
+#[get("/files")]
+pub fn get_all_files() -> Json<serde_json::Value> {
+    let (code, message, result) = file_controller::get_all_files_controller();
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":result
+    }))
+    .unwrap();
+    Json(response)
+}

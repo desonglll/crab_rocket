@@ -19,3 +19,10 @@ pub async fn retrieve_file_controller(uuid: Uuid) -> Option<rocket::fs::NamedFil
         }
     }
 }
+
+pub fn get_all_files_controller() -> (i32, String, Vec<File>) {
+    match File::get_all_files() {
+        Ok(all_files) => (200, String::from("GET ALL FILES OK"), all_files),
+        Err(e) => (204, e.to_string(), Vec::new()),
+    }
+}

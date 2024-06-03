@@ -1,4 +1,4 @@
-use crate::models::files::NewFile;
+use crate::models::files::{File, NewFile};
 use crate::schema::file_table::dsl::*;
 use crate::schema::file_table::{self};
 use diesel::prelude::*;
@@ -45,4 +45,23 @@ pub fn retrieve_file_url_by_uuid(
 ) -> Result<String, diesel::result::Error> {
     println!("enter mapper: {:?}", uuid);
     file_table.filter(file_table::id.eq(uuid)).select(file_url).first::<String>(conn)
+}
+
+pub fn fetch_all_files(conn: &mut PgConnection) -> Result<Vec<File>, diesel::result::Error> {
+    file_table.order(file_table::id.asc()).load::<File>(conn)
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{establish_pg_connection, mappers::file_mapper::fetch_all_files};
+    #[test]
+    fn test_fetch_all_files() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let all_files = fetch_all_files(&mut conn);
+                println!("{all_files:?}");
+            }
+            Err(_) => (),
+        }
+    }
 }
