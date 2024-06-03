@@ -1,7 +1,11 @@
 use crate::controllers::file_controller::{self, retrieve_file_controller};
+use crate::models::files::File;
 use crate::models::upload::Upload;
+use crate::services::file_service::GetFile;
 use rocket::form::Form;
+use rocket::response::stream::ByteStream;
 use rocket::serde::json::Json;
+use rocket::tokio::io::AsyncReadExt;
 use rocket::{get, post};
 
 use serde_json::json;
@@ -39,4 +43,35 @@ pub fn get_all_files() -> Json<serde_json::Value> {
     }))
     .unwrap();
     Json(response)
+}
+
+/// ## 字节流下载文件
+#[get("/byte/stream/<uuid>")]
+pub async fn file_stream(uuid: Uuid) -> Option<ByteStream![Vec<u8>]> {
+    match File::retrieve_file_url_by_uuid(uuid) {
+        Ok(path) => {
+            let mut file = match rocket::tokio::fs::File::open(path).await {
+                Ok(f) => f,
+                Err(e) => {
+                    println!("Failed to open file: {:?}", e);
+                    return None;
+                }
+            };
+            let mut buffer = vec![0; 1024];
+
+            Some(ByteStream! {
+                loop {
+                    let n = file.read(&mut buffer).await.unwrap();
+                    if n == 0 {
+                        break;
+                    }
+                    yield buffer[..n].to_vec();
+                }
+            })
+        }
+        Err(e) => {
+            println!("{:?}", e.to_string());
+            None
+        }
+    }
 }

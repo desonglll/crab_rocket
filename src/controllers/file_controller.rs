@@ -2,7 +2,6 @@ use rocket::fs::TempFile;
 use uuid::Uuid;
 
 use crate::{models::files::File, services::file_service::GetFile};
-
 pub async fn insert_file_controller(files: Vec<TempFile<'_>>) -> (i32, String, Vec<String>) {
     match File::insert_file(files).await {
         Ok(result) => (200, String::from("INSERT FILES OK"), result),
@@ -19,6 +18,9 @@ pub async fn retrieve_file_controller(uuid: Uuid) -> Option<rocket::fs::NamedFil
         }
     }
 }
+// pub async fn retrieve_file_controller(uuid: Uuid) -> _ {
+
+// }
 
 pub fn get_all_files_controller() -> (i32, String, Vec<File>) {
     match File::get_all_files() {

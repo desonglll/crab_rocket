@@ -57,6 +57,7 @@ fn rocket() -> _ {
             form_file_route::upload,
             form_file_route::retrieve,
             form_file_route::get_all_files,
+            form_file_route::file_stream,
             info_route::get_info,
             // task routes
             task_route::index,
