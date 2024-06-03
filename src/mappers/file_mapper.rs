@@ -4,7 +4,9 @@ use crate::schema::file_table::{self};
 use diesel::prelude::*;
 use diesel::{PgConnection, RunQueryDsl};
 use rocket::fs::TempFile;
-use std::path::Path;
+use rocket::response::stream::ByteStream;
+use rocket::tokio::io::AsyncRead;
+use std::path::{Path, PathBuf};
 use uuid::Uuid;
 
 pub async fn insert_files(
