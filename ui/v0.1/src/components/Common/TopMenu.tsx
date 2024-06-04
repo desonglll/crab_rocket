@@ -15,35 +15,33 @@ const items = [
         icon: <SettingOutlined/>,
     },
     {
-        label: '用户管理',
-        key: 'user',
-        icon: <SettingOutlined/>,
+        label: 'Manage',
+        key: 'manage',
         children: [
             {
-                type: 'group',
                 label: '用户管理',
+                key: 'user',
+                icon: <SettingOutlined/>,
                 children: [
-                    {label: '用户列表', key: ''},
-                    {label: '增加用户', key: 'new'},
-                ],
-            },
-            {
-                type: 'group',
+                    {
+                        type: 'group',
+                        label: '用户管理',
+                        children: [
+                            {label: '用户列表', key: 'user-list'},
+                            {label: '增加用户', key: 'user-new'},
+                        ],
+                    },
+                ]
+            }, {
                 label: '角色管理',
+                key: 'role',
+                icon: <SettingOutlined/>,
                 children: [
                     {label: '角色列表', key: 'role-list'},
                     {label: '角色添加', key: 'role-new'},
                 ]
-            },
-            {
-                type: 'group',
-                label: '权限管理',
-                children: [
-                    {label: '权限列表', key: 'permission-list'},
-                    {label: '权限添加', key: 'permission-new'},
-                ]
             }
-        ],
+        ]
     },
     {
         label: '推文',

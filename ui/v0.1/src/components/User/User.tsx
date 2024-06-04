@@ -6,11 +6,10 @@ import {UserDetail} from "./UserDetail.tsx";
 export function User() {
     return (
         <>
-            <UserList/>
             <Routes>
-                <Route path={"/"} element={<UserList/>}/>
-                <Route path={"new"} element={<UserNew/>}/>
-                <Route path={"user/detail/:user_id"} element={<UserDetail/>}/>
+                <Route path={"user-list"} element={<UserList/>}/>
+                <Route path={"user-new"} element={<UserNew/>}/>
+                <Route path={"user-detail/:user_id"} element={<UserDetail/>}/>
             </Routes>
         </>
     );
