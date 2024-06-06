@@ -1,5 +1,3 @@
 export function Greet() {
-    return (
-        <>this is greet</>
-    );
+	return <>this is greet</>;
 }

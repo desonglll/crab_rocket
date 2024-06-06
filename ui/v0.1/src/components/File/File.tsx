@@ -1,12 +1,12 @@
-import {Route, Routes} from "react-router-dom";
-import {FileTable} from "./FileTable.tsx";
+import { Route, Routes } from "react-router-dom";
+import { FileTable } from "./FileTable.tsx";
 
 export function File() {
-    return (
-        <>
-            <Routes>
-                <Route path={""} element={<FileTable/>}/>
-            </Routes>
-        </>
-    );
+	return (
+		<>
+			<Routes>
+				<Route path={""} element={<FileTable />} />
+			</Routes>
+		</>
+	);
 }
