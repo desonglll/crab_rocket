@@ -2,10 +2,11 @@
 name = "crab_rocket_post"
 version = "0.1.0"
 edition = "2021"
-
+description = "Post package for the crab rocket project"
+license = "MIT OR Apache-2.0"
 [dependencies]
-crab_rocket_utils = { path = "../crab_rocket_utils" }
-crab_rocket_schema = { path = "../crab_rocket_schema" }
+crab_rocket_utils = { version = "*" }
+crab_rocket_schema = { version = "*" }
 rocket = { version = "0.5.1", features = ["json", "uuid"] }
 diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
 utoipa = { version = "4", features = ["rocket_extras"] }

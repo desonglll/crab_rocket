@@ -1,14 +1,23 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+pub mod controllers {
+    pub mod post_controller;
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod mappers {
+    pub mod post_mapper;
+}
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+pub mod models {
+    pub mod post;
+}
+
+pub mod routes {
+    pub mod post_param;
+    pub mod post_route;
+}
+
+pub mod services {
+    pub mod post_service;
+    pub mod r#impl {
+        pub mod post_impl;
     }
 }
