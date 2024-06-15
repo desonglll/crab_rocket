@@ -5,7 +5,7 @@ FROM rust:latest
 WORKDIR /crab_rocket
 
 RUN apt-get update && apt-get install -y postgresql-client
-COPY .. ./
+COPY . ./
 # RUN cargo build --release
 # 设置环境变量
 ENV DATABASE_URL=postgres://postgres:password@host.docker.internal:15432/hello_rocket
