@@ -2,6 +2,8 @@
 name = "crab_rocket_schema"
 version = "0.1.0"
 edition = "2021"
+description = "Schema definitions for the crab rocket project"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
