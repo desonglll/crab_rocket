@@ -2,14 +2,16 @@
 extern crate rocket;
 extern crate crab_rocket_task;
 extern crate crab_rocket_utils;
-use crab_rocket::routes::{
-    bin_file_route, common, employee_route, form_file_route, info_route, permission_route,
-    user_route,
-};
+use crab_rocket::routes::common;
+use crab_rocket_employee::routes::employee_route;
+use crab_rocket_file::routes::{bin_file_route, form_file_route};
 use crab_rocket_follow::routes::follow_route;
+use crab_rocket_info::routes::info_route;
+use crab_rocket_permission::routes::permission_route;
 use crab_rocket_post::routes::post_route;
 use crab_rocket_role::routes::role_route;
 use crab_rocket_task::routes::task_route;
+use crab_rocket_user::routes::user_route;
 use dotenvy::dotenv;
 use rocket::http::Method;
 use rocket::routes;

@@ -14,13 +14,16 @@ diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
 dotenvy = "0.15"
 serde_json = "1.0.117"
 utoipa = { version = "4", features = ["rocket_extras"] }
-rand = "0.8.5"
-uuid = { version = "1.0", features = ["serde", "v4"] }
 crab_rocket_utils = { version = "0.1.0" }
 crab_rocket_task = { version = "0.1.0" }
 crab_rocket_post = { version = "0.1.0" }
 crab_rocket_follow = { version = "0.1.0" }
-crab_rocket_role = { path = "./crab_rocket_role" }
+crab_rocket_role = { version = "0.1.0" }
+crab_rocket_permission = { version = "0.1.0" }
+crab_rocket_user = { version = "0.1.0" }
+crab_rocket_employee = { version = "0.1.0" }
+crab_rocket_info = { version = "0.1.0" }
+crab_rocket_file = { version = "0.1.0" }
 
 [profile.dev]
 opt-level = 0
