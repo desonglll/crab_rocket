@@ -13,6 +13,7 @@
   - [Second Running](#second-running)
   - [Reset Database](#reset-database)
 - [Run with Dockerfile](#run-with-dockerfile)
+- [`mise`](#mise)
 - [🚦 Work Flow](#-work-flow)
   - [impl level](#impl-level)
 - [Develop Warning](#develop-warning)
@@ -131,6 +132,13 @@ diesel database reset
 docker build -t crab_rocket .
 docker run --name crab_rocket_demo --rm -p 8000:8000 crab_rocket
 ```
+
+## `mise`
+```shell
+mise run r
+```
+
+configured at `.mise.config.toml`
 
 ## 🚦 Work Flow
 
