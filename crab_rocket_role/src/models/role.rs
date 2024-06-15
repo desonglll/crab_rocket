@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::role_table)]
+#[diesel(table_name = crab_rocket_schema::schema::role_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Role {
     role_id: i32,
@@ -87,7 +87,7 @@ impl Role {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::role_table)]
+#[diesel(table_name = crab_rocket_schema::schema::role_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewRole {
     role_name: String,
@@ -136,7 +136,7 @@ impl NewRole {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::role_table)]
+#[diesel(table_name = crab_rocket_schema::schema::role_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchRole {
     role_name: String,

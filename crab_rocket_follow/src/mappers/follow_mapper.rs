@@ -1,7 +1,7 @@
 use crate::models::follow::{Follow, NewFollow};
-use crate::routes::models::follow_param::FollowParam;
-use crate::schema::follows::dsl::*;
-use crate::schema::follows::{self};
+use crate::routes::follow_param::FollowParam;
+use crab_rocket_schema::schema::follows::dsl::*;
+use crab_rocket_schema::schema::follows::{self};
 use diesel::prelude::*;
 
 pub fn create_new_follow(

@@ -1,11 +1,11 @@
 use crate::mappers::role_mapper::{delete_role_by_id, fetch_role_by_id, update_role_by_id};
 use crate::models::role::PatchRole;
 use crate::{
-    establish_pg_connection,
     mappers::role_mapper::{fetch_all_roles, insert_role},
     models::role::Role,
     services::role_service::GetRole,
 };
+use crab_rocket_schema::establish_pg_connection;
 use std::error::Error;
 
 impl GetRole for Role {

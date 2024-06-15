@@ -6,7 +6,7 @@ use crate::{controllers::follow_controller, models::follow::NewFollow};
 #[utoipa::path(
     responses(
         (status = 200, description = "found successfully", body = Follow),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[get("/follow")]
@@ -24,12 +24,12 @@ pub fn get_all_follows() -> Json<serde_json::Value> {
 #[utoipa::path(
     responses(
         (status = 200, description = "found successfully", body = Vec<Follow>),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[post("/follow/filter", data = "<params>")]
 pub fn get_follows_by_params(
-    params: Json<crate::routes::models::follow_param::FollowParam>,
+    params: Json<crate::routes::follow_param::FollowParam>,
 ) -> Json<serde_json::Value> {
     let (code, message, follows) = follow_controller::get_follows_by_params_controller(&params);
     let response = serde_json::from_value(json!({
@@ -44,7 +44,7 @@ pub fn get_follows_by_params(
 #[utoipa::path(
     responses(
         (status = 200, description = "created successfully", body = Follow),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[post("/follow", data = "<follow>")]
@@ -62,7 +62,7 @@ pub fn insert_single_follow(follow: Json<NewFollow>) -> Json<serde_json::Value> 
 #[utoipa::path(
     responses(
         (status = 200, description = "delete successfully", body = Follow),
-        (status = NOT_FOUND, description = "not found") 
+        (status = NOT_FOUND, description = "not found")
     )
 )]
 #[delete("/follow", data = "<follow>")]

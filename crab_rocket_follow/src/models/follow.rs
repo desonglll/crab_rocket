@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::follows)]
+#[diesel(table_name = crab_rocket_schema::schema::follows)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Follow {
     following_user_id: i32,
@@ -65,7 +65,7 @@ impl Follow {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::follows)]
+#[diesel(table_name = crab_rocket_schema::schema::follows)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewFollow {
     following_user_id: i32,

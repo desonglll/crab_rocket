@@ -218,6 +218,9 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "chrono-tz",
+ "crab_rocket_follow",
+ "crab_rocket_post",
+ "crab_rocket_role",
  "crab_rocket_task",
  "crab_rocket_utils",
  "diesel",
@@ -231,8 +234,55 @@ dependencies = [
 ]
 
 [[package]]
+name = "crab_rocket_follow"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06e05b2d91e66f197baba4fa99f71b05d9feeb81dd85f2efc45045e77a6905ef"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "crab_rocket_schema",
+ "diesel",
+ "rocket",
+ "serde_json",
+ "utoipa",
+]
+
+[[package]]
+name = "crab_rocket_post"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "034eb01f9ff8c49621558e9f5380cd2d8c7be68c5fb8864ee531176ace02c229"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "crab_rocket_schema",
+ "crab_rocket_utils",
+ "diesel",
+ "rocket",
+ "serde_json",
+ "utoipa",
+]
+
+[[package]]
+name = "crab_rocket_role"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "crab_rocket_schema",
+ "crab_rocket_utils",
+ "diesel",
+ "rocket",
+ "serde_json",
+ "utoipa",
+]
+
+[[package]]
 name = "crab_rocket_schema"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "764dd560583cf15adce3bdbcf0fab540c3057b637723e46a66824c3dec427b28"
 dependencies = [
  "diesel",
 ]
@@ -240,6 +290,8 @@ dependencies = [
 [[package]]
 name = "crab_rocket_task"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a03b754120d6b336ddf1801ff16b470be151bc53a7ccfdee26c89bb7a5b8ea1"
 dependencies = [
  "chrono",
  "chrono-tz",
@@ -254,6 +306,8 @@ dependencies = [
 [[package]]
 name = "crab_rocket_utils"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "84ccbf6fc141dfb9a2a8471200af39a44ba3346dc17b5431ba2f711457e09cbb"
 dependencies = [
  "chrono",
 ]

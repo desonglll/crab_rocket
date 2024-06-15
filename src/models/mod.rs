@@ -1,9 +1,6 @@
 pub mod employee;
 pub mod files;
-pub mod follow;
 pub mod info;
 pub mod permission;
-pub mod post;
-pub mod role;
 pub mod upload;
 pub mod user;

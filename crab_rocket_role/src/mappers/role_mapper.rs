@@ -1,6 +1,6 @@
 use crate::models::role::{NewRole, Role};
-use crate::schema::role_table::dsl::*; //配合下面的 `posts.filter()`
-use crate::schema::role_table::{self};
+use crab_rocket_schema::schema::role_table::dsl::*; //配合下面的 `posts.filter()`
+use crab_rocket_schema::schema::role_table::{self};
 use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 

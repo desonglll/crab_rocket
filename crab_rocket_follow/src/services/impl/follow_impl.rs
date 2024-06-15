@@ -1,10 +1,10 @@
 use crate::{
-    establish_pg_connection,
     mappers::follow_mapper,
     models::follow::{Follow, NewFollow},
-    routes::models::follow_param::FollowParam,
+    routes::follow_param::FollowParam,
     services::follow_service::GetFollow,
 };
+use crab_rocket_schema::establish_pg_connection;
 
 impl GetFollow for Follow {
     fn create_new_follow(follow: &NewFollow) -> Result<Follow, Box<dyn std::error::Error>> {

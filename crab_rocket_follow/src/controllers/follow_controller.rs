@@ -1,6 +1,6 @@
 use crate::{
     models::follow::{Follow, NewFollow},
-    routes::models::follow_param::FollowParam,
+    routes::follow_param::FollowParam,
     services::follow_service::GetFollow,
 };
 
