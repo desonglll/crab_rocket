@@ -2,6 +2,8 @@
 name = "crab_rocket_task"
 version = "0.1.0"
 edition = "2021"
+description = "Task package for the crab rocket project"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 crab_rocket_utils = { version = "*" }
