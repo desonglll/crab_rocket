@@ -3,6 +3,21 @@ name = "crab_rocket"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = [
+    "modules/cb_employee",
+    "modules/cb_file",
+    "modules/cb_follow",
+    "modules/cb_info",
+    "modules/cb_permission",
+    "modules/cb_post",
+    "modules/cb_role",
+    "modules/cb_schema",
+    "modules/cb_task",
+    "modules/cb_user",
+    "modules/cb_utils",
+]
+
 [dependencies]
 chrono = { version = "0.4.19", features = ["serde"] }
 chrono-tz = "0.9.0"
