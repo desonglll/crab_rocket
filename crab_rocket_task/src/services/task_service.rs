@@ -1,6 +1,6 @@
 use crate::{
     models::task::{NewTask, PatchTask, Task},
-    routes::models::task_param::TaskParam,
+    routes::task_param::TaskParam,
 };
 
 pub trait GetTask {

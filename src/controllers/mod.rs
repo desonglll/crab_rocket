@@ -5,5 +5,4 @@ pub mod info_controller;
 pub mod permission_controller;
 pub mod post_controller;
 pub mod role_controller;
-pub mod task_controller;
 pub mod user_controller;

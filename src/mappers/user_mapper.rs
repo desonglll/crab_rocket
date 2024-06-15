@@ -1,7 +1,7 @@
 use crate::models::user::{NewUser, PatchUser, User};
 use crate::schema::user_table::dsl::*;
 use crate::schema::user_table::{self};
-use crate::utils::time::get_e8_time;
+use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 
 // GOOD:
@@ -61,8 +61,8 @@ mod test {
     fn test_insert_user() {
         use crate::{
             establish_pg_connection, mappers::user_mapper::insert_user, models::user::NewUser,
-            utils::time::get_e8_time,
         };
+        use crab_rocket_utils::time::get_e8_time;
 
         let user = NewUser::new(
             "username".to_string(),

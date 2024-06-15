@@ -1,12 +1,10 @@
-use crate::establish_pg_connection;
 use crate::mappers::task_mapper;
+use crab_rocket_schema::establish_pg_connection;
 
-use crate::routes::models::task_param::TaskParam;
+use crate::models::task::{NewTask, Task};
+use crate::routes::task_param::TaskParam;
 use crate::services::task_service::GetTask;
-use crate::{
-    models::task::{NewTask, Task},
-    utils::time::get_e8_time,
-};
+use crab_rocket_utils::time::get_e8_time;
 
 // GOOD:
 pub fn get_all_tasks_controller() -> (i32, String, Vec<Task>) {
@@ -71,6 +69,7 @@ pub fn put_task_by_id_controller(
         Err(e) => (504, e.to_string(), Task::default()),
     }
 }
+
 pub fn update_task_by_id_controller(
     id: i32,
     patch_task: &crate::models::task::PatchTask,
@@ -87,6 +86,7 @@ pub fn delete_task_by_id_controller(id: i32) -> (i32, String, Task) {
         Err(e) => (204, e.to_string(), Task::default()),
     }
 }
+
 pub fn get_tasks_by_params_controller(params: &TaskParam) -> (i32, String, Vec<Task>) {
     match Task::filter_tasks_by_params(params) {
         Ok(filtered_tasks) => (200, String::from("GET TASKS BY PARAMS OK"), filtered_tasks),

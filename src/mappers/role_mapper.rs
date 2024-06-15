@@ -1,7 +1,7 @@
 use crate::models::role::{NewRole, Role};
 use crate::schema::role_table::dsl::*; //配合下面的 `posts.filter()`
 use crate::schema::role_table::{self};
-use crate::utils::time::get_e8_time;
+use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 
 pub fn insert_role(

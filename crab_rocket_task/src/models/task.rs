@@ -3,12 +3,12 @@ use rocket::serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use utoipa::ToSchema;
 
-use crate::utils::time::get_e8_time;
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crate::schema::tasks)]
+#[diesel(table_name = crab_rocket_schema::schema::tasks)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Task {
     id: i32,
@@ -96,7 +96,7 @@ impl Display for Task {
 
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-#[diesel(table_name = crate::schema::tasks)]
+#[diesel(table_name = crab_rocket_schema::schema::tasks)]
 pub struct NewTask {
     title: String,
     content: Option<String>,
@@ -165,7 +165,7 @@ impl NewTask {
 
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-#[diesel(table_name = crate::schema::tasks)]
+#[diesel(table_name = crab_rocket_schema::schema::tasks)]
 pub struct PatchTask {
     title: String,
     content: Option<String>,
@@ -230,7 +230,7 @@ impl Into<NewTask> for Task {
 
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-#[diesel(table_name = crate::schema::tasks)]
+#[diesel(table_name = crab_rocket_schema::schema::tasks)]
 pub struct PutTask {
     id: i32,
     title: String,
@@ -351,7 +351,7 @@ mod test {
         let task = super::Task::new(1, "title".to_string(), "content".to_string().into(), Some(4));
         println!("{task}");
 
-        let fixed_dt = crate::utils::time::get_e8_time();
+        let fixed_dt = crab_rocket_utils::time::get_e8_time();
         println!("{:?}", fixed_dt);
     }
 }

@@ -1,7 +1,8 @@
-use crate::establish_pg_connection;
 use crate::mappers::task_mapper;
 use crate::models::task::{NewTask, Task};
 use crate::services::task_service;
+use crab_rocket_schema::establish_pg_connection;
+
 impl task_service::GetTask for Task {
     // GOOD:
     fn insert_single_task(task: &NewTask) -> Result<Task, Box<dyn std::error::Error>> {
@@ -131,7 +132,7 @@ impl task_service::GetTask for Task {
     }
 
     fn filter_tasks_by_params(
-        params: &crate::routes::models::task_param::TaskParam,
+        params: &crate::routes::task_param::TaskParam,
     ) -> Result<Vec<Task>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => {
@@ -162,12 +163,10 @@ impl task_service::GetTask for Task {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        models::task::PatchTask, routes::models::task_param::TaskParam, utils::time::get_e8_time,
-    };
-
     use self::task_service::GetTask;
     use super::*;
+    use crate::{models::task::PatchTask, routes::models::task_param::TaskParam};
+    use crab_rocket_utils::time::get_e8_time;
 
     #[test]
     fn test_insert_single_task() {
@@ -193,6 +192,7 @@ mod tests {
         let task = Task::get_task_by_id(t_id);
         println!("{task:?}");
     }
+
     #[test]
     fn test_update_task_by_id() {
         let t_id = 1;
@@ -204,11 +204,13 @@ mod tests {
         let updated_task = Task::update_task_by_id(t_id, &task);
         println!("updated_task: {updated_task:?}");
     }
+
     #[test]
     fn test_delete_task_by_id() {
         let deleted_task = Task::delete_task_by_id(4);
         println!("deleted_task: {deleted_task:?}");
     }
+
     #[test]
     fn test_insert_full_single_task() {
         let task = Task::new(2, "title1".to_string(), "content".to_string().into(), Some(4));

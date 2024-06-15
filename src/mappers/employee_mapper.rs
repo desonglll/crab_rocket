@@ -1,7 +1,7 @@
 use crate::models::employee::{Employee, NewEmployee, PatchEmployee};
 use crate::routes::models::employee_param::EmployeeParam;
 use crate::schema::employee_table::{self, dsl::*};
-use crate::utils::time::get_e8_time;
+use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 
 pub fn insert_employee(
@@ -154,7 +154,7 @@ mod test {
     #[test]
     fn test_update_employee_by_id() {
         use super::*;
-        use crate::utils::time::get_e8_time;
+        use crab_rocket_utils::time::get_e8_time;
 
         let updated_emp = crate::models::employee::PatchEmployee::new(
             "John Doe".to_string(),

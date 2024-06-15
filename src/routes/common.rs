@@ -2,10 +2,12 @@ use rocket::{get, serde::json::Json};
 use utoipa::OpenApi;
 
 use crate::models::employee::{NewEmployee, PatchEmployee};
-use crate::models::{employee::Employee, follow::Follow, post::Post, task::Task, user::User};
+use crate::models::{employee::Employee, follow::Follow, post::Post, user::User};
 use crate::routes::*;
 
 use self::models::employee_param::EmployeeParam;
+use crab_rocket_task::models::task::Task;
+use crab_rocket_task::routes::task_route;
 
 #[derive(OpenApi)]
 #[openapi(

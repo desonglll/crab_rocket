@@ -6,5 +6,4 @@ pub mod info_service;
 pub mod permission_service;
 pub mod post_service;
 pub mod role_service;
-pub mod task_service;
 pub mod user_service;

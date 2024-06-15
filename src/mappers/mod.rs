@@ -5,5 +5,4 @@ pub mod info_mapper;
 pub mod permission_mapper;
 pub mod post_mapper;
 pub mod role_mapper;
-pub mod task_mapper;
 pub mod user_mapper;

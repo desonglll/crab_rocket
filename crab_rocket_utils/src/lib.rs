@@ -1,4 +1,5 @@
 pub mod mkdir;
+pub mod time;
 pub fn run_preload() {
     match mkdir::make_directory("upload") {
         Ok(_) => {

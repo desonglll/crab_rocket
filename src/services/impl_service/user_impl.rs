@@ -103,11 +103,9 @@ impl user_service::GetUser for User {
 mod test {
     #[test]
     fn test_insert_single_user() {
+        use crate::models::user::{NewUser, User};
         use crate::services::user_service::GetUser;
-        use crate::{
-            models::user::{NewUser, User},
-            utils::time::get_e8_time,
-        };
+        use crab_rocket_utils::time::get_e8_time;
         let user = NewUser::new(
             "username".to_string(),
             Some(1),

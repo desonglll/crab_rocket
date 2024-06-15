@@ -416,7 +416,7 @@ mod test {
     #[test]
     fn test_user_new() {
         use super::User;
-        use crate::utils::time::get_e8_time;
+        use crab_rocket_utils::time::get_e8_time;
         let user = User::new(
             1,
             "john_doe".to_string(),
