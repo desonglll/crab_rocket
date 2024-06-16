@@ -28,17 +28,19 @@ diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
 # https://docs.diesel.rs/master/diesel/sql_types/struct.Datetime.html
 dotenvy = "0.15"
 serde_json = "1.0.117"
+colored = "2.1.0"
+
 utoipa = { version = "4", features = ["rocket_extras"] }
-crab_rocket_utils = { version = "0.1.0" }
-crab_rocket_task = { version = "0.1.0" }
-crab_rocket_post = { version = "0.1.0" }
-crab_rocket_follow = { version = "0.1.0" }
-crab_rocket_role = { version = "0.1.0" }
-crab_rocket_permission = { version = "0.1.0" }
-crab_rocket_user = { version = "0.1.0" }
-crab_rocket_employee = { version = "0.1.0" }
-crab_rocket_info = { version = "0.1.0" }
-crab_rocket_file = { version = "0.1.0" }
+crab_rocket_utils = { path = "./modules/cb_utils" }
+crab_rocket_task = { path = "./modules/cb_task" }
+crab_rocket_post = { path = "./modules/cb_post" }
+crab_rocket_follow = { path = "./modules/cb_follow" }
+crab_rocket_role = { path = "./modules/cb_role" }
+crab_rocket_permission = { path = "./modules/cb_permission" }
+crab_rocket_user = { path = "./modules/cb_user" }
+crab_rocket_employee = { path = "./modules/cb_employee" }
+crab_rocket_info = { path = "./modules/cb_info" }
+crab_rocket_file = { path = "./modules/cb_file" }
 
 [profile.dev]
 opt-level = 0

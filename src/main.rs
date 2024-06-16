@@ -12,17 +12,17 @@ use crab_rocket_post::routes::post_route;
 use crab_rocket_role::routes::role_route;
 use crab_rocket_task::routes::task_route;
 use crab_rocket_user::routes::user_route;
-use dotenvy::dotenv;
+// use dotenvy::dotenv;
 use rocket::http::Method;
 use rocket::routes;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
-use std::env;
+// use std::env;
 
 #[launch]
 fn rocket() -> _ {
     // Clear environment variable before running.
-    env::remove_var("DATABASE_URL");
-    dotenv().ok();
+    // env::remove_var("DATABASE_URL");
+    // dotenv().ok();
 
     crab_rocket_utils::run_preload();
 

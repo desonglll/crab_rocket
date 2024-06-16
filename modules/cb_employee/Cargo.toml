@@ -12,5 +12,5 @@ utoipa = { version = "4", features = ["rocket_extras"] }
 chrono = { version = "0.4.19", features = ["serde"] }
 chrono-tz = "0.9.0"
 serde_json = "1.0.117"
-crab_rocket_schema = { version = "0.1.0" }
-crab_rocket_utils = { version = "0.1.0" }
+crab_rocket_schema = { path = "../cb_schema" }
+crab_rocket_utils = { path = "../cb_utils" }

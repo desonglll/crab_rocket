@@ -1,23 +1,41 @@
+use colored::Colorize;
 use std::{fs, path::Path};
-
-/// Creates a directory at a specified path.
-/// Returns `Ok(())` if the directory was created successfully, or an error if not.
-pub fn make_directory(path: &str) -> Result<String, std::io::Error> {
+/// 在指定路径创建目录
+/// 打印结果
+///
+/// ## 参数
+///
+/// * `path` - 要创建目录的路径。
+///
+/// ## 返回
+///
+/// 返回目录路径的字符串表示，如果失败则返回空字符串。
+///
+/// ## 示例
+///
+/// ```
+/// let path = "upload";
+/// let result = make_directory(path);
+/// if !result.is_empty() {
+///     println!("目录创建成功: {}", result);
+/// } else {
+///     println!("目录创建失败");
+/// }
+/// ```
+pub fn make_directory(path: &str) -> () {
     match fs::create_dir(Path::new(path)) {
-        Ok(_) => Ok(String::from(path)),
-        Err(err) => Err(err),
+        Ok(_) => {
+            println!("{}{}{}", "Created `/{".green(), path.green(), "}` successfully.".green());
+        }
+        Err(err) => {
+            println!("{}{}{}", "Failed to create `/{".yellow(), path.yellow(), "}`.".yellow());
+            println!("{}", err.to_string().yellow());
+        }
     }
 }
 
 #[test]
 fn test_make_directory() {
     let path = "upload";
-    match make_directory(path) {
-        Ok(result) => {
-            println!("{:?}", result);
-        }
-        Err(e) => {
-            println!("{:?}", e.to_string());
-        }
-    }
+    make_directory(path);
 }

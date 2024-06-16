@@ -1,9 +1,11 @@
 [package]
 name = "crab_rocket_utils"
-version = "0.1.0"
+authors = ["desonglll"]
+version = "0.1.1"
 edition = "2021"
 description = "Utils for the crab rocket project"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
 chrono = { version = "0.4.19", features = ["serde"] }
+colored = "2.1.0"
