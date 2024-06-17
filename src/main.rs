@@ -53,7 +53,7 @@ fn rocket() -> _ {
     .to_cors()
     .unwrap();
     rocket::build()
-        .mount("/", routes![
+        .mount("/api", routes![
             common::doc,
             bin_file_route::files,
             bin_file_route::retrieve_bin,
