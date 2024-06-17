@@ -119,6 +119,7 @@ pub fn fetch_tasks_by_params(
     }
     query.order(tasks::updated_at.desc()).load::<Task>(conn)
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -152,6 +153,7 @@ mod tests {
             Err(_) => println!("establish_pg_connection error"),
         }
     }
+
     #[test]
     fn test_fetch_task_by_id() {
         match establish_pg_connection() {
@@ -184,6 +186,7 @@ mod tests {
             Err(_) => println!("establish_pg_connection error"),
         }
     }
+
     #[test]
     fn test_delete_task_by_id() {
         match establish_pg_connection() {

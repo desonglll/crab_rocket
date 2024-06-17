@@ -14,7 +14,6 @@ use serde_json::json;
 /// PUT 比較正確的定義是 Replace (Create or Update)，
 /// 例如PUT/items/1的意思是替換/items/1，如果已經存在就替換，沒有就新增。
 /// PUT必須包含items/1的所有屬性資料。
-
 #[utoipa::path(
     responses(
         (status = 200, description = "found successfully", body = Task),
@@ -29,7 +28,7 @@ pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "data":task
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
@@ -48,7 +47,7 @@ pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Val
         "message":message,
         "data":patched_task
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
@@ -75,7 +74,7 @@ pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
         "message":message,
         "data":task
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
@@ -94,13 +93,13 @@ pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "date":deleted_task
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
 #[utoipa::path(
     responses(
-        (status = 200, description = "found successfully", body = Vec<Task>),
+        (status = 200, description = "found successfully", body = Vec < Task >),
         (status = NOT_FOUND, description = "not found")
     )
 )]
@@ -131,13 +130,13 @@ pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
         "message":message,
         "data":result_task
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
 #[utoipa::path(
     responses(
-        (status = 200, description = "found successfully", body = Vec<Task>),
+        (status = 200, description = "found successfully", body = Vec < Task >),
         (status = NOT_FOUND, description = "not found")
     )
 )]
@@ -150,9 +149,8 @@ pub fn get_tasks_by_params(
         "code":code,
         "message":message,
         "data":filtered_tasks,
-
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
