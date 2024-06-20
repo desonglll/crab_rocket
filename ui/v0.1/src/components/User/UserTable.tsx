@@ -117,6 +117,8 @@ export function UserTable() {
 	];
 
 	useEffect(() => {
+
+		
 		fetchUser().then(() => {
 			setLoading(!loading);
 		});
