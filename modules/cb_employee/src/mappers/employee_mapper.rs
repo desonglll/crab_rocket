@@ -37,7 +37,13 @@ pub fn delete_employee_by_id(
         }
     }
 }
-
+// GOOD:
+pub fn fetch_employee_by_id(
+    conn: &mut PgConnection,
+    id: i32,
+) -> Result<Employee, diesel::result::Error> {
+    employee_table.filter(employee_table::employee_id.eq(id)).first(conn)
+}
 pub fn update_employee_by_id(
     conn: &mut PgConnection,
     id: i32,
@@ -106,12 +112,10 @@ mod test {
     fn test_insert_employee() {
         let new_employee = NewEmployee::default();
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match insert_employee(&mut conn, &new_employee) {
-                    Ok(inserted_employee) => println!("{inserted_employee:?}"),
-                    Err(_) => println!("error"),
-                }
-            }
+            Ok(mut conn) => match insert_employee(&mut conn, &new_employee) {
+                Ok(inserted_employee) => println!("{inserted_employee:?}"),
+                Err(_) => println!("error"),
+            },
             Err(_) => println!("Error"),
         }
     }
@@ -119,12 +123,10 @@ mod test {
     #[test]
     fn test_delete_employee_by_id() {
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match delete_employee_by_id(&mut conn, 1) {
-                    Ok(deleted_employee) => println!("{deleted_employee:?}"),
-                    Err(_) => println!("error"),
-                }
-            }
+            Ok(mut conn) => match delete_employee_by_id(&mut conn, 1) {
+                Ok(deleted_employee) => println!("{deleted_employee:?}"),
+                Err(_) => println!("error"),
+            },
             Err(_) => println!("Error"),
         }
     }
@@ -137,14 +139,12 @@ mod test {
             offset: None,
         };
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match fetch_employee_by_params(&mut conn, &params) {
-                    Ok(u_posts) => {
-                        println!("{u_posts:?}")
-                    }
-                    Err(_) => (),
+            Ok(mut conn) => match fetch_employee_by_params(&mut conn, &params) {
+                Ok(u_posts) => {
+                    println!("{u_posts:?}")
                 }
-            }
+                Err(_) => (),
+            },
             Err(_) => (),
         }
     }
@@ -176,17 +176,15 @@ mod test {
             Some(1),
         );
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match update_employee_by_id(&mut conn, 5, &updated_emp) {
-                    Ok(updated_emp) => {
-                        println!("{updated_emp:?}")
-                    }
-                    Err(e) => {
-                        println!("{e:?}");
-                        ()
-                    }
+            Ok(mut conn) => match update_employee_by_id(&mut conn, 5, &updated_emp) {
+                Ok(updated_emp) => {
+                    println!("{updated_emp:?}")
                 }
-            }
+                Err(e) => {
+                    println!("{e:?}");
+                    ()
+                }
+            },
             Err(_) => (),
         }
     }

@@ -10,7 +10,12 @@ pub fn insert_single_employee_controller(new_employee: &NewEmployee) -> (i32, St
         Err(e) => (204, e.to_string(), Employee::default()),
     }
 }
-
+pub fn get_employee_by_id_controller(id: i32) -> (i32, String, Employee) {
+    match Employee::get_employee_by_id(id) {
+        Ok(result) => (200, String::from("GET EMPLOYEE BY ID OK"), result),
+        Err(e) => (204, e.to_string(), Employee::default()),
+    }
+}
 pub fn delete_employee_by_id_controller(id: i32) -> (i32, String, Employee) {
     match Employee::delete_employee_by_id(id) {
         Ok(result) => (200, String::from("DELETE EMPLOYEE BY ID OK"), result),

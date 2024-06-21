@@ -1,4 +1,4 @@
-use rocket::{delete, patch, post, serde::json::Json};
+use rocket::{delete, get, patch, post, serde::json::Json};
 use serde_json::json;
 
 use super::employee_param::EmployeeParam;
@@ -65,6 +65,17 @@ pub fn get_employee_by_params(params: Json<EmployeeParam>) -> Json<serde_json::V
     Json(response)
 }
 
+#[get("/employee/<id>")]
+pub fn get_employee_by_id(id: i32) -> Json<serde_json::Value> {
+    let (code, message, result) = employee_controller::get_employee_by_id_controller(id);
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":result
+    }))
+    .unwrap();
+    Json(response)
+}
 #[utoipa::path(
     responses(
         (status = 200, description = "update successfully", body = Employee),
