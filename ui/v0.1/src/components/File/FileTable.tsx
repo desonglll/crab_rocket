@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 
 export function FileTable() {
 	const [loading, setLoading] = useState(true);
-	const [files, setFiles] = useState<File>([]);
+	const [files, setFiles] = useState<File[]>();
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
