@@ -1,10 +1,8 @@
 import { Menu, MenuProps } from "antd";
-
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import menuItems from "../../config/menuItems";
-
-export function TopMenu() {
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+function SideMenu() {
   const [current, setCurrent] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,13 +22,18 @@ export function TopMenu() {
     navigate(`${e.key}`);
   };
   return (
-    <>
+    <div>
       <Menu
-        onClick={onClick}
-        selectedKeys={[current]}
-        mode="horizontal"
+        defaultSelectedKeys={["1"]}
+        defaultOpenKeys={["sub1"]}
+        mode="vertical"
         items={menuItems}
+        selectedKeys={[current]}
+        onClick={onClick}
+        // style={{ background: "#ffffff" }}
       />
-    </>
+    </div>
   );
 }
+
+export default SideMenu;

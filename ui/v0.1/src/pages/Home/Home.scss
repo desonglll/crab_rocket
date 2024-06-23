@@ -1,0 +1,36 @@
+// 定义一个容器类来包含所有样式
+// 头部样式
+.header {
+  // text-align: center;
+  // padding-inline: 48px;
+  background-color: #ffffff;
+}
+
+// 内容样式
+.content {
+  text-align: center;
+  background-color: #ffffff;
+}
+
+// 侧边栏样式
+.sider {
+  text-align: center;
+  background-color: #ffffff;
+  background: #ffffff !important;
+}
+
+// 底部样式
+.footer {
+  text-align: center;
+  background-color: #ffffff;
+}
+// 布局样式
+.layout {
+  border-radius: 8px;
+  overflow: hidden;
+  width: calc(100% - 8px);
+  max-width: calc(100% - 8px);
+  height: calc(100% - 8px);
+
+  background-color: #ffffff;
+}

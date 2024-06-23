@@ -6,20 +6,55 @@ import UserRoutes from "../../routes/UserRoutes.tsx";
 import TaskRoutes from "../../routes/TaskRoutes.tsx";
 import FileRoutes from "../../routes/FileRoutes.tsx";
 import RoleRoutes from "../../routes/RoleRoutes.tsx";
+import { useState } from "react";
+import { Layout } from "antd";
+const { Header, Footer, Sider, Content } = Layout;
+import { Button } from "antd";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { TopMenu } from "../../components/Common/TopMenu.tsx";
+import SideMenu from "../../components/Common/SideMenu.tsx";
 
+import "./Home.scss";
 export function Home() {
+  const [collapsed, setCollapsed] = useState(false);
+
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
   return (
     <>
-      <Routes>
-        <Route path={""} element={<Greet />} />
-        <Route path={"greet"} element={<Greet />} />
-        <Route path={"post/*"} element={<PostRoutes />} />
-        <Route path={"task/*"} element={<TaskRoutes />} />
-        <Route path={"employee/*"} element={<EmployeeRoutes />} />
-        <Route path={"file/*"} element={<FileRoutes />} />
-        <Route path={"user/*"} element={<UserRoutes />} />
-        <Route path={"role/*"} element={<RoleRoutes />} />
-      </Routes>
+      <Layout>
+        <Header className="header">
+          <TopMenu />
+        </Header>
+        <div>
+          <Button
+            type="primary"
+            onClick={toggleCollapsed}
+            style={{ marginBottom: 16 }}
+          >
+            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </Button>
+        </div>
+        <Layout className="layout">
+          <Sider className="sider" width="15%" collapsed={collapsed}>
+            <SideMenu />
+          </Sider>
+          <Content className="content">
+            <Routes>
+              <Route path={""} element={<Greet />} />
+              <Route path={"greet"} element={<Greet />} />
+              <Route path={"post/*"} element={<PostRoutes />} />
+              <Route path={"task/*"} element={<TaskRoutes />} />
+              <Route path={"employee/*"} element={<EmployeeRoutes />} />
+              <Route path={"file/*"} element={<FileRoutes />} />
+              <Route path={"user/*"} element={<UserRoutes />} />
+              <Route path={"role/*"} element={<RoleRoutes />} />
+            </Routes>
+          </Content>
+        </Layout>
+        <Footer className="footer">Footer</Footer>
+      </Layout>
     </>
   );
 }
