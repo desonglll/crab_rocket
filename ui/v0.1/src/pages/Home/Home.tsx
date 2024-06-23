@@ -23,21 +23,31 @@ export function Home() {
   };
   return (
     <>
-      <Layout>
-        <Header className="header">
+      <Layout style={{ height: "100%" }}>
+        <Header
+          className="header"
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            // width: "100%",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <TopMenu />
         </Header>
-        <div>
-          <Button
-            type="primary"
-            onClick={toggleCollapsed}
-            style={{ marginBottom: 16 }}
-          >
-            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          </Button>
-        </div>
         <Layout className="layout">
-          <Sider className="sider" width="15%" collapsed={collapsed}>
+          <Sider className="sider" width="10%" collapsed={collapsed}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                type="primary"
+                onClick={toggleCollapsed}
+                style={{ marginBottom: 16 }}
+              >
+                {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              </Button>
+            </div>
             <SideMenu />
           </Sider>
           <Content className="content">

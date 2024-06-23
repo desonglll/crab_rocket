@@ -24,13 +24,13 @@ export function TopMenu() {
     navigate(`${e.key}`);
   };
   return (
-    <>
+    <div style={{ width: "100%" }}>
       <Menu
         onClick={onClick}
         selectedKeys={[current]}
         mode="horizontal"
         items={menuItems}
       />
-    </>
+    </div>
   );
 }

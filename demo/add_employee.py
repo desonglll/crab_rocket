@@ -96,7 +96,7 @@ def send_post_request(url, data):
 
 
 if __name__ == "__main__":
-    url = "http://localhost:8000/employee"  # Replace with actual endpoint URL
+    url = "http://localhost:8000/api/employee"  # Replace with actual endpoint URL
     for _ in range(10000):
         new_employee = generate_new_employee()
         send_post_request(url, new_employee)

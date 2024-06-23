@@ -6,7 +6,7 @@ function EmployeeRoutes() {
   return (
     <>
       <Routes>
-        <Route path="/" Component={EmployeeList} />
+        <Route path="list" Component={EmployeeList} />
         <Route path={"detail/:employee_id"} element={<EmployeeDetail />} />
       </Routes>
     </>

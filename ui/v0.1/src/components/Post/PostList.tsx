@@ -22,7 +22,6 @@ function PostList() {
             <BackButton />
             <NewPostButton />
             <Collapse items={items} defaultActiveKey={["1"]} />
-            {/* <PostTable /> */}
           </div>
         </Fade>
       }

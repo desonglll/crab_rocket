@@ -45,22 +45,49 @@ const menuItems: ItemType<MenuItemType>[] = [
           { label: "角色添加", key: "/role/new" },
         ],
       },
+      {
+        label: "员工管理",
+        key: "/employee",
+        icon: <SettingOutlined />,
+        children: [
+          { label: "员工列表", key: "/employee/list" },
+          { label: "员工添加", key: "/employee/new" },
+        ],
+      },
     ],
   },
   {
-    label: "推文",
-    key: "/post",
+    label: "日常",
+    key: "/daily",
     icon: <FormOutlined />,
     children: [
-      { label: "推文列表", key: "/post/list" },
-      { label: "推文添加", key: "/post/new" },
+      {
+        label: "推文管理",
+        key: "/post",
+        children: [
+          { label: "推文列表", key: "/post/list" },
+          { label: "推文添加", key: "/post/new" },
+        ],
+      },
+      {
+        label: "任务管理",
+        key: "/task",
+        children: [
+          { label: "任务列表", key: "/task/list" },
+          { label: "任务添加", key: "/task/new" },
+        ],
+      },
     ],
   },
   {
-    key: "alipay",
+    key: "github",
     label: (
-      <a href="https://ant.design" target="_blank" rel="noopener noreferrer">
-        Navigation Four - Link
+      <a
+        href="https://github.com/desonglll/crab_rocket"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Github
       </a>
     ),
   },
