@@ -7,63 +7,79 @@ import TaskRoutes from "../../routes/TaskRoutes.tsx";
 import FileRoutes from "../../routes/FileRoutes.tsx";
 import RoleRoutes from "../../routes/RoleRoutes.tsx";
 import { useState } from "react";
-import { Layout } from "antd";
+import { Flex, Layout, MenuTheme } from "antd";
 const { Header, Footer, Sider, Content } = Layout;
 import { Button } from "antd";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { TopMenu } from "../../components/Common/TopMenu.tsx";
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SunOutlined,
+} from "@ant-design/icons";
+import TopMenu from "../../components/Common/TopMenu.tsx";
 import SideMenu from "../../components/Common/SideMenu.tsx";
-
 import "./Home.scss";
 export function Home() {
   const [collapsed, setCollapsed] = useState(false);
+  const [theme, setTheme] = useState<MenuTheme>("light");
 
-  const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
-  };
   return (
     <>
-      <Layout style={{ height: "100%" }}>
-        <Header
-          className="header"
-          style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 1,
-            // width: "100%",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <TopMenu />
-        </Header>
-        <Layout className="layout">
-          <Sider className="sider" width="10%" collapsed={collapsed}>
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <Layout>
+        <Sider className="sider" collapsed={collapsed} theme={theme}>
+          <div className="demo-logo-vertical"></div>
+          <SideMenu themeMode={theme} />
+        </Sider>
+        <Layout style={{ height: "100vh", width: "100vw", overflow: "auto" }}>
+          <Flex vertical={true}>
+            <Header
+              className="header"
+              style={{
+                position: "sticky",
+                top: 0,
+                zIndex: 1,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               <Button
-                type="primary"
-                onClick={toggleCollapsed}
-                style={{ marginBottom: 16 }}
-              >
-                {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              </Button>
-            </div>
-            <SideMenu />
-          </Sider>
-          <Content className="content">
-            <Routes>
-              <Route path={""} element={<Greet />} />
-              <Route path={"greet"} element={<Greet />} />
-              <Route path={"post/*"} element={<PostRoutes />} />
-              <Route path={"task/*"} element={<TaskRoutes />} />
-              <Route path={"employee/*"} element={<EmployeeRoutes />} />
-              <Route path={"file/*"} element={<FileRoutes />} />
-              <Route path={"user/*"} element={<UserRoutes />} />
-              <Route path={"role/*"} element={<RoleRoutes />} />
-            </Routes>
-          </Content>
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: "16px",
+                  width: 64,
+                  height: 64,
+                }}
+              />
+              <Button
+                type="text"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                icon={<SunOutlined />}
+                style={{
+                  fontSize: "16px",
+                  width: 64,
+                  height: 64,
+                }}
+              />
+              <TopMenu themeMode={theme} />
+            </Header>
+            <Layout className="layout">
+              <Content className="content">
+                <Routes>
+                  <Route path={""} element={<Greet />} />
+                  <Route path={"greet"} element={<Greet />} />
+                  <Route path={"post/*"} element={<PostRoutes />} />
+                  <Route path={"task/*"} element={<TaskRoutes />} />
+                  <Route path={"employee/*"} element={<EmployeeRoutes />} />
+                  <Route path={"file/*"} element={<FileRoutes />} />
+                  <Route path={"user/*"} element={<UserRoutes />} />
+                  <Route path={"role/*"} element={<RoleRoutes />} />
+                </Routes>
+              </Content>
+            </Layout>
+          </Flex>
+          <Footer className="footer">Footer</Footer>
         </Layout>
-        <Footer className="footer">Footer</Footer>
       </Layout>
     </>
   );

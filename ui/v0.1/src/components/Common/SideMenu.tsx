@@ -1,8 +1,10 @@
-import { Menu, MenuProps } from "antd";
+import { Menu, MenuProps, MenuTheme } from "antd";
 import menuItems from "../../config/menuItems";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-function SideMenu() {
+const SideMenu: React.FC<{ themeMode: MenuTheme }> = ({
+  themeMode = "light",
+}) => {
   const [current, setCurrent] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,14 +28,14 @@ function SideMenu() {
       <Menu
         defaultSelectedKeys={["1"]}
         defaultOpenKeys={["sub1"]}
-        mode="vertical"
+        mode="inline"
         items={menuItems}
         selectedKeys={[current]}
         onClick={onClick}
-        // style={{ background: "#ffffff" }}
+        theme={themeMode}
       />
     </div>
   );
-}
+};
 
 export default SideMenu;
