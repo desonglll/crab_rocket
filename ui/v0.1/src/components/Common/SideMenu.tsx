@@ -33,6 +33,7 @@ const SideMenu: React.FC<{ themeMode: MenuTheme }> = ({
         selectedKeys={[current]}
         onClick={onClick}
         theme={themeMode}
+        style={{ width: "100%" }}
       />
     </div>
   );

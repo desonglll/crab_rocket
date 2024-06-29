@@ -25,61 +25,68 @@ export function Home() {
   return (
     <>
       <Layout>
-        <Sider className="sider" collapsed={collapsed} theme={theme}>
-          <div className="demo-logo-vertical"></div>
-          <SideMenu themeMode={theme} />
-        </Sider>
-        <Layout style={{ height: "100vh", width: "100vw", overflow: "auto" }}>
-          <Flex vertical={true}>
-            <Header
-              className="header"
-              style={{
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
+        <Flex>
+          <Layout>
+            <Sider className="sider" collapsed={collapsed} theme={theme}>
+              <div className="demo-logo-vertical"></div>
+              <SideMenu themeMode={theme} />
+            </Sider>
+          </Layout>
+
+          <Layout style={{ height: "100vh", width: "100vw", overflow: "auto" }}>
+            <Flex vertical={true}>
+              <Header
+                className="header"
                 style={{
-                  fontSize: "16px",
-                  width: 64,
-                  height: 64,
+                  position: "sticky",
+                  top: 0,
+                  zIndex: 1,
+                  display: "flex",
+                  alignItems: "center",
                 }}
-              />
-              <Button
-                type="text"
-                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                icon={<SunOutlined />}
-                style={{
-                  fontSize: "16px",
-                  width: 64,
-                  height: 64,
-                }}
-              />
-              <TopMenu themeMode={theme} />
-            </Header>
-            <Layout className="layout">
-              <Content className="content">
-                <Routes>
-                  <Route path={""} element={<Greet />} />
-                  <Route path={"greet"} element={<Greet />} />
-                  <Route path={"post/*"} element={<PostRoutes />} />
-                  <Route path={"task/*"} element={<TaskRoutes />} />
-                  <Route path={"employee/*"} element={<EmployeeRoutes />} />
-                  <Route path={"file/*"} element={<FileRoutes />} />
-                  <Route path={"user/*"} element={<UserRoutes />} />
-                  <Route path={"role/*"} element={<RoleRoutes />} />
-                </Routes>
-              </Content>
-            </Layout>
-          </Flex>
-          <Footer className="footer">Footer</Footer>
-        </Layout>
+              >
+                <Button
+                  type="text"
+                  icon={
+                    collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+                  }
+                  onClick={() => setCollapsed(!collapsed)}
+                  style={{
+                    fontSize: "16px",
+                    width: 64,
+                    height: 64,
+                  }}
+                />
+                <Button
+                  type="text"
+                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                  icon={<SunOutlined />}
+                  style={{
+                    fontSize: "16px",
+                    width: 64,
+                    height: 64,
+                  }}
+                />
+                <TopMenu themeMode={theme} />
+              </Header>
+              <Layout className="layout">
+                <Content className="content">
+                  <Routes>
+                    <Route path={""} element={<Greet />} />
+                    <Route path={"greet"} element={<Greet />} />
+                    <Route path={"post/*"} element={<PostRoutes />} />
+                    <Route path={"task/*"} element={<TaskRoutes />} />
+                    <Route path={"employee/*"} element={<EmployeeRoutes />} />
+                    <Route path={"file/*"} element={<FileRoutes />} />
+                    <Route path={"user/*"} element={<UserRoutes />} />
+                    <Route path={"role/*"} element={<RoleRoutes />} />
+                  </Routes>
+                </Content>
+              </Layout>
+            </Flex>
+            <Footer className="footer">Footer</Footer>
+          </Layout>
+        </Flex>
       </Layout>
     </>
   );
