@@ -1,5 +1,8 @@
-use crate::controllers::file_controller::{self, retrieve_file_controller};
+use crate::controllers::file_controller::{
+    self, download_file_controller, retrieve_file_controller,
+};
 use crate::models::file::File;
+use crate::models::file_response::{FileDownloadResponse, FileRetrieveResponse};
 use crate::models::upload::Upload;
 use crate::services::file_service::GetFile;
 use rocket::form::Form;
@@ -32,8 +35,14 @@ pub fn options_upload() -> Status {
     Status::Ok
 }
 
+#[get("/download/<uuid>")]
+pub async fn download_file(uuid: Uuid) -> Option<FileDownloadResponse> {
+    println!("{:?}", uuid);
+    download_file_controller(uuid).await
+}
+
 #[get("/retrieve/<uuid>")]
-pub async fn retrieve(uuid: Uuid) -> Option<rocket::fs::NamedFile> {
+pub async fn retrieve_file(uuid: Uuid) -> Option<FileRetrieveResponse> {
     println!("{:?}", uuid);
     retrieve_file_controller(uuid).await
 }
