@@ -1,6 +1,7 @@
 import { UploadOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
+import "./FileUpload.scss";
 const host = window.location.hostname;
 const props: UploadProps = {
   name: "file",
@@ -23,9 +24,11 @@ const props: UploadProps = {
 function FileUpload() {
   return (
     <>
-      <Upload {...props}>
-        <Button icon={<UploadOutlined />}>Click to Upload</Button>
-      </Upload>
+      <div className="upload_button">
+        <Upload {...props}>
+          <Button icon={<UploadOutlined />}>Click to Upload</Button>
+        </Upload>
+      </div>
     </>
   );
 }
