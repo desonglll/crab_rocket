@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["modules/*", "."]
+members = ["modules/*"]
 
 [dependencies]
+rocket = { version = "0.5.1", features = ["json", "uuid"] }
 chrono = { version = "0.4.19", features = ["serde"] }
 chrono-tz = "0.9.0"
-rocket = { version = "0.5.1", features = ["json", "uuid"] }
 rocket_cors = "0.6.0"
 diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
 # Need to enable `chrono` feature to handle DateTime.
@@ -18,8 +18,6 @@ dotenvy = "0.15"
 serde_json = "1.0.117"
 colored = "2.1.0"
 utoipa = { version = "4", features = ["rocket_extras"] }
-
-[workspace.dependencies]
 crab_rocket_utils = { path = "./modules/cb_utils" }
 crab_rocket_task = { path = "./modules/cb_task" }
 crab_rocket_post = { path = "./modules/cb_post" }
