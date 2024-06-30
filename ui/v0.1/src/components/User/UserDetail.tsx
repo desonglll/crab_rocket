@@ -45,7 +45,7 @@ export function UserDetail() {
     data.updated_at = dayjs(data.updated_at).format(
       "YYYY-MM-DDTHH:mm:ss.SSSSSS"
     );
-    console.log(data);
+    console.log("onFinish: ", data);
     try {
       axios.patch(`user/${user_id}`, data).then(() => {
         messageApi
@@ -55,7 +55,7 @@ export function UserDetail() {
             duration: 2,
           })
           .then(() => {
-            window.location.reload();
+            // window.location.reload();
           });
       });
     } catch (error) {
@@ -65,9 +65,7 @@ export function UserDetail() {
   const handleSelectRole = (role: number) => {
     console.log("select:", role);
     // 使用 Form 实例的 setFieldsValue 方法更新表单字段值
-    form.setFieldsValue({
-      role: role,
-    });
+    form.setFieldValue("role_id", role);
   };
   const update_uuid = (uuid: string) => {
     form.setFieldValue("avatar_url", uuid);
@@ -82,18 +80,17 @@ export function UserDetail() {
             <Form
               initialValues={{
                 username: user?.username,
-                role: user?.role_id,
+                role_id: user?.role_id,
                 created_at: dayjs(user?.created_at),
                 email: user?.email,
                 password: user?.password,
                 fullname: user?.fullname,
-                avatar_url:
-                  axios.defaults.baseURL + "/retrieve/" + user?.avatar_url,
+                avatar_url: user?.avatar_url,
                 bio: user?.bio,
                 updated_at: dayjs(user?.updated_at),
                 mobile_phone: user?.mobile_phone,
               }}
-              labelCol={{ span: 8 }}
+              labelCol={{ span: 10 }}
               wrapperCol={{ span: 16 }}
               style={{ maxWidth: 600 }}
               onFinish={onFinish}
@@ -105,7 +102,7 @@ export function UserDetail() {
                     <Form.Item name={"username"} label={"Username"}>
                       <Input />
                     </Form.Item>
-                    <Form.Item name={"role"} label={"role"}>
+                    <Form.Item name={"role_id"} label={"role"}>
                       <SelectRole
                         selected_role={user?.role_id}
                         onSelectRole={handleSelectRole}

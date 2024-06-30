@@ -69,6 +69,7 @@ pub fn insert_single_user(user: Json<NewUser>) -> Json<serde_json::Value> {
 )]
 #[patch("/user/<id>", data = "<user>")]
 pub fn update_user_by_id(id: i32, user: Json<PatchUser>) -> Json<serde_json::Value> {
+    println!("{:?}", user);
     let (code, message, updated_user) = user_controller::update_user_by_id_controller(id, &user);
     let response = serde_json::from_value(json!({
         "code":code,

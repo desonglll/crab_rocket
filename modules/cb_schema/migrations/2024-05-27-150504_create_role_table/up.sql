@@ -16,3 +16,7 @@ VALUES
 ('Admin', 'Administrator role with full access', 'all'),
 ('User', 'Standard user role with limited access', 'read,write'),
 ('Guest', 'Guest role with read-only access', 'read');
+-- 向 role_table 表插入示例数据
+INSERT INTO role_table (role_id, role_name, description, permissions)
+VALUES
+(-1, 'NULL', 'NULL', 'NULL');

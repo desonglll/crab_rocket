@@ -1,5 +1,5 @@
-import { Button, Space, Table, message } from "antd";
-import { NavLink } from "react-router-dom";
+import { Button, Card, Space, Table, message } from "antd";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -10,7 +10,7 @@ export function UserTable() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-
+  const navigate = useNavigate();
   const fetchUser = async () => {
     try {
       const response = await axios.get(`user`);
@@ -53,7 +53,15 @@ export function UserTable() {
       dataIndex: "username",
       key: "username",
       render: (_: string, user: User) => (
-        <NavLink to={`/user/detail/${user.user_id}`}>{user.username}</NavLink>
+        <Card
+          hoverable
+          onClick={() => {
+            navigate(`/user/detail/${user.user_id}`);
+          }}
+          style={{ width: "100%" }}
+        >
+          {user.username}
+        </Card>
       ),
     },
     {

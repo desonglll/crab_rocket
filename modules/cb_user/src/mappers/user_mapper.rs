@@ -18,7 +18,7 @@ pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, dies
 
 // GOOD:
 pub fn fetch_all_users(conn: &mut PgConnection) -> Result<Vec<User>, diesel::result::Error> {
-    user_table.order(user_table::user_id.asc()).load::<User>(conn)
+    user_table.order(user_table::user_id.desc()).load::<User>(conn)
 }
 
 // GOOD:
@@ -32,6 +32,7 @@ pub fn update_user_by_id(
     id: i32,
     user: &PatchUser,
 ) -> Result<User, diesel::result::Error> {
+    // println!("{:?}", user);
     diesel::update(user_table.filter(user_id.eq(id)))
         .set((
             user_table::username.eq(user.username()),
@@ -77,12 +78,10 @@ mod test {
         );
         println!("{user:?}");
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match insert_user(&mut conn, &user) {
-                    Ok(result) => println!("{result}"),
-                    Err(_) => println!("err"),
-                }
-            }
+            Ok(mut conn) => match insert_user(&mut conn, &user) {
+                Ok(result) => println!("{result}"),
+                Err(_) => println!("err"),
+            },
             Err(_) => println!("establish_pg_connection error"),
         }
     }
@@ -93,12 +92,10 @@ mod test {
 
         use super::fetch_all_users;
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match fetch_all_users(&mut conn) {
-                    Ok(res) => println!("{res:?}"),
-                    Err(_) => println!("Err"),
-                }
-            }
+            Ok(mut conn) => match fetch_all_users(&mut conn) {
+                Ok(res) => println!("{res:?}"),
+                Err(_) => println!("Err"),
+            },
             Err(_) => println!("establish_pg_connection error"),
         }
     }
@@ -109,12 +106,10 @@ mod test {
         use crab_rocket_schema::establish_pg_connection;
         let id = 1;
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match fetch_user_by_id(&mut conn, id) {
-                    Ok(res) => println!("{res}"),
-                    Err(_) => println!("Err"),
-                }
-            }
+            Ok(mut conn) => match fetch_user_by_id(&mut conn, id) {
+                Ok(res) => println!("{res}"),
+                Err(_) => println!("Err"),
+            },
             Err(_) => println!("establish_pg_connection error"),
         }
     }
