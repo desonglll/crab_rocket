@@ -2,7 +2,7 @@
 extern crate rocket;
 extern crate crab_rocket_task;
 extern crate crab_rocket_utils;
-use crab_rocket::routes::common;
+use crab_rocket::{env_variables, routes::common};
 use crab_rocket_employee::routes::employee_route;
 use crab_rocket_file::routes::{bin_file_route, form_file_route};
 use crab_rocket_follow::routes::follow_route;
@@ -23,6 +23,8 @@ use std::env;
 fn rocket() -> _ {
     // Clear environment variable before running.
     env::remove_var("DATABASE_URL");
+    // Load env
+    env_variables::load_env();
     dotenv().ok();
 
     crab_rocket_utils::run_preload();
@@ -47,6 +49,9 @@ fn rocket() -> _ {
             "Another-Header", // 允许的其他头部信息
             "Authorization",
             "Accept",
+            "User-Agent",
+            "X-Requested-With",
+            "Referer",
         ]),
         allow_credentials: true,
         ..Default::default()
@@ -65,6 +70,7 @@ fn rocket() -> _ {
                 form_file_route::retrieve,
                 form_file_route::get_all_files,
                 form_file_route::file_stream,
+                form_file_route::options_upload,
                 info_route::get_info,
                 // task routes
                 task_route::index,

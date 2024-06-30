@@ -3,11 +3,11 @@ use crate::models::file::File;
 use crate::models::upload::Upload;
 use crate::services::file_service::GetFile;
 use rocket::form::Form;
+use rocket::http::Status;
 use rocket::response::stream::ByteStream;
 use rocket::serde::json::Json;
 use rocket::tokio::io::AsyncReadExt;
-use rocket::{get, post};
-
+use rocket::{get, options, post};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -27,6 +27,11 @@ pub async fn upload(upload: Form<Upload<'_>>) -> Json<serde_json::Value> {
     .unwrap();
     Json(response)
 }
+#[options("/upload")]
+pub fn options_upload() -> Status {
+    Status::Ok
+}
+
 #[get("/retrieve/<uuid>")]
 pub async fn retrieve(uuid: Uuid) -> Option<rocket::fs::NamedFile> {
     println!("{:?}", uuid);
