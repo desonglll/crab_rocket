@@ -20,6 +20,13 @@ pub async fn insert_file_controller(files: Vec<TempFile<'_>>) -> (i32, String, V
         Err(e) => (204, e.to_string(), Vec::new()),
     }
 }
+pub async fn insert_avatar_file_controller(file: TempFile<'_>) -> (i32, String, String) {
+    match File::insert_avatar_file(file).await {
+        Ok(result) => (200, String::from("INSERT FILES OK"), result),
+        Err(e) => (204, e.to_string(), String::new()),
+    }
+}
+
 pub async fn retrieve_file_controller(uuid: Uuid) -> Option<FileRetrieveResponse> {
     match File::retrieve_file_url_by_uuid(uuid) {
         Ok(path) => {

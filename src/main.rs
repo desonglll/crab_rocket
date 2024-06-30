@@ -67,6 +67,7 @@ fn rocket() -> _ {
                 bin_file_route::retrieve_bin,
                 bin_file_route::upload_bin,
                 form_file_route::upload,
+                form_file_route::upload_avatar,
                 form_file_route::download_file,
                 form_file_route::retrieve_file,
                 form_file_route::get_all_files,
