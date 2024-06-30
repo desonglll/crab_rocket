@@ -55,9 +55,9 @@ async function setupChart() {
       {
         type: "value",
         name: "times",
-        min: 0,
-        max: 250,
-        interval: 50,
+        // min: 0,
+        // max: 1000,
+        // interval: 50,
         axisLabel: {
           formatter: "{value} times",
         },

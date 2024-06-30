@@ -54,7 +54,7 @@ pub fn retrieve_file_url_by_uuid(
 }
 
 pub fn fetch_all_files(conn: &mut PgConnection) -> Result<Vec<File>, diesel::result::Error> {
-    file_table.order(file_table::id.asc()).load::<File>(conn)
+    file_table.order(file_table::uploaded_at.desc()).load::<File>(conn)
 }
 
 #[cfg(test)]

@@ -36,7 +36,15 @@
 }
 .demo-logo-vertical {
   height: 32px;
+  width: -webkit-fill-available;
   margin: 16px;
+  background: rgba(105, 151, 249, 0.2);
+  border-radius: 6px;
+}
+.demo-avatar {
+  height: 50px;
+  width: 50px;
+  margin: auto;
   background: rgba(105, 151, 249, 0.2);
   border-radius: 6px;
 }

@@ -28,7 +28,7 @@ export function Home() {
         <Flex>
           <Layout>
             <Sider className="sider" collapsed={collapsed} theme={theme}>
-              <div className="demo-logo-vertical"></div>
+              <Button className="demo-logo-vertical"></Button>
               <SideMenu themeMode={theme} />
             </Sider>
           </Layout>
@@ -68,6 +68,7 @@ export function Home() {
                   }}
                 />
                 <TopMenu themeMode={theme} />
+                <Button className="demo-avatar"></Button>
               </Header>
               <Layout className="layout">
                 <Content className="content">
