@@ -28,7 +28,7 @@ pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "data":task
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -47,7 +47,7 @@ pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Val
         "message":message,
         "data":patched_task
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -74,7 +74,7 @@ pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
         "message":message,
         "data":task
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -93,7 +93,7 @@ pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
         "message":message,
         "date":deleted_task
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -105,6 +105,7 @@ pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
 )]
 #[get("/task")]
 pub fn get_all_tasks() -> Json<serde_json::Value> {
+    crab_rocket_schema::update_reload::update_reload_count();
     let (code, message, tasks) = task_controller::get_all_tasks_controller();
     let response = json!({
         "code":code,
@@ -130,7 +131,7 @@ pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
         "message":message,
         "data":result_task
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 
@@ -150,7 +151,7 @@ pub fn get_tasks_by_params(
         "message":message,
         "data":filtered_tasks,
     }))
-        .unwrap();
+    .unwrap();
     Json(response)
 }
 

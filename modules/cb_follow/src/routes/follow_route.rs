@@ -11,6 +11,7 @@ use crate::{controllers::follow_controller, models::follow::NewFollow};
 )]
 #[get("/follow")]
 pub fn get_all_follows() -> Json<serde_json::Value> {
+    crab_rocket_schema::update_reload::update_reload_count();
     let (code, message, all_follows) = follow_controller::get_all_follows_controller();
     let response = serde_json::from_value(json!({
         "code":code,

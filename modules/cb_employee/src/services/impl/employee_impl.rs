@@ -23,7 +23,21 @@ impl GetEmployee for Employee {
             }
         }
     }
-
+    fn get_all_employees() -> Result<Vec<Employee>, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match employee_mapper::fetch_all_employees(&mut conn) {
+                Ok(all_employees) => Ok(all_employees),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
     fn get_employee_by_id(id: i32) -> Result<Employee, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match employee_mapper::fetch_employee_by_id(&mut conn, id) {

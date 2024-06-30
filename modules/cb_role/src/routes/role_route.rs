@@ -19,6 +19,7 @@ pub fn insert_role(role: Json<NewRole>) -> Json<serde_json::Value> {
 
 #[get("/role")]
 pub fn get_all_roles() -> Json<serde_json::Value> {
+    crab_rocket_schema::update_reload::update_reload_count();
     let (status, message, roles) = role_controller::get_all_roles_controller();
     let response = json!(
         {

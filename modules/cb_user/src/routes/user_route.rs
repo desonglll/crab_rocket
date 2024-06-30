@@ -14,6 +14,7 @@ use crate::{
 )]
 #[get("/user")]
 pub fn get_all_users() -> Json<serde_json::Value> {
+    crab_rocket_schema::update_reload::update_reload_count();
     let (code, message, all_users) = user_controller::get_all_users_controller();
     let response = serde_json::from_value(json!({
         "code":code,

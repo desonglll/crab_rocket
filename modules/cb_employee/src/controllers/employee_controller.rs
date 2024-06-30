@@ -3,6 +3,12 @@ use crate::{
     routes::employee_param::EmployeeParam,
     services::employee_service::GetEmployee,
 };
+pub fn get_all_employees_controller() -> (i32, String, Vec<Employee>) {
+    match Employee::get_all_employees() {
+        Ok(all_employees) => (200, String::from("GET ALL EMPLOYEES OK"), all_employees),
+        Err(e) => (204, e.to_string(), Vec::new()),
+    }
+}
 
 pub fn insert_single_employee_controller(new_employee: &NewEmployee) -> (i32, String, Employee) {
     match Employee::insert_employee(new_employee) {

@@ -124,6 +124,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    reload_counts (reload_date) {
+        reload_date -> Date,
+        count -> Int4,
+    }
+}
+
+diesel::table! {
     role_table (role_id) {
         role_id -> Int4,
         #[max_length = 255]
@@ -180,6 +187,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     follows,
     permission_table,
     posts,
+    reload_counts,
     role_table,
     tasks,
     user_table,

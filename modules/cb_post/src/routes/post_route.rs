@@ -22,6 +22,7 @@ pub struct PostQuery {
 )]
 #[get("/post")]
 pub fn get_all_posts() -> Json<serde_json::Value> {
+    crab_rocket_schema::update_reload::update_reload_count();
     let (code, message, all_posts) = post_controller::get_all_posts_controller();
     let response = serde_json::from_value(json!({
         "code":code,

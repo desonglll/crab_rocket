@@ -44,6 +44,13 @@ pub fn fetch_employee_by_id(
 ) -> Result<Employee, diesel::result::Error> {
     employee_table.filter(employee_table::employee_id.eq(id)).first(conn)
 }
+
+pub fn fetch_all_employees(
+    conn: &mut PgConnection,
+) -> Result<Vec<Employee>, diesel::result::Error> {
+    employee_table.order(employee_table::employee_id.asc()).load::<Employee>(conn)
+}
+
 pub fn update_employee_by_id(
     conn: &mut PgConnection,
     id: i32,

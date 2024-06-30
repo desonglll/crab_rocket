@@ -16,6 +16,7 @@ use crate::{
 )]
 #[post("/employee", data = "<employee>")]
 pub fn insert_single_employee(employee: Json<NewEmployee>) -> Json<serde_json::Value> {
+    crab_rocket_schema::update_reload::update_reload_count();
     let (code, message, inserted_employee) =
         employee_controller::insert_single_employee_controller(&employee);
     let response = serde_json::from_value(json!({
@@ -26,7 +27,18 @@ pub fn insert_single_employee(employee: Json<NewEmployee>) -> Json<serde_json::V
     .unwrap();
     Json(response)
 }
-
+#[get("/employee")]
+pub fn get_all_employees() -> Json<serde_json::Value> {
+    crab_rocket_schema::update_reload::update_reload_count();
+    let (code, message, all_employees) = employee_controller::get_all_employees_controller();
+    let response = serde_json::from_value(json!({
+        "code":code,
+        "message":message,
+        "data":all_employees
+    }))
+    .unwrap();
+    Json(response)
+}
 // for employee delete
 #[utoipa::path(
     responses(
