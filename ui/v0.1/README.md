@@ -19,3 +19,8 @@ server{
        }
 }
 ```
+
+## Production build
+```shell
+# npm run build -- --mode production
+```

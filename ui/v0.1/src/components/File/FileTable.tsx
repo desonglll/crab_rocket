@@ -2,7 +2,6 @@ import { Button, Card, Table, TableProps, message } from "antd";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { File } from "../../models/models.ts";
-import { NavLink } from "react-router-dom";
 import dayjs from "dayjs";
 
 export function FileTable() {
@@ -42,9 +41,9 @@ export function FileTable() {
               const msg = successful
                 ? "File ID copied to clipboard"
                 : "Failed to copy file ID";
-              message.success(msg);
+              messageApi.success(msg);
             } catch (err) {
-              message.error("Failed to copy file ID");
+              messageApi.error("Failed to copy file ID");
             }
             document.body.removeChild(textArea);
           }}
@@ -88,7 +87,7 @@ export function FileTable() {
       dataIndex: "uploaded_at",
       key: "uploaded_at",
       render: (_, file: File) => (
-        <Card style={{ width: "max-content" }}>
+        <Card hoverable style={{ width: "max-content" }}>
           {dayjs(file.uploaded_at).format("YYYY-MM-DDTHH:mm:ss")}
         </Card>
       ),
