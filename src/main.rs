@@ -10,6 +10,7 @@ use crab_rocket_info::routes::info_route;
 use crab_rocket_permission::routes::permission_route;
 use crab_rocket_post::routes::post_route;
 use crab_rocket_role::routes::role_route;
+use crab_rocket_schema::routes::schema_routes;
 use crab_rocket_task::routes::task_route;
 use crab_rocket_user::routes::user_route;
 use dotenvy::dotenv;
@@ -100,6 +101,7 @@ fn rocket() -> _ {
                 employee_route::insert_single_employee,
                 employee_route::delete_employee_by_id,
                 employee_route::get_employee_by_id,
+                employee_route::get_all_employees,
                 employee_route::get_employee_by_params,
                 employee_route::update_employee_by_id,
                 // role routes
@@ -109,7 +111,9 @@ fn rocket() -> _ {
                 role_route::get_role_by_id,
                 role_route::update_role_by_id,
                 // permission routes
-                permission_route::get_all_permissions
+                permission_route::get_all_permissions,
+                // schema_routes
+                schema_routes::get_reload_count
             ],
         )
         .attach(cors)
