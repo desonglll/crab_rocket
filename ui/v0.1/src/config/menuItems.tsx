@@ -4,6 +4,8 @@ import {
   SettingOutlined,
   HomeOutlined,
   FileOutlined,
+  UnorderedListOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 const menuItems: ItemType<MenuItemType>[] = [
   {
@@ -13,8 +15,20 @@ const menuItems: ItemType<MenuItemType>[] = [
   },
   {
     label: "文件",
-    key: "/file/list",
+    key: "/file",
     icon: <FileOutlined />,
+    children: [
+      {
+        label: "文件列表",
+        key: "/file/list",
+        icon: <UnorderedListOutlined />,
+      },
+      {
+        label: "文件上传",
+        key: "/file/upload",
+        icon: <UploadOutlined />,
+      },
+    ],
   },
   {
     label: "管理",

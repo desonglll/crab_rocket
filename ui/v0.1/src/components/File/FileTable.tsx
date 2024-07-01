@@ -68,8 +68,8 @@ export function FileTable() {
             try {
               const successful = document.execCommand("copy");
               const msg = successful
-                ? "File ID copied to clipboard"
-                : "Failed to copy file ID";
+                ? "File name copied to clipboard"
+                : "Failed to copy file name";
               message.success(msg);
             } catch (err) {
               message.error("Failed to copy file ID");
@@ -123,7 +123,12 @@ export function FileTable() {
         <>
           {contextHolder}
           <div style={{ overflow: "auto" }}>
-            <Table columns={columns} dataSource={files} rowKey={"id"} />
+            <Table
+              size="middle"
+              columns={columns}
+              dataSource={files}
+              rowKey={"id"}
+            />
           </div>
         </>
       )}

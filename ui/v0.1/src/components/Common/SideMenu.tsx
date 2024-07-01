@@ -24,18 +24,15 @@ const SideMenu: React.FC<{ themeMode: MenuTheme }> = ({
     navigate(`${e.key}`);
   };
   return (
-    <div>
-      <Menu
-        defaultSelectedKeys={["1"]}
-        defaultOpenKeys={["sub1"]}
-        mode="inline"
-        items={menuItems}
-        selectedKeys={[current]}
-        onClick={onClick}
-        theme={themeMode}
-        style={{ width: "100%" }}
-      />
-    </div>
+    <Menu
+      defaultSelectedKeys={["1"]}
+      defaultOpenKeys={["sub1"]}
+      mode="inline"
+      items={menuItems}
+      selectedKeys={[current]}
+      onClick={onClick}
+      theme={themeMode}
+    />
   );
 };
 

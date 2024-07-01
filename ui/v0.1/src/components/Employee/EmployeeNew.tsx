@@ -1,41 +1,18 @@
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Fade } from "@mui/material";
 import { Button, DatePicker, Form, Input, message } from "antd";
-import { BackButton } from "../Common/BackButton";
 import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone"; // 引入时区插件
-import utc from "dayjs/plugin/utc";
 import SelectRole from "../Common/SelectRole.tsx";
 import { Employee } from "../../models/models.ts";
-// 添加时区和 UTC 插件
-dayjs.extend(timezone);
-dayjs.extend(utc);
-
-export function EmployeeDetail() {
-  const { employee_id } = useParams();
+import { BackButton } from "../Common/BackButton.tsx";
+function EmployeeNew() {
   const [loading, setLoading] = useState(true);
-  const [employee, setEmployee] = useState<Employee>();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm(); // 使用 Form 实例
-
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get(`employee/${employee_id}`);
-      console.log(response.data);
-
-      setEmployee(response.data.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
   useEffect(() => {
-    fetchUser().then(() => {
-      setLoading(!loading);
-    });
+    setLoading(!loading);
   }, []);
-
   const onFinish = (data: Employee) => {
     // 将 created_at 转换为 UTC 时间，并格式化为您希望的日期时间格式
     data.last_update = dayjs(data.last_update).format(
@@ -51,11 +28,11 @@ export function EmployeeDetail() {
     }
     console.log(data);
     try {
-      axios.patch(`employee/${employee_id}`, data).then(() => {
+      axios.post(`employee`, data).then(() => {
         messageApi
           .open({
             type: "success",
-            content: "成功更新用户信息",
+            content: "成功新建用户信息",
             duration: 2,
           })
           .then(() => {
@@ -81,29 +58,6 @@ export function EmployeeDetail() {
             {contextHolder}
             <BackButton />
             <Form
-              initialValues={{
-                employee_id: employee?.employee_id,
-                first_name: employee?.first_name,
-                last_name: employee?.last_name,
-                employee_name: employee?.employee_name,
-                gender: employee?.gender,
-                date_of_birth: dayjs(employee?.date_of_birth),
-                hire_date: dayjs(employee?.hire_date),
-                email: employee?.email,
-                phone_number: employee?.phone_number,
-                department_id: employee?.department_id,
-                job_title: employee?.job_title,
-                salary: employee?.salary,
-                manager_id: employee?.manager_id,
-                address: employee?.address,
-                city: employee?.city,
-                state: employee?.state,
-                postal_code: employee?.postal_code,
-                valid: employee?.valid,
-                last_update: dayjs(employee?.last_update),
-                role_name: employee?.role_name,
-                role_id: employee?.role_id,
-              }}
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
               style={{ maxWidth: 600 }}
@@ -169,7 +123,7 @@ export function EmployeeDetail() {
               </Form.Item>
               <Form.Item name={"role_id"} label={"role_id"}>
                 <SelectRole
-                  selected_role={employee?.role_id}
+                  selected_role={-1}
                   onSelectRole={handleSelectRole}
                 />
               </Form.Item>
@@ -183,3 +137,5 @@ export function EmployeeDetail() {
     </>
   );
 }
+
+export default EmployeeNew;

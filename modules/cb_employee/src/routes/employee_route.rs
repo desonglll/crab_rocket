@@ -1,4 +1,4 @@
-use rocket::{delete, get, patch, post, serde::json::Json};
+use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 use serde_json::json;
 
 use super::employee_param::EmployeeParam;
@@ -104,4 +104,8 @@ pub fn update_employee_by_id(id: i32, emp: Json<PatchEmployee>) -> Json<serde_js
     }))
     .unwrap();
     Json(response)
+}
+#[options("/employee/filter")]
+pub fn options_employee_filter() -> Status {
+    Status::Ok
 }

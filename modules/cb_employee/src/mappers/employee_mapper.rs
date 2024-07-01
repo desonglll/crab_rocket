@@ -48,7 +48,7 @@ pub fn fetch_employee_by_id(
 pub fn fetch_all_employees(
     conn: &mut PgConnection,
 ) -> Result<Vec<Employee>, diesel::result::Error> {
-    employee_table.order(employee_table::employee_id.asc()).load::<Employee>(conn)
+    employee_table.order(employee_table::last_update.desc()).load::<Employee>(conn)
 }
 
 pub fn update_employee_by_id(
@@ -103,7 +103,7 @@ pub fn fetch_employee_by_params(
             query = query.offset(offset.into());
         }
     }
-    let filtered_emp = query.order(employee_table::employee_id.asc()).load::<Employee>(conn);
+    let filtered_emp = query.order(employee_table::last_update.desc()).load::<Employee>(conn);
 
     filtered_emp
 }
