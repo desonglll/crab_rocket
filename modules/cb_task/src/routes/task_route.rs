@@ -10,10 +10,10 @@ use serde_json::json;
 /// 若业务逻辑复杂则启用controller层
 /// 目前只是把业务逻辑简单包含在路由中
 /// ## Put和Patch
-/// https://ihower.tw/blog/archives/6483
+/// `https://ihower.tw/blog/archives/6483`
 /// PUT 比較正確的定義是 Replace (Create or Update)，
 /// 例如PUT/items/1的意思是替換/items/1，如果已經存在就替換，沒有就新增。
-/// PUT必須包含items/1的所有屬性資料。
+/// PUT必須包含items/1的所有屬性資料
 #[utoipa::path(
     responses(
         (status = 200, description = "found successfully", body = Task),

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["establish_pg_connection"],"mod":["env_variables","routes"]};
