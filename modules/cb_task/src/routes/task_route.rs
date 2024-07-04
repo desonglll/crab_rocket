@@ -2,7 +2,9 @@ use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::{delete, get, options, patch, post};
 use serde_json::json;
-use obj_traits::{ControllerCRUD, PaginationRequestParam, RequestParam};
+use obj_traits::controller::controller_crud::ControllerCRUD;
+use obj_traits::request::pagination_request_param::PaginationRequestParam;
+use obj_traits::request::request_param::RequestParam;
 use crate::controllers::task_controller::TaskController;
 use crate::models::task::{NewTask, PatchTask};
 

@@ -1,7 +1,11 @@
 use crate::mappers::task_mapper::TaskMapper;
 use crate::models::task::{NewTask, PatchTask, Task};
 use crab_rocket_schema::establish_pg_connection;
-use obj_traits::{Data, MapperCRUD, PaginationRequestParam, RequestParam, ServiceCRUD};
+use obj_traits::mapper::mapper_crud::MapperCRUD;
+use obj_traits::request::pagination_request_param::PaginationRequestParam;
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::data::Data;
+use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct TaskService {}
 
@@ -113,7 +117,6 @@ mod tests {
     use super::*;
     use crate::models::task::NewTask;
     use crab_rocket_utils::time::get_e8_time;
-    use obj_traits::PaginationRequestParam;
 
     #[test]
     fn test_insert_single_task() {

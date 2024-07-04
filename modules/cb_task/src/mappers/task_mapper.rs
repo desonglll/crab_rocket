@@ -3,8 +3,11 @@ use crab_rocket_schema::schema::tasks::dsl; //配合下面的 `tasks.filter()`
 use crab_rocket_schema::schema::tasks::{self};
 use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
-use obj_traits::{Data, PaginationRequestParam, RequestParam};
-use obj_traits::{MapperCRUD, Pagination};
+use obj_traits::mapper::mapper_crud::MapperCRUD;
+use obj_traits::request::pagination_request_param::{Pagination, PaginationRequestParam};
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::data::Data;
+
 
 pub struct TaskMapper {}
 
@@ -94,7 +97,9 @@ mod tests {
     use super::TaskMapper;
     use crate::models::task::{NewTask, PatchTask};
     use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::{MapperCRUD, PaginationRequestParam, RequestParam};
+    use obj_traits::mapper::mapper_crud::MapperCRUD;
+    use obj_traits::request::pagination_request_param::PaginationRequestParam;
+    use obj_traits::request::request_param::RequestParam;
 
     #[test]
     fn test_insert_task() {

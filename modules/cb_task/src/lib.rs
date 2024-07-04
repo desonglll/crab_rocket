@@ -13,7 +13,6 @@ pub mod models {
 }
 
 pub mod routes {
-    pub mod task_param;
     pub mod task_route;
 }
 
