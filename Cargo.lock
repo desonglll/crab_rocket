@@ -351,6 +351,7 @@ name = "crab_rocket_schema"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "colored",
  "diesel",
  "dotenv",
  "rocket",

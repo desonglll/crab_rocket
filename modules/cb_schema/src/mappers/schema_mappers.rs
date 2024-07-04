@@ -1,5 +1,5 @@
+use crate::models::reload_count::ReloadCount;
 use crate::schema::reload_counts::{self, dsl::*};
-use crate::update_reload::ReloadCount;
 use diesel::prelude::*;
 use diesel::PgConnection;
 pub fn get_reload_counts(

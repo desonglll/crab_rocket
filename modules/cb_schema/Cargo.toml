@@ -12,3 +12,4 @@ serde_json = "1.0.118"
 diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
 chrono = { version = "0.4.38" }
 dotenv = { version = "0.15.0" }
+colored = { version = "2.1.0" }
