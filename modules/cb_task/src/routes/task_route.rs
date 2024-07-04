@@ -1,10 +1,10 @@
-use crate::controllers::task_controller;
-use crate::models::task::{NewTask, PatchTask, PutTask, Task};
-use crab_rocket_utils::time::get_e8_time;
 use rocket::http::Status;
 use rocket::serde::json::Json;
-use rocket::{delete, get, options, patch, post, put};
+use rocket::{delete, get, options, patch, post};
 use serde_json::json;
+use obj_traits::{ControllerCRUD, PaginationRequestParam, RequestParam};
+use crate::controllers::task_controller::TaskController;
+use crate::models::task::{NewTask, PatchTask};
 
 /// # Note
 /// 若业务逻辑复杂则启用controller层
@@ -22,14 +22,10 @@ use serde_json::json;
 )]
 #[get("/task/<id>")]
 pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
-    let (code, message, task) = task_controller::get_task_by_id_controller(id);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":task
-    }))
-    .unwrap();
-    Json(response)
+    crab_rocket_schema::update_reload::update_reload_count();
+    let resp = TaskController::get_by_id(id).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[utoipa::path(
@@ -40,15 +36,9 @@ pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
 )]
 #[patch("/task/<id>", data = "<task>")]
 pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
-    let (code, message, patched_task) =
-        task_controller::update_task_by_id_controller(id, &task.into_inner());
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":patched_task
-    }))
-    .unwrap();
-    Json(response)
+    let resp = TaskController::update_by_id(id, &task).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[utoipa::path(
@@ -57,44 +47,11 @@ pub fn update_task_by_id(id: i32, task: Json<PatchTask>) -> Json<serde_json::Val
         (status = NOT_FOUND, description = "not found")
     )
 )]
-#[put("/task/<id>", data = "<task>")]
-pub fn put_task(id: i32, task: Json<PatchTask>) -> Json<serde_json::Value> {
-    //Convert a patch task json to a put task json which include `id`.
-    let put_task = PutTask::new(
-        id,
-        task.title().to_string(),
-        task.content().clone(),
-        Some(get_e8_time()),
-        task.user_id(),
-    );
-    let (code, message, task) = task_controller::put_task_by_id_controller(id, &put_task.into());
-    println!("{task:?}");
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":task
-    }))
-    .unwrap();
-    Json(response)
-}
-
-#[utoipa::path(
-    params(("id", description = "delete id"),),
-    responses(
-        (status = 200, description = "delete successfully", body = Task),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
 #[delete("/task/<id>")]
 pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
-    let (code, message, deleted_task) = task_controller::delete_task_by_id_controller(id);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "date":deleted_task
-    }))
-    .unwrap();
-    Json(response)
+    let resp = TaskController::delete_by_id(id).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[utoipa::path(
@@ -103,16 +60,32 @@ pub fn delete_task_by_id(id: i32) -> Json<serde_json::Value> {
         (status = NOT_FOUND, description = "not found")
     )
 )]
-#[get("/task")]
-pub fn get_all_tasks() -> Json<serde_json::Value> {
+#[post("/ttask", data = "<params>")]
+pub fn get_tasks_by_param(mut params: Option<Json<RequestParam<PaginationRequestParam>>>) -> Json<serde_json::Value> {
+    if params.is_none() {
+        params = Some(Json(RequestParam::new(PaginationRequestParam::new(Some(10), Some(0)))));
+    }
+    println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
-    let (code, message, tasks) = task_controller::get_all_tasks_controller();
-    let response = json!({
-        "code":code,
-        "message": message,
-        "data":tasks
-    });
-    Json(serde_json::from_value(response).unwrap())
+    let resp = TaskController::get_all(&params.unwrap()).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
+}
+
+#[get("/task?<limit>&<offset>")]
+pub fn get_tasks(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
+    if limit.is_none() {
+        limit = Some(10);
+    };
+    if offset.is_none() {
+        offset = Some(0);
+    };
+    let params = RequestParam::new(PaginationRequestParam::new(limit, offset));
+    println!("{:?}", params);
+    crab_rocket_schema::update_reload::update_reload_count();
+    let resp = TaskController::get_all(&params).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[utoipa::path(
@@ -123,36 +96,11 @@ pub fn get_all_tasks() -> Json<serde_json::Value> {
 )]
 #[post("/task", data = "<task>")]
 pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
-    let mut raw_task: NewTask = task.into_inner();
-    let (code, message, result_task): (i32, String, Task) =
-        task_controller::insert_single_task_controller(&mut raw_task);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":result_task
-    }))
-    .unwrap();
-    Json(response)
-}
+    let mut obj: NewTask = task.into_inner();
 
-#[utoipa::path(
-    responses(
-        (status = 200, description = "found successfully", body = Vec < Task >),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[post("/task/filter", data = "<params>")]
-pub fn get_tasks_by_params(
-    params: Json<crate::routes::task_param::TaskParam>,
-) -> Json<serde_json::Value> {
-    let (code, message, filtered_tasks) = task_controller::get_tasks_by_params_controller(&params);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":filtered_tasks,
-    }))
-    .unwrap();
-    Json(response)
+    let resp = TaskController::add_single(&mut obj).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[get("/")]

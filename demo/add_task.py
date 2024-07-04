@@ -24,7 +24,7 @@ def generate_random_data():
 
 
 if __name__ == "__main__":
-    url = "http://localhost:8000/task"  # 请将URL替换为实际的目标URL
+    url = "http://localhost:8000/api/task"  # 请将URL替换为实际的目标URL
     for _ in range(10000):
         random_data = generate_random_data()
         send_post_request(url, random_data)

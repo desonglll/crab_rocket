@@ -9,6 +9,7 @@ use crab_rocket_schema::routes::schema_routes;
 use crab_rocket_task::routes::task_route;
 use crab_rocket_user::routes::user_route;
 use rocket::{routes, Route};
+
 pub fn module_routes() -> Vec<Route> {
     routes![
         bin_file_route::files,
@@ -25,13 +26,12 @@ pub fn module_routes() -> Vec<Route> {
         // task routes
         task_route::index,
         task_route::demo,
+        task_route::get_tasks_by_param,
         task_route::insert_single_task,
-        task_route::get_all_tasks,
         task_route::get_task_by_id,
         task_route::update_task_by_id,
         task_route::delete_task_by_id,
-        task_route::put_task,
-        task_route::get_tasks_by_params,
+        task_route::get_tasks,
         task_route::options_task_filter,
         //user routes
         user_route::insert_single_user,

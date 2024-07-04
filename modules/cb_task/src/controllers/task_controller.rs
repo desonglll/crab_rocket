@@ -1,95 +1,81 @@
-use crate::mappers::task_mapper;
-use crab_rocket_schema::establish_pg_connection;
-
-use crate::models::task::{NewTask, Task};
-use crate::routes::task_param::TaskParam;
-use crate::services::task_service::GetTask;
+use std::error::Error;
 use crab_rocket_utils::time::get_e8_time;
+use crate::models::task::{NewTask, PatchTask, Task};
+use crate::services::task_service::{TaskService};
+use obj_traits::{ApiResponse, ControllerCRUD, Data, Pagination, PaginationRequestParam, RequestParam, ServiceCRUD};
 
-// GOOD:
-pub fn get_all_tasks_controller() -> (i32, String, Vec<Task>) {
-    match Task::get_all_tasks() {
-        Ok(all_tasks) => (200, String::from("OK"), all_tasks),
-        Err(e) => {
-            println!("{e:?}");
-            (200, e.to_string(), Vec::new())
-        }
-    }
-}
+pub struct TaskController {}
 
-// GOOD:
-pub fn get_task_by_id_controller(id: i32) -> (i32, String, Task) {
-    match Task::get_task_by_id(id) {
-        Ok(task) => (200, String::from("OK"), task),
-        Err(e) => {
-            println!("{e:?}");
-            (200, e.to_string(), Task::default())
-        }
-    }
-}
+impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationRequestParam>> for TaskController {
+    fn get_all(param: &RequestParam<PaginationRequestParam>) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn Error>> {
+        match TaskService::get_all(param) {
+            Ok(data) => {
+                let response =
+                    ApiResponse::new("200".to_string(), "Success".to_string(), data);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
 
-pub fn insert_single_task_controller(raw_task: &mut NewTask) -> (i32, String, Task) {
-    // Handle None date time
-    if raw_task.created_at() == None {
-        raw_task.set_created_at(Some(get_e8_time()));
-    }
-    if raw_task.updated_at() == None {
-        raw_task.set_updated_at(Some(get_e8_time()));
-    }
-    match Task::insert_single_task(&raw_task.clone()) {
-        Ok(result_task) => (201, String::from("Created"), result_task),
-        Err(e) => (204, e.to_string(), Task::default()),
-    }
-}
-
-pub fn put_task_by_id_controller(
-    id: i32,
-    task: &crate::models::task::PutTask,
-) -> (i32, String, Task) {
-    match establish_pg_connection() {
-        Ok(mut conn) => {
-            if task_mapper::check_exist_task_by_id(&mut conn, id) {
-                // Update all fields if exists.
-                println!("Update all fields.");
-                match Task::update_task_by_id(id, &task.clone().into()) {
-                    Ok(task) => (200, String::from("PUT OK"), task),
-                    Err(e) => (204, e.to_string(), Task::default()),
-                }
-            } else {
-                // Insert a new task if not exists.
-                println!("Insert a new task.");
-                match Task::insert_full_single_task(&task.clone().into()) {
-                    Ok(inserted_new_task) => {
-                        (200, String::from("PUT -> INSERT NEW OK"), inserted_new_task)
-                    }
-                    Err(e) => (204, e.to_string(), Task::default()),
-                }
+                Ok(ApiResponse::new("200".to_string(), e.to_string(), Data::new(Vec::new(), Pagination::default())))
             }
         }
-        Err(e) => (504, e.to_string(), Task::default()),
+    }
+    fn get_by_id(pid: i32) -> Result<ApiResponse<Task>, Box<dyn Error>> {
+        match TaskService::get_by_id(pid) {
+            Ok(body) => {
+                let response = ApiResponse::new(String::from("200"), String::from("Success"), body);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::new("200".to_string(), e.to_string(), Task::default()))
+            }
+        }
+    }
+
+    fn add_single(obj: &mut NewTask) -> Result<ApiResponse<Task>, Box<dyn Error>> {
+        // Handle None date time
+        if obj.created_at() == None {
+            obj.set_created_at(Some(get_e8_time()));
+        }
+        if obj.updated_at() == None {
+            obj.set_updated_at(Some(get_e8_time()));
+        }
+        match TaskService::add_single(&obj) {
+            Ok(result_task) => {
+                let response = ApiResponse::success(result_task);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+    fn delete_by_id(pid: i32) -> Result<ApiResponse<Task>, Box<dyn Error>> {
+        match TaskService::delete_by_id(pid) {
+            Ok(deleted_task) => {
+                let response = ApiResponse::success(deleted_task);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+    fn update_by_id(pid: i32, obj: &PatchTask) -> Result<ApiResponse<Task>, Box<dyn Error>> {
+        match TaskService::update_by_id(pid, &obj) {
+            Ok(patched_task) => {
+                let response = ApiResponse::success(patched_task);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
     }
 }
 
-pub fn update_task_by_id_controller(
-    id: i32,
-    patch_task: &crate::models::task::PatchTask,
-) -> (i32, String, Task) {
-    match Task::update_task_by_id(id, patch_task) {
-        Ok(patched_task) => (200, String::from("PATCH OK"), patched_task),
-        Err(e) => (204, e.to_string(), Task::default()),
-    }
-}
-
-pub fn delete_task_by_id_controller(id: i32) -> (i32, String, Task) {
-    match Task::delete_task_by_id(id) {
-        Ok(deleted_task) => (204, String::from("Deleted"), deleted_task),
-        Err(e) => (204, e.to_string(), Task::default()),
-    }
-}
-
-pub fn get_tasks_by_params_controller(params: &TaskParam) -> (i32, String, Vec<Task>) {
-    match Task::filter_tasks_by_params(params) {
-        Ok(filtered_tasks) => (200, String::from("GET TASKS BY PARAMS OK"), filtered_tasks),
-        Err(e) => (204, e.to_string(), Vec::new()),
-    }
-}
