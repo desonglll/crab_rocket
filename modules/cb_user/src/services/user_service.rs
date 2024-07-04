@@ -1,9 +1,145 @@
+use std::error::Error;
+use crab_rocket_schema::establish_pg_connection;
+use obj_traits::mapper::mapper_crud::MapperCRUD;
+use obj_traits::request::pagination_request_param::PaginationRequestParam;
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::data::Data;
+use obj_traits::service::service_crud::ServiceCRUD;
+use crate::mappers::user_mapper::UserMapper;
 use crate::models::user::{NewUser, PatchUser, User};
 
-pub trait GetUser {
-    fn insert_single_user(user: &NewUser) -> Result<User, Box<dyn std::error::Error>>;
-    fn get_all_users() -> Result<Vec<User>, Box<dyn std::error::Error>>;
-    fn get_user_by_id(id: i32) -> Result<User, Box<dyn std::error::Error>>;
-    fn update_user_by_id(id: i32, user: &PatchUser) -> Result<User, Box<dyn std::error::Error>>;
-    fn delete_user_by_id(id: i32) -> Result<User, Box<dyn std::error::Error>>;
+pub struct UserService {}
+
+impl ServiceCRUD<User, NewUser, PatchUser, RequestParam<PaginationRequestParam>> for UserService {
+    fn get_all(param: &RequestParam<PaginationRequestParam>) -> Result<Data<Vec<User>>, Box<dyn Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match UserMapper::get_all(&mut conn, param) {
+                    Ok(all_users) => Ok(all_users),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+    fn get_by_id(pid: i32) -> Result<User, Box<dyn Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match UserMapper::get_by_id(&mut conn, pid) {
+                    Ok(user) => Ok(user),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+
+    fn add_single(obj: &NewUser) -> Result<User, Box<dyn Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match UserMapper::add_single(&mut conn, obj) {
+                    Ok(user) => Ok(user),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+
+    fn delete_by_id(pid: i32) -> Result<User, Box<dyn Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match UserMapper::delete_by_id(&mut conn, pid) {
+                    Ok(deleted_user) => Ok(deleted_user),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+
+    fn update_by_id(pid: i32, obj: &PatchUser) -> Result<User, Box<dyn Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match UserMapper::update_by_id(&mut conn, pid, obj) {
+                    Ok(updated_user) => Ok(updated_user),
+                    Err(e) => {
+                        println!("{e:?}");
+                        Err(Box::new(e))
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use obj_traits::request::pagination_request_param::PaginationRequestParam;
+    use obj_traits::request::request_param::RequestParam;
+    use obj_traits::service::service_crud::ServiceCRUD;
+    use crate::services::user_service::UserService;
+
+    #[test]
+    fn test_insert_single_user() {
+        use crate::models::user::{NewUser};
+        let user = NewUser::demo();
+        match UserService::add_single(&user) {
+            Ok(result) => println!("{result}"),
+            Err(e) => println!("{e:?}"),
+        }
+    }
+
+    #[test]
+    fn test_get_all_users() {
+        let param = RequestParam::new(PaginationRequestParam::demo());
+        match UserService::get_all(&param) {
+            Ok(res) => println!("{res}"),
+            Err(e) => println!("{e:?}"),
+        }
+    }
+
+    #[test]
+    fn test_get_user_by_id() {
+        match UserService::get_by_id(1) {
+            Ok(res) => println!("{res:?}"),
+            Err(e) => println!("{e:?}"),
+        }
+    }
+
+    #[test]
+    fn test_delete_user_by_id() {
+        match UserService::delete_by_id(2) {
+            Ok(res) => println!("{res:?}"),
+            Err(e) => println!("{e:?}"),
+        }
+    }
 }

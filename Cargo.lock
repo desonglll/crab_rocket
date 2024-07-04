@@ -383,6 +383,7 @@ dependencies = [
  "crab_rocket_schema",
  "crab_rocket_utils",
  "diesel",
+ "obj_traits",
  "rocket",
  "serde_json",
  "utoipa",

@@ -11,6 +11,9 @@ impl PaginationRequestParam {
     pub fn new(limit: Option<i32>, offset: Option<i32>) -> Self {
         Self { limit, offset }
     }
+    pub fn demo() -> Self {
+        Self { limit: Some(10), offset: Some(0) }
+    }
 }
 
 #[derive(Serialize, Default, Clone)]

@@ -50,6 +50,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationRequestParam>> 
             .offset(((page - 1) * per_page) as i64)
             .load::<Task>(conn)?;
         let body = Data::new(data, pagination);
+        println!("{body}");
         Ok(body)
     }
 
@@ -93,7 +94,6 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationRequestParam>> 
 
 #[cfg(test)]
 mod tests {
-    use rocket::yansi::Paint;
     use super::TaskMapper;
     use crate::models::task::{NewTask, PatchTask};
     use crab_rocket_schema::establish_pg_connection;
@@ -122,8 +122,8 @@ mod tests {
     fn test_fetch_all_tasks() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let param = RequestParam::new(PaginationRequestParam::default());
-                let all_tasks = super::TaskMapper::get_all(&mut conn, &param).unwrap();
+                let param = RequestParam::new(PaginationRequestParam::demo());
+                let all_tasks = TaskMapper::get_all(&mut conn, &param).unwrap();
                 let json_string = serde_json::to_string_pretty(&all_tasks).unwrap();
                 println!("{json_string:?}");
             }
@@ -171,23 +171,6 @@ mod tests {
                 let t_id = 2;
                 match super::TaskMapper::delete_by_id(&mut conn, t_id) {
                     Ok(res) => println!("{res:?}"),
-                    Err(_) => println!("Err"),
-                }
-            }
-            Err(_) => println!("establish_pg_connection error"),
-        }
-    }
-
-    #[test]
-    fn test_fetch_tasks_by_params() {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                let param: PaginationRequestParam = PaginationRequestParam {
-                    limit: Some(10),
-                    offset: Some(0),
-                };
-                match TaskMapper::get_by_param(&mut conn, &param) {
-                    Ok(filtered_tasks) => println!("{filtered_tasks:?}"),
                     Err(_) => println!("Err"),
                 }
             }

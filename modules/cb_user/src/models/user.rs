@@ -2,6 +2,7 @@ use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use utoipa::ToSchema;
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
@@ -15,7 +16,7 @@ pub struct User {
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
-    fullname: Option<String>,
+    full_name: Option<String>,
     avatar_url: Option<String>,
     bio: Option<String>,
     updated_at: Option<chrono::NaiveDateTime>,
@@ -30,7 +31,7 @@ impl User {
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
-        fullname: Option<String>,
+        full_name: Option<String>,
         avatar_url: Option<String>,
         bio: Option<String>,
         updated_at: Option<chrono::NaiveDateTime>,
@@ -43,7 +44,7 @@ impl User {
             created_at,
             email,
             password,
-            fullname,
+            full_name,
             avatar_url,
             bio,
             updated_at,
@@ -75,8 +76,8 @@ impl User {
         &self.password
     }
 
-    pub fn fullname(&self) -> &Option<String> {
-        &self.fullname
+    pub fn full_name(&self) -> &Option<String> {
+        &self.full_name
     }
 
     pub fn avatar_url(&self) -> &Option<String> {
@@ -119,8 +120,8 @@ impl User {
         self.password = password;
     }
 
-    pub fn set_fullname(&mut self, fullname: Option<String>) {
-        self.fullname = fullname;
+    pub fn set_full_name(&mut self, full_name: Option<String>) {
+        self.full_name = full_name;
     }
 
     pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
@@ -150,7 +151,7 @@ impl Display for User {
             self.role_id.unwrap(),
             self.created_at.unwrap(),
             self.email,
-            self.fullname.clone().unwrap(),
+            self.full_name.clone().unwrap(),
             self.avatar_url.clone().unwrap(),
             self.bio.clone().unwrap(),
             self.updated_at.unwrap(),
@@ -170,7 +171,7 @@ pub struct NewUser {
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
-    fullname: Option<String>,
+    full_name: Option<String>,
     avatar_url: Option<String>,
     bio: Option<String>,
     updated_at: Option<chrono::NaiveDateTime>,
@@ -184,7 +185,7 @@ impl NewUser {
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
-        fullname: Option<String>,
+        full_name: Option<String>,
         avatar_url: Option<String>,
         bio: Option<String>,
         updated_at: Option<chrono::NaiveDateTime>,
@@ -196,11 +197,26 @@ impl NewUser {
             created_at,
             email,
             password,
-            fullname,
+            full_name,
             avatar_url,
             bio,
             updated_at,
             mobile_phone,
+        }
+    }
+
+    pub fn demo() -> Self {
+        Self {
+            username: "username".to_string(),
+            role_id: Some(1),
+            created_at: Some(get_e8_time()),
+            email: Some(String::from("email")),
+            password: "password".to_string(),
+            full_name: Some(String::from("fullname")),
+            avatar_url: Some(String::from("avatar_url")),
+            bio: Some(String::from("bio")),
+            updated_at: Some(get_e8_time()),
+            mobile_phone: "mobile_phone".to_string(),
         }
     }
 
@@ -224,8 +240,8 @@ impl NewUser {
         &self.password
     }
 
-    pub fn fullname(&self) -> &Option<String> {
-        &self.fullname
+    pub fn full_name(&self) -> &Option<String> {
+        &self.full_name
     }
 
     pub fn avatar_url(&self) -> &Option<String> {
@@ -264,8 +280,8 @@ impl NewUser {
         self.password = password;
     }
 
-    pub fn set_fullname(&mut self, fullname: Option<String>) {
-        self.fullname = fullname;
+    pub fn set_full_name(&mut self, full_name: Option<String>) {
+        self.full_name = full_name;
     }
 
     pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {
@@ -296,7 +312,7 @@ pub struct PatchUser {
     created_at: Option<chrono::NaiveDateTime>,
     email: Option<String>,
     password: String,
-    fullname: Option<String>,
+    full_name: Option<String>,
     avatar_url: Option<String>,
     bio: Option<String>,
     updated_at: Option<chrono::NaiveDateTime>,
@@ -310,7 +326,7 @@ impl PatchUser {
         created_at: Option<chrono::NaiveDateTime>,
         email: Option<String>,
         password: String,
-        fullname: Option<String>,
+        full_name: Option<String>,
         avatar_url: Option<String>,
         bio: Option<String>,
         updated_at: Option<chrono::NaiveDateTime>,
@@ -322,7 +338,7 @@ impl PatchUser {
             created_at,
             email,
             password,
-            fullname,
+            full_name,
             avatar_url,
             bio,
             updated_at,
@@ -350,8 +366,8 @@ impl PatchUser {
         &self.password
     }
 
-    pub fn fullname(&self) -> &Option<String> {
-        &self.fullname
+    pub fn full_name(&self) -> &Option<String> {
+        &self.full_name
     }
 
     pub fn avatar_url(&self) -> &Option<String> {
@@ -390,8 +406,8 @@ impl PatchUser {
         self.password = password;
     }
 
-    pub fn set_fullname(&mut self, fullname: Option<String>) {
-        self.fullname = fullname;
+    pub fn set_full_name(&mut self, full_name: Option<String>) {
+        self.full_name = full_name;
     }
 
     pub fn set_avatar_url(&mut self, avatar_url: Option<String>) {

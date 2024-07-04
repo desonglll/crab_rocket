@@ -5,7 +5,7 @@ CREATE TABLE "posts" (
   "title" varchar(255) DEFAULT 'Untitled',
   "body" text DEFAULT 'No Content',
   "user_id" int4 DEFAULT -1,
-  "status" varchar(255) DEFAULT 'unknow status',
+  "status" varchar(255) DEFAULT 'unknown status',
   "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   "username" varchar(255),

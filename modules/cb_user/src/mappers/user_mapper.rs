@@ -1,86 +1,102 @@
 use crate::models::user::{NewUser, PatchUser, User};
-use crab_rocket_schema::schema::user_table::dsl::*;
+use crab_rocket_schema::schema::user_table::dsl;
 use crab_rocket_schema::schema::user_table::{self};
-use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
+use diesel::result::Error;
+use crab_rocket_utils::time::get_e8_time;
+use obj_traits::mapper::mapper_crud::MapperCRUD;
+use obj_traits::request::pagination_request_param::{Pagination, PaginationRequestParam};
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::data::Data;
 
-// GOOD:
-pub fn insert_user(conn: &mut PgConnection, user: &NewUser) -> Result<User, diesel::result::Error> {
-    let new_user = diesel::insert_into(user_table)
-        .values(user)
-        .returning(User::as_returning())
-        .get_result(conn);
-    match new_user {
-        Ok(new_user) => Ok(new_user),
-        Err(e) => Err(e),
+pub struct UserMapper {}
+
+impl MapperCRUD<User, NewUser, PatchUser, RequestParam<PaginationRequestParam>> for UserMapper {
+    fn get_all(conn: &mut PgConnection, param: &RequestParam<PaginationRequestParam>) -> Result<Data<Vec<User>>, Error> {
+        // 当前页码（page）
+        // 每页条目数（per_page）
+        //
+        // 总页数（total_pages）
+        //
+        // 公式
+        //
+        // 当前页的 offset: (page - 1) * per_page
+        //
+        // 下一页的 offset: page * per_page
+        //
+        // 上一页的 offset: (page - 2) * per_page （如果 page > 1）
+        //
+        // limit 始终为 per_page
+        // 计算分页相关
+        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
+        let per_page = param.pagination.limit.unwrap();
+        // 获取总记录数
+        let total_count = dsl::user_table.count().get_result::<i64>(conn)? as i32;
+        // 计算总页数
+        let total_pages = (total_count + per_page - 1) / per_page;
+
+        let previous_page_offset = (page - 2) * per_page;
+        let next_page_offset = page * per_page;
+        let pagination =
+            Pagination::new(page, per_page, total_pages, total_count, Some(format!("?limit={}&offset={}", per_page, next_page_offset)), Some(format!("?limit={}&offset={}", per_page, previous_page_offset)));
+
+        // 分页查询
+        let data = dsl::user_table
+            .order(dsl::updated_at.desc())
+            .limit(per_page as i64)
+            .offset(((page - 1) * per_page) as i64)
+            .load::<User>(conn)?;
+        let body = Data::new(data, pagination);
+        Ok(body)
     }
-}
-
-// GOOD:
-pub fn fetch_all_users(conn: &mut PgConnection) -> Result<Vec<User>, diesel::result::Error> {
-    user_table.order(user_table::user_id.desc()).load::<User>(conn)
-}
-
-// GOOD:
-pub fn fetch_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diesel::result::Error> {
-    user_table.filter(user_table::user_id.eq(id)).first(conn)
-}
-
-// GOOD:
-pub fn update_user_by_id(
-    conn: &mut PgConnection,
-    id: i32,
-    user: &PatchUser,
-) -> Result<User, diesel::result::Error> {
-    // println!("{:?}", user);
-    diesel::update(user_table.filter(user_id.eq(id)))
-        .set((
-            user_table::username.eq(user.username()),
-            user_table::password.eq(user.password()),
-            user_table::role_id.eq(user.role_id()),
-            user_table::email.eq(user.email()),
-            user_table::fullname.eq(user.fullname()),
-            user_table::avatar_url.eq(user.avatar_url()),
-            user_table::bio.eq(user.bio()),
-            user_table::updated_at.eq(Some(get_e8_time())),
-            user_table::mobile_phone.eq(user.mobile_phone()),
-            user_table::created_at.eq(user.created_at()),
-        ))
-        .get_result(conn)
-}
-
-// GOOD:
-pub fn delete_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, diesel::result::Error> {
-    diesel::delete(user_table.filter(user_table::user_id.eq(id))).get_result(conn)
+    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<User, Error> {
+        dsl::user_table.filter(dsl::user_id.eq(pid)).first(conn)
+    }
+    fn add_single(conn: &mut PgConnection, obj: &NewUser) -> Result<User, Error> {
+        diesel::insert_into(dsl::user_table)
+            .values(obj)
+            .returning(User::as_returning())
+            .get_result(conn)
+    }
+    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<User, Error> {
+        diesel::delete(dsl::user_table.filter(dsl::user_id.eq(pid))).get_result(conn)
+    }
+    fn update_by_id(conn: &mut PgConnection, pid: i32, obj: &PatchUser) -> Result<User, Error> {
+        diesel::update(dsl::user_table.filter(dsl::user_id.eq(pid)))
+            .set((
+                user_table::username.eq(obj.username()),
+                user_table::password.eq(obj.password()),
+                user_table::role_id.eq(obj.role_id()),
+                user_table::email.eq(obj.email()),
+                user_table::full_name.eq(obj.full_name()),
+                user_table::avatar_url.eq(obj.avatar_url()),
+                user_table::bio.eq(obj.bio()),
+                user_table::updated_at.eq(Some(get_e8_time())),
+                user_table::mobile_phone.eq(obj.mobile_phone()),
+                user_table::created_at.eq(obj.created_at()),
+            ))
+            .get_result(conn)
+    }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::models::user::PatchUser;
+    use obj_traits::mapper::mapper_crud::MapperCRUD;
+    use obj_traits::request::pagination_request_param::PaginationRequestParam;
+    use obj_traits::request::request_param::RequestParam;
+    use crate::mappers::user_mapper::UserMapper;
+    use crate::models::user::{NewUser, PatchUser};
 
     #[test]
     fn test_insert_user() {
-        use crate::{mappers::user_mapper::insert_user, models::user::NewUser};
         use crab_rocket_schema::establish_pg_connection;
-        use crab_rocket_utils::time::get_e8_time;
 
-        let user = NewUser::new(
-            "username".to_string(),
-            Some(1),
-            Some(get_e8_time()),
-            Some(String::from("email")),
-            "password".to_string(),
-            Some(String::from("fullname")),
-            Some(String::from("avatar_url")),
-            Some(String::from("bio")),
-            Some(get_e8_time()),
-            "mobile_phone".to_string(),
-        );
+        let user = NewUser::demo();
         println!("{user:?}");
         match establish_pg_connection() {
-            Ok(mut conn) => match insert_user(&mut conn, &user) {
+            Ok(mut conn) => match UserMapper::add_single(&mut conn, &user) {
                 Ok(result) => println!("{result}"),
-                Err(_) => println!("err"),
+                Err(e) => println!("{e:?}"),
             },
             Err(_) => println!("establish_pg_connection error"),
         }
@@ -90,11 +106,12 @@ mod test {
     fn test_fetch_all_users() {
         use crab_rocket_schema::establish_pg_connection;
 
-        use super::fetch_all_users;
+        let param = RequestParam::new(PaginationRequestParam::demo());
+
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_all_users(&mut conn) {
-                Ok(res) => println!("{res:?}"),
-                Err(_) => println!("Err"),
+            Ok(mut conn) => match UserMapper::get_all(&mut conn, &param) {
+                Ok(res) => println!("{res}"),
+                Err(e) => println!("{e:?}"),
             },
             Err(_) => println!("establish_pg_connection error"),
         }
@@ -102,13 +119,12 @@ mod test {
 
     #[test]
     fn test_fetch_user_by_id() {
-        use super::fetch_user_by_id;
         use crab_rocket_schema::establish_pg_connection;
         let id = 1;
         match establish_pg_connection() {
-            Ok(mut conn) => match fetch_user_by_id(&mut conn, id) {
+            Ok(mut conn) => match UserMapper::get_by_id(&mut conn, id) {
                 Ok(res) => println!("{res}"),
-                Err(_) => println!("Err"),
+                Err(e) => println!("{e:?}"),
             },
             Err(_) => println!("establish_pg_connection error"),
         }
@@ -120,9 +136,9 @@ mod test {
             Ok(mut conn) => {
                 let id = 1;
                 let user = PatchUser::default();
-                match crate::mappers::user_mapper::update_user_by_id(&mut conn, id, &user) {
+                match UserMapper::update_by_id(&mut conn, id, &user) {
                     Ok(res) => println!("{res}"),
-                    Err(_) => println!("Err"),
+                    Err(e) => println!("{e:?}"),
                 }
             }
             Err(_) => println!("establish_pg_connection error"),
@@ -134,10 +150,9 @@ mod test {
         match crab_rocket_schema::establish_pg_connection() {
             Ok(mut conn) => {
                 let id = 1;
-                let result = super::delete_user_by_id(&mut conn, id);
-                match result {
+                match UserMapper::delete_by_id(&mut conn, id) {
                     Ok(res) => println!("{res}"),
-                    Err(_) => println!("Err"),
+                    Err(e) => println!("{e:?}"),
                 }
             }
             Err(_) => println!("establish_pg_connection error"),

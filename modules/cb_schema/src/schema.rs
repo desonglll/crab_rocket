@@ -167,7 +167,7 @@ diesel::table! {
         #[max_length = 255]
         password -> Varchar,
         #[max_length = 255]
-        fullname -> Nullable<Varchar>,
+        full_name -> Nullable<Varchar>,
         #[max_length = 255]
         avatar_url -> Nullable<Varchar>,
         bio -> Nullable<Text>,

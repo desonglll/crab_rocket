@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_get_all_tasks() {
-        let param = RequestParam::new(PaginationRequestParam::default());
+        let param = RequestParam::new(PaginationRequestParam::demo());
         let all_tasks = TaskService::get_all(&param).unwrap();
         println!("{all_tasks}");
     }
@@ -160,15 +160,5 @@ mod tests {
     fn test_delete_task_by_id() {
         let deleted_task = TaskService::delete_by_id(4);
         println!("deleted_task: {deleted_task:?}");
-    }
-
-    #[test]
-    fn test_get_tasks_by_params() {
-        let params: PaginationRequestParam = PaginationRequestParam {
-            limit: Some(10),
-            offset: Some(0),
-        };
-        let filtered_tasks = TaskService::get_by_param(&params);
-        println!("{filtered_tasks:?}");
     }
 }
