@@ -1,7 +1,7 @@
 use std::error::Error;
 use crab_rocket_schema::establish_pg_connection;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::PaginationRequestParam;
+use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::ServiceCRUD;
@@ -10,8 +10,8 @@ use crate::models::user::{NewUser, PatchUser, User};
 
 pub struct UserService {}
 
-impl ServiceCRUD<User, NewUser, PatchUser, RequestParam<PaginationRequestParam>> for UserService {
-    fn get_all(param: &RequestParam<PaginationRequestParam>) -> Result<Data<Vec<User>>, Box<dyn Error>> {
+impl ServiceCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for UserService {
+    fn get_all(param: &RequestParam<PaginationParam>) -> Result<Data<Vec<User>>, Box<dyn Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => {
                 match UserMapper::get_all(&mut conn, param) {
@@ -103,7 +103,7 @@ impl ServiceCRUD<User, NewUser, PatchUser, RequestParam<PaginationRequestParam>>
 
 #[cfg(test)]
 mod test {
-    use obj_traits::request::pagination_request_param::PaginationRequestParam;
+    use obj_traits::request::pagination_request_param::PaginationParam;
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
     use crate::services::user_service::UserService;
@@ -120,7 +120,7 @@ mod test {
 
     #[test]
     fn test_get_all_users() {
-        let param = RequestParam::new(PaginationRequestParam::demo());
+        let param = RequestParam::new(PaginationParam::demo());
         match UserService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

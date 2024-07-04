@@ -11,7 +11,7 @@ use crab_rocket_post::routes::post_route;
 use crab_rocket_task::models::task::Task;
 use crab_rocket_task::routes::task_route;
 use crab_rocket_user::models::user::User;
-use crab_rocket_user::routes::user_route;
+// use crab_rocket_user::routes::user_route;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -31,11 +31,11 @@ use crab_rocket_user::routes::user_route;
         post_route::delete_post_by_id,
         post_route::get_posts_by_params,
 //user routes
-        user_route::insert_single_user,
-        user_route::get_all_users,
-        user_route::get_user_by_id,
-        user_route::update_user_by_id,
-        user_route::delete_user_by_id,
+//         user_route::insert_single_user,
+//         user_route::get_all_users,
+//         user_route::get_user_by_id,
+//         user_route::update_user_by_id,
+//         user_route::delete_user_by_id,
 // follow routes
         follow_route::insert_single_follow,
         follow_route::get_all_follows,

@@ -2,15 +2,15 @@ use crate::mappers::task_mapper::TaskMapper;
 use crate::models::task::{NewTask, PatchTask, Task};
 use crab_rocket_schema::establish_pg_connection;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::PaginationRequestParam;
+use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct TaskService {}
 
-impl ServiceCRUD<Task, NewTask, PatchTask, RequestParam<PaginationRequestParam>> for TaskService {
-    fn get_all(param: &RequestParam<PaginationRequestParam>) -> Result<Data<Vec<Task>>, Box<dyn std::error::Error>> {
+impl ServiceCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for TaskService {
+    fn get_all(param: &RequestParam<PaginationParam>) -> Result<Data<Vec<Task>>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => {
                 match TaskMapper::get_all(&mut conn, param) {
@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_get_all_tasks() {
-        let param = RequestParam::new(PaginationRequestParam::demo());
+        let param = RequestParam::new(PaginationParam::demo());
         let all_tasks = TaskService::get_all(&param).unwrap();
         println!("{all_tasks}");
     }

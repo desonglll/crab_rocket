@@ -5,14 +5,14 @@ use diesel::prelude::*;
 use diesel::result::Error;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationRequestParam};
+use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 
 pub struct UserMapper {}
 
-impl MapperCRUD<User, NewUser, PatchUser, RequestParam<PaginationRequestParam>> for UserMapper {
-    fn get_all(conn: &mut PgConnection, param: &RequestParam<PaginationRequestParam>) -> Result<Data<Vec<User>>, Error> {
+impl MapperCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for UserMapper {
+    fn get_all(conn: &mut PgConnection, param: &RequestParam<PaginationParam>) -> Result<Data<Vec<User>>, Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -82,7 +82,7 @@ impl MapperCRUD<User, NewUser, PatchUser, RequestParam<PaginationRequestParam>> 
 #[cfg(test)]
 mod test {
     use obj_traits::mapper::mapper_crud::MapperCRUD;
-    use obj_traits::request::pagination_request_param::PaginationRequestParam;
+    use obj_traits::request::pagination_request_param::PaginationParam;
     use obj_traits::request::request_param::RequestParam;
     use crate::mappers::user_mapper::UserMapper;
     use crate::models::user::{NewUser, PatchUser};
@@ -106,7 +106,7 @@ mod test {
     fn test_fetch_all_users() {
         use crab_rocket_schema::establish_pg_connection;
 
-        let param = RequestParam::new(PaginationRequestParam::demo());
+        let param = RequestParam::new(PaginationParam::demo());
 
         match establish_pg_connection() {
             Ok(mut conn) => match UserMapper::get_all(&mut conn, &param) {

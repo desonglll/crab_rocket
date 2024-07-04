@@ -4,17 +4,17 @@ use crab_rocket_schema::schema::tasks::{self};
 use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationRequestParam};
+use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 
 
 pub struct TaskMapper {}
 
-impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationRequestParam>> for TaskMapper {
+impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for TaskMapper {
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationRequestParam>,
+        param: &RequestParam<PaginationParam>,
     ) -> Result<Data<Vec<Task>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -98,7 +98,7 @@ mod tests {
     use crate::models::task::{NewTask, PatchTask};
     use crab_rocket_schema::establish_pg_connection;
     use obj_traits::mapper::mapper_crud::MapperCRUD;
-    use obj_traits::request::pagination_request_param::PaginationRequestParam;
+    use obj_traits::request::pagination_request_param::PaginationParam;
     use obj_traits::request::request_param::RequestParam;
 
     #[test]
@@ -122,7 +122,7 @@ mod tests {
     fn test_fetch_all_tasks() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let param = RequestParam::new(PaginationRequestParam::demo());
+                let param = RequestParam::new(PaginationParam::demo());
                 let all_tasks = TaskMapper::get_all(&mut conn, &param).unwrap();
                 let json_string = serde_json::to_string_pretty(&all_tasks).unwrap();
                 println!("{json_string:?}");

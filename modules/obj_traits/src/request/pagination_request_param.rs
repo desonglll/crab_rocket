@@ -2,12 +2,12 @@ use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
-pub struct PaginationRequestParam {
+pub struct PaginationParam {
     pub limit: Option<i32>,
     pub offset: Option<i32>,
 }
 
-impl PaginationRequestParam {
+impl PaginationParam {
     pub fn new(limit: Option<i32>, offset: Option<i32>) -> Self {
         Self { limit, offset }
     }

@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate rocket;
+
 use crab_rocket::{
     env_variables,
-    routes::{docs, routes::module_routes},
+    routes::{routes::module_routes},
 };
 use crab_rocket_utils;
 use dotenvy::dotenv;
-use rocket::routes;
 use rocket::{http::Method, Route};
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use std::env;
@@ -32,9 +32,9 @@ fn rocket() -> _ {
             Method::Put,
             Method::Delete,
         ]
-        .into_iter()
-        .map(From::from)
-        .collect(),
+            .into_iter()
+            .map(From::from)
+            .collect(),
         allowed_headers: AllowedHeaders::some(&[
             "Content-Type",
             "Authorization",
@@ -48,16 +48,16 @@ fn rocket() -> _ {
         allow_credentials: true,
         ..Default::default()
     }
-    .to_cors()
-    .unwrap();
+        .to_cors()
+        .unwrap();
 
     let mut routes = Vec::<Route>::new();
 
     let module_routes = module_routes();
 
-    let doc_routes = routes![docs::doc];
+    // let doc_routes = routes![docs::doc];
 
-    routes.extend(doc_routes.clone());
+    // routes.extend(doc_routes.clone());
     routes.extend(module_routes.clone());
 
     rocket::build().mount("/api", routes).attach(cors)

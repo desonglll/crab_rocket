@@ -26,20 +26,22 @@ pub fn module_routes() -> Vec<Route> {
         // task routes
         task_route::index,
         task_route::demo,
-        task_route::get_tasks_by_param,
-        task_route::insert_single_task,
-        task_route::get_task_by_id,
-        task_route::update_task_by_id,
-        task_route::delete_task_by_id,
-        task_route::get_tasks,
         task_route::options_task_filter,
+        //
+        task_route::get_tasks,
+        task_route::get_tasks_by_param,
+        task_route::get_task_by_id,
+        task_route::insert_single_task,
+        task_route::delete_task_by_id,
+        task_route::update_task_by_id,
         //user routes
-        user_route::insert_single_user,
-        user_route::get_all_users,
+        user_route::options_user,
+        //
+        user_route::get_users,
         user_route::get_user_by_id,
-        user_route::update_user_by_id,
+        user_route::insert_single_user,
         user_route::delete_user_by_id,
-        user_route::options_user_filter,
+        user_route::update_user_by_id,
         // post routes
         post_route::insert_single_post,
         post_route::get_all_posts,

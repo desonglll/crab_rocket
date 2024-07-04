@@ -1,48 +1,78 @@
+use std::error::Error;
 use obj_traits::controller::controller_crud::ControllerCRUD;
-use obj_traits::request::pagination_request_param::PaginationRequestParam;
+use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::api_response::ApiResponse;
+use obj_traits::response::data::Data;
+use obj_traits::service::service_crud::ServiceCRUD;
 use crate::models::user::{NewUser, PatchUser, User};
+use crate::services::user_service::UserService;
 
 pub struct UserController {}
 
-// impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationRequestParam>> for UserController {}
+impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for UserController {
+    fn get_all(param: &RequestParam<PaginationParam>) -> Result<ApiResponse<Data<Vec<User>>>, Box<dyn Error>> {
+        match UserService::get_all(param) {
+            Ok(all_users) => {
+                let response = ApiResponse::success(all_users);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
 
-// use crate::{
-//     models::user::{NewUser, PatchUser, User},
-//     services::user_service::GetUser,
-// };
-//
-// pub fn insert_single_user_controller(user: &NewUser) -> (i32, String, User) {
-//     match User::insert_single_user(user) {
-//         Ok(result) => (200, "INSERT OK".to_string(), result),
-//         Err(e) => (204, e.to_string(), User::default()),
-//     }
-// }
-//
-// pub fn get_all_users_controller() -> (i32, String, Vec<User>) {
-//     match User::get_all_users() {
-//         Ok(all_users) => (200, String::from("GET ALL USERS OK"), all_users),
-//         Err(e) => (204, e.to_string(), Vec::new()),
-//     }
-// }
-//
-// pub fn get_user_by_id_controller(id: i32) -> (i32, String, User) {
-//     match User::get_user_by_id(id) {
-//         Ok(user) => (200, String::from("GET USER BY ID OK"), user),
-//         Err(e) => (204, e.to_string(), User::default()),
-//     }
-// }
-//
-// pub fn update_user_by_id_controller(id: i32, user: &PatchUser) -> (i32, String, User) {
-//     match User::update_user_by_id(id, user) {
-//         Ok(updated_user) => (200, String::from("UPDATED USER OK"), updated_user),
-//         Err(e) => (204, e.to_string(), User::default()),
-//     }
-// }
-//
-// pub fn delete_user_by_id_controller(id: i32) -> (i32, String, User) {
-//     match User::delete_user_by_id(id) {
-//         Ok(deleted_user) => (200, String::from("DELETE USER OK"), deleted_user),
-//         Err(e) => (204, e.to_string(), User::default()),
-//     }
-// }
+    fn get_by_id(pid: i32) -> Result<ApiResponse<User>, Box<dyn Error>> {
+        match UserService::get_by_id(pid) {
+            Ok(user) => {
+                let response = ApiResponse::success(user);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+
+    fn add_single(obj: &mut NewUser) -> Result<ApiResponse<User>, Box<dyn Error>> {
+        match UserService::add_single(obj) {
+            Ok(user) => {
+                let response = ApiResponse::success(user);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+
+    fn delete_by_id(pid: i32) -> Result<ApiResponse<User>, Box<dyn Error>> {
+        match UserService::delete_by_id(pid) {
+            Ok(user) => {
+                let response = ApiResponse::success(user);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+
+    fn update_by_id(pid: i32, obj: &PatchUser) -> Result<ApiResponse<User>, Box<dyn Error>> {
+        match UserService::update_by_id(pid, obj) {
+            Ok(user) => {
+                let response = ApiResponse::success(user);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+}

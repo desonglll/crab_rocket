@@ -1,7 +1,7 @@
 use std::error::Error;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::controller::controller_crud::ControllerCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationRequestParam};
+use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
@@ -11,8 +11,8 @@ use crate::services::task_service::{TaskService};
 
 pub struct TaskController {}
 
-impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationRequestParam>> for TaskController {
-    fn get_all(param: &RequestParam<PaginationRequestParam>) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn Error>> {
+impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for TaskController {
+    fn get_all(param: &RequestParam<PaginationParam>) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn Error>> {
         match TaskService::get_all(param) {
             Ok(data) => {
                 let response =
