@@ -1,49 +1,63 @@
-use crate::models::role::PatchRole;
-use crate::{
-    models::role::{NewRole, Role},
-    services::role_service::GetRole,
-};
+use std::error::Error;
+use obj_traits::controller::controller_crud::ControllerCRUD;
+use obj_traits::request::pagination_request_param::PaginationParam;
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::api_response::ApiResponse;
+use obj_traits::response::data::Data;
+use obj_traits::service::service_crud::ServiceCRUD;
+use crate::models::role::{NewRole, PatchRole, Role};
+use crate::services::role_service::RoleService;
 
-pub fn insert_role_controller(new_role: &mut NewRole) -> (i32, String, Role) {
-    match Role::insert_role(&new_role.clone()) {
-        Ok(result_task) => (201, String::from("Created"), result_task),
-        Err(e) => (204, e.to_string(), Role::default()),
-    }
-}
+pub struct RoleController {}
 
-pub fn get_all_roles_controller() -> (i32, String, Vec<Role>) {
-    match Role::get_all_roles() {
-        Ok(all_roles) => (200, String::from("found successfully"), all_roles),
-        Err(e) => (204, e.to_string(), Vec::new()),
-    }
-}
-
-pub fn delete_role_by_id_controller(id: i32) -> (i32, String, Role) {
-    match Role::delete_role_by_id(id) {
-        Ok(deleted_role) => (200, String::from("DELETE ROLE BY ID OK"), deleted_role),
-        Err(e) => {
-            println!("{e:?}");
-            (204, e.to_string(), Role::default())
+impl ControllerCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam>> for RoleController {
+    fn get_all(param: &RequestParam<PaginationParam>) -> Result<ApiResponse<Data<Vec<Role>>>, Box<dyn Error>> {
+        match RoleService::get_all(param) {
+            Ok(all_roles) => Ok(ApiResponse::success(all_roles)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
         }
     }
-}
 
-pub fn get_role_by_id_controller(id: i32) -> (i32, String, Role) {
-    match Role::get_role_by_id(id) {
-        Ok(role) => (200, String::from("GET ROLE BY ID OK"), role),
-        Err(e) => {
-            println!("{e:?}");
-            (204, e.to_string(), Role::default())
+    fn get_by_id(pid: i32) -> Result<ApiResponse<Role>, Box<dyn Error>> {
+        match RoleService::get_by_id(pid) {
+            Ok(role) => Ok(ApiResponse::success(role)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
         }
     }
-}
 
-pub fn update_role_by_id_controller(id: i32, role: &PatchRole) -> (i32, String, Role) {
-    match Role::update_role_by_id(id, role) {
-        Ok(updated_role) => (200, String::from("UPDATE ROLE BY ID OK"), updated_role),
-        Err(e) => {
-            println!("{e:?}");
-            (204, e.to_string(), Role::default())
+    fn add_single(obj: &mut NewRole) -> Result<ApiResponse<Role>, Box<dyn Error>> {
+        match RoleService::add_single(obj) {
+            Ok(result_task) => Ok(ApiResponse::success(result_task)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+
+    fn delete_by_id(pid: i32) -> Result<ApiResponse<Role>, Box<dyn Error>> {
+        match RoleService::delete_by_id(pid) {
+            Ok(deleted_role) => Ok(ApiResponse::success(deleted_role)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
+        }
+    }
+
+    fn update_by_id(pid: i32, obj: &PatchRole) -> Result<ApiResponse<Role>, Box<dyn Error>> {
+        match RoleService::update_by_id(pid, obj) {
+            Ok(updated_role) => Ok(ApiResponse::success(updated_role)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error())
+            }
         }
     }
 }

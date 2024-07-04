@@ -108,6 +108,14 @@ impl NewRole {
         }
     }
 
+    pub fn demo() -> Self {
+        Self {
+            role_name: String::from("admin"),
+            description: Some(String::from("Administrator role with full access")),
+            permissions: Some(String::from("admin:full_access,user:view,post:edit")),
+        }
+    }
+
     pub fn role_name(&self) -> &str {
         &self.role_name
     }

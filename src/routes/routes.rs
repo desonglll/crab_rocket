@@ -64,10 +64,10 @@ pub fn module_routes() -> Vec<Route> {
         employee_route::update_employee_by_id,
         employee_route::options_employee_filter,
         // role routes
-        role_route::insert_role,
-        role_route::get_all_roles,
-        role_route::delete_role_by_id,
+        role_route::get_roles,
         role_route::get_role_by_id,
+        role_route::insert_single_role,
+        role_route::delete_role_by_id,
         role_route::update_role_by_id,
         // permission routes
         permission_route::get_all_permissions,
