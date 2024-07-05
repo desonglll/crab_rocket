@@ -1,13 +1,10 @@
-use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
+use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
-use crate::{
-    models::user::{NewUser, PatchUser},
-};
 use crate::controllers::user_controller::UserController;
-
+use crate::models::user::{NewUser, PatchUser};
 
 #[get("/user?<limit>&<offset>")]
 pub fn get_users(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
@@ -26,7 +23,9 @@ pub fn get_users(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
 }
 
 #[post("/uuser", data = "<params>")]
-pub fn get_users_by_param(mut params: Option<Json<RequestParam<PaginationParam>>>) -> Json<serde_json::Value> {
+pub fn get_users_by_param(
+    mut params: Option<Json<RequestParam<PaginationParam>>>,
+) -> Json<serde_json::Value> {
     if params.is_none() {
         params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
     }

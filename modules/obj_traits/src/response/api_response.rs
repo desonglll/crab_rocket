@@ -23,10 +23,10 @@ impl<T: Default> ApiResponse<T> {
             body,
         }
     }
-    pub fn error() -> Self {
+    pub fn error(e: Box<dyn std::error::Error>) -> Self {
         Self {
             code: "200".to_string(),
-            message: "Error".to_string(),
+            message: e.to_string(),
             body: T::default(),
         }
     }

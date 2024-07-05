@@ -1,3 +1,4 @@
+use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -319,7 +320,29 @@ impl NewEmployee {
             role_id,
         }
     }
-
+    pub fn demo() -> Self {
+        Self {
+            employee_name: "JohnDoe".to_string(),
+            first_name: Some("John".to_string()),
+            last_name: Some("Doe".to_string()),
+            gender: Some("Male".to_string()),
+            date_of_birth: Some(get_e8_time()), // Example: 1990-01-01 00:00:00
+            hire_date: Some(get_e8_time()),     // Example: 2020-01-01 00:00:00
+            email: Some("johndoe@example.com".to_string()),
+            phone_number: Some("123-456-7890".to_string()),
+            department_id: Some(1),
+            job_title: Some("Software Engineer".to_string()),
+            salary: Some(60000),
+            manager_id: Some(2),
+            address: Some("123 Main St".to_string()),
+            city: Some("Anytown".to_string()),
+            state: Some("Anystate".to_string()),
+            postal_code: Some("12345".to_string()),
+            valid: Some(true),
+            role_name: Some("Developer".to_string()),
+            role_id: Some(1),
+        }
+    }
     pub fn employee_name(&self) -> &str {
         &self.employee_name
     }
@@ -542,6 +565,30 @@ impl PatchEmployee {
             valid,
             role_name,
             role_id,
+        }
+    }
+
+    pub fn demo() -> Self {
+        Self {
+            employee_name: "JohnDoe".to_string(),
+            first_name: Some("John".to_string()),
+            last_name: Some("Doe".to_string()),
+            gender: Some("Male".to_string()),
+            date_of_birth: Some(get_e8_time()), // Example: 1990-01-01 00:00:00
+            hire_date: Some(get_e8_time()),     // Example: 2020-01-01 00:00:00
+            email: Some("johndoe@example.com".to_string()),
+            phone_number: Some("123-456-7890".to_string()),
+            department_id: Some(1),
+            job_title: Some("Software Engineer".to_string()),
+            salary: Some(60000),
+            manager_id: Some(2),
+            address: Some("123 Main St".to_string()),
+            city: Some("Anytown".to_string()),
+            state: Some("Anystate".to_string()),
+            postal_code: Some("12345".to_string()),
+            valid: Some(true),
+            role_name: Some("Developer".to_string()),
+            role_id: Some(1),
         }
     }
 

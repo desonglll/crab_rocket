@@ -1,111 +1,73 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+use obj_traits::request::pagination_request_param::PaginationParam;
+use obj_traits::request::request_param::RequestParam;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
-use serde_json::json;
 
-use super::employee_param::EmployeeParam;
-use crate::{
-    controllers::employee_controller,
-    models::employee::{NewEmployee, PatchEmployee},
-};
+use crate::controllers::employee_controller::EmployeeController;
+use crate::models::employee::{NewEmployee, PatchEmployee};
 
-// for employee insert
-#[utoipa::path(
-    responses(
-        (status = 200, description = "created successfully", body = Employee),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[post("/employee", data = "<employee>")]
-pub fn insert_single_employee(employee: Json<NewEmployee>) -> Json<serde_json::Value> {
+#[get("/employee?<limit>&<offset>")]
+pub fn get_employees(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
+    if limit.is_none() {
+        limit = Some(10);
+    };
+    if offset.is_none() {
+        offset = Some(0);
+    };
+    let params = RequestParam::new(PaginationParam::new(limit, offset));
+    println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
-    let (code, message, inserted_employee) =
-        employee_controller::insert_single_employee_controller(&employee);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":inserted_employee
-    }))
-    .unwrap();
-    Json(response)
-}
-#[get("/employee")]
-pub fn get_all_employees() -> Json<serde_json::Value> {
-    crab_rocket_schema::update_reload::update_reload_count();
-    let (code, message, all_employees) = employee_controller::get_all_employees_controller();
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":all_employees
-    }))
-    .unwrap();
-    Json(response)
-}
-// for employee delete
-#[utoipa::path(
-    responses(
-        (status = 200, description = "delete successfully", body = Employee),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[delete("/employee/<id>")]
-pub fn delete_employee_by_id(id: i32) -> Json<serde_json::Value> {
-    let (code, message, updated_user) = employee_controller::delete_employee_by_id_controller(id);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":updated_user
-    }))
-    .unwrap();
-    Json(response)
+    let resp = EmployeeController::get_all(&params).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
-// for employee filter by params
-#[utoipa::path(
-    responses(
-        (status = 200, description = "found successfully", body = Vec<Employee>),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[post("/employee/filter", data = "<params>")]
-pub fn get_employee_by_params(params: Json<EmployeeParam>) -> Json<serde_json::Value> {
-    let (code, message, emp) = employee_controller::get_employee_by_params_controller(&params);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":emp,
-    }))
-    .unwrap();
-    Json(response)
+#[post("/uemployee", data = "<params>")]
+pub fn get_employees_by_param(
+    mut params: Option<Json<RequestParam<PaginationParam>>>,
+) -> Json<serde_json::Value> {
+    if params.is_none() {
+        params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
+    }
+    println!("{:?}", params);
+    crab_rocket_schema::update_reload::update_reload_count();
+    let resp = EmployeeController::get_all(&params.unwrap()).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[get("/employee/<id>")]
 pub fn get_employee_by_id(id: i32) -> Json<serde_json::Value> {
-    let (code, message, result) = employee_controller::get_employee_by_id_controller(id);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":result
-    }))
-    .unwrap();
-    Json(response)
+    crab_rocket_schema::update_reload::update_reload_count();
+    let resp = EmployeeController::get_by_id(id).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
-#[utoipa::path(
-    responses(
-        (status = 200, description = "update successfully", body = Employee),
-        (status = NOT_FOUND, description = "not found")     )
-)]
-#[patch("/employee/<id>", data = "<emp>")]
-pub fn update_employee_by_id(id: i32, emp: Json<PatchEmployee>) -> Json<serde_json::Value> {
-    let (code, message, updated_emp) =
-        employee_controller::update_employee_by_id_controller(id, &emp);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":updated_emp
-    }))
-    .unwrap();
-    Json(response)
+
+#[post("/employee", data = "<employee>")]
+pub fn insert_single_employee(employee: Json<NewEmployee>) -> Json<serde_json::Value> {
+    let mut obj: NewEmployee = employee.into_inner();
+
+    let resp = EmployeeController::add_single(&mut obj).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
-#[options("/employee/filter")]
-pub fn options_employee_filter() -> Status {
+
+#[delete("/employee/<id>")]
+pub fn delete_employee_by_id(id: i32) -> Json<serde_json::Value> {
+    let resp = EmployeeController::delete_by_id(id).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
+}
+
+#[patch("/employee/<id>", data = "<task>")]
+pub fn update_employee_by_id(id: i32, task: Json<PatchEmployee>) -> Json<serde_json::Value> {
+    let resp = EmployeeController::update_by_id(id, &task).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
+}
+
+#[options("/employee")]
+pub fn options_employee() -> Status {
     Status::Ok
 }

@@ -1,17 +1,19 @@
-use std::error::Error;
+use crate::models::user::{NewUser, PatchUser, User};
+use crate::services::user_service::UserService;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::ServiceCRUD;
-use crate::models::user::{NewUser, PatchUser, User};
-use crate::services::user_service::UserService;
+use std::error::Error;
 
 pub struct UserController {}
 
 impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for UserController {
-    fn get_all(param: &RequestParam<PaginationParam>) -> Result<ApiResponse<Data<Vec<User>>>, Box<dyn Error>> {
+    fn get_all(
+        param: &RequestParam<PaginationParam>,
+    ) -> Result<ApiResponse<Data<Vec<User>>>, Box<dyn Error>> {
         match UserService::get_all(param) {
             Ok(all_users) => {
                 let response = ApiResponse::success(all_users);
@@ -19,7 +21,7 @@ impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -32,7 +34,7 @@ impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -45,7 +47,7 @@ impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -58,7 +60,7 @@ impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -71,7 +73,7 @@ impl ControllerCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }

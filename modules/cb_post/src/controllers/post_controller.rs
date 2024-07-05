@@ -25,7 +25,7 @@ impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for
             Ok(all_posts) => Ok(ApiResponse::success(all_posts)),
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -35,7 +35,7 @@ impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for
             Ok(post) => Ok(ApiResponse::success(post)),
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -45,7 +45,7 @@ impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for
             Ok(result) => Ok(ApiResponse::success(result)),
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -55,7 +55,7 @@ impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for
             Ok(deleted_post) => Ok(ApiResponse::success(deleted_post)),
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -68,7 +68,7 @@ impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for
             Ok(updated_post) => Ok(ApiResponse::success(updated_post)),
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }

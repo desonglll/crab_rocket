@@ -51,18 +51,23 @@ pub fn module_routes() -> Vec<Route> {
         post_route::delete_post_by_id,
         post_route::options_post_filter,
         // follow routes
-        follow_route::insert_single_follow,
-        follow_route::get_all_follows,
+        follow_route::get_follows,
         follow_route::get_follows_by_params,
-        follow_route::delete_follow,
-        // employee routes
+        follow_route::insert_single_follow,
+        follow_route::insert_single_follow_by_params,
+        follow_route::delete_follow_by_id,
+        follow_route::update_follow_by_id,
+        follow_route::delete_follow_specifically,
+        follow_route::get_followeds_by_user_id,
+        follow_route::get_followings_by_user_id,
+        //employee routes
+        employee_route::options_employee,
+        //
+        employee_route::get_employees,
+        employee_route::get_employee_by_id,
         employee_route::insert_single_employee,
         employee_route::delete_employee_by_id,
-        employee_route::get_employee_by_id,
-        employee_route::get_all_employees,
-        employee_route::get_employee_by_params,
         employee_route::update_employee_by_id,
-        employee_route::options_employee_filter,
         // role routes
         role_route::get_roles,
         role_route::get_role_by_id,

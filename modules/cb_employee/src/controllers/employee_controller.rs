@@ -1,42 +1,85 @@
-use crate::{
-    models::employee::{Employee, NewEmployee, PatchEmployee},
-    routes::employee_param::EmployeeParam,
-    services::employee_service::GetEmployee,
-};
-pub fn get_all_employees_controller() -> (i32, String, Vec<Employee>) {
-    match Employee::get_all_employees() {
-        Ok(all_employees) => (200, String::from("GET ALL EMPLOYEES OK"), all_employees),
-        Err(e) => (204, e.to_string(), Vec::new()),
-    }
-}
+use crate::models::employee::{Employee, NewEmployee, PatchEmployee};
+use crate::services::employee_service::EmployeeService;
+use obj_traits::controller::controller_crud::ControllerCRUD;
+use obj_traits::request::pagination_request_param::PaginationParam;
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::api_response::ApiResponse;
+use obj_traits::response::data::Data;
+use obj_traits::service::service_crud::ServiceCRUD;
+use std::error::Error;
 
-pub fn insert_single_employee_controller(new_employee: &NewEmployee) -> (i32, String, Employee) {
-    match Employee::insert_employee(new_employee) {
-        Ok(result) => (200, String::from("INSERT EMPLOYEE OK"), result),
-        Err(e) => (204, e.to_string(), Employee::default()),
+pub struct EmployeeController {}
+
+impl ControllerCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationParam>>
+    for EmployeeController
+{
+    fn get_all(
+        param: &RequestParam<PaginationParam>,
+    ) -> Result<ApiResponse<Data<Vec<Employee>>>, Box<dyn Error>> {
+        match EmployeeService::get_all(param) {
+            Ok(all_employees) => {
+                let response = ApiResponse::success(all_employees);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
     }
-}
-pub fn get_employee_by_id_controller(id: i32) -> (i32, String, Employee) {
-    match Employee::get_employee_by_id(id) {
-        Ok(result) => (200, String::from("GET EMPLOYEE BY ID OK"), result),
-        Err(e) => (204, e.to_string(), Employee::default()),
+
+    fn get_by_id(pid: i32) -> Result<ApiResponse<Employee>, Box<dyn Error>> {
+        match EmployeeService::get_by_id(pid) {
+            Ok(employee) => {
+                let response = ApiResponse::success(employee);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
     }
-}
-pub fn delete_employee_by_id_controller(id: i32) -> (i32, String, Employee) {
-    match Employee::delete_employee_by_id(id) {
-        Ok(result) => (200, String::from("DELETE EMPLOYEE BY ID OK"), result),
-        Err(e) => (204, e.to_string(), Employee::default()),
+
+    fn add_single(obj: &mut NewEmployee) -> Result<ApiResponse<Employee>, Box<dyn Error>> {
+        match EmployeeService::add_single(obj) {
+            Ok(employee) => {
+                let response = ApiResponse::success(employee);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
     }
-}
-pub fn get_employee_by_params_controller(params: &EmployeeParam) -> (i32, String, Vec<Employee>) {
-    match Employee::filter_employee_by_params(params) {
-        Ok(filtered_emp) => (200, String::from("GET EMPLOYEE BY PARAMS OK"), filtered_emp),
-        Err(e) => (204, e.to_string(), Vec::new()),
+
+    fn delete_by_id(pid: i32) -> Result<ApiResponse<Employee>, Box<dyn Error>> {
+        match EmployeeService::delete_by_id(pid) {
+            Ok(employee) => {
+                let response = ApiResponse::success(employee);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
     }
-}
-pub fn update_employee_by_id_controller(id: i32, emp: &PatchEmployee) -> (i32, String, Employee) {
-    match Employee::update_employee_by_id(id, emp) {
-        Ok(updated_emp) => (200, String::from("UPDATED EMPLOYEE OK"), updated_emp),
-        Err(e) => (204, e.to_string(), Employee::default()),
+
+    fn update_by_id(
+        pid: i32,
+        obj: &PatchEmployee,
+    ) -> Result<ApiResponse<Employee>, Box<dyn Error>> {
+        match EmployeeService::update_by_id(pid, obj) {
+            Ok(employee) => {
+                let response = ApiResponse::success(employee);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
     }
 }

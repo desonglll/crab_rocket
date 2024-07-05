@@ -4,10 +4,12 @@ pub mod models {
 
 pub mod mappers {
     pub mod follow_mapper;
+    pub mod follow_mapper_trait;
 }
 
 pub mod controllers {
     pub mod follow_controller;
+    pub mod follow_controller_trait;
 }
 
 pub mod routes {
@@ -16,7 +18,5 @@ pub mod routes {
 }
 pub mod services {
     pub mod follow_service;
-    pub mod r#impl {
-        pub mod follow_impl;
-    }
+    pub mod follow_service_trait;
 }

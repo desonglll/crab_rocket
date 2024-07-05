@@ -10,7 +10,9 @@ pub fn get_all_permissions() -> Json<serde_json::Value> {
         {
             "status": status,
             "message": message,
-            "data":permissions
+            "body":{
+                "data":permissions
+            }
         }
     );
     Json(serde_json::from_value(response).unwrap())

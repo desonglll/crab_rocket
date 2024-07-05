@@ -11,12 +11,8 @@ pub mod controllers {
 }
 
 pub mod routes {
-    pub mod employee_param;
     pub mod employee_route;
 }
 pub mod services {
     pub mod employee_service;
-    pub mod r#impl {
-        pub mod employee_impl;
-    }
 }

@@ -10,7 +10,9 @@ pub fn get_info() -> Json<serde_json::Value> {
         {
             "status": status,
             "message": message,
-            "data":info
+            "body":{
+                "data":info
+            }
         }
     );
     Json(serde_json::from_value(response).unwrap())

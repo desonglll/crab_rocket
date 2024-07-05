@@ -1,4 +1,5 @@
-use std::error::Error;
+use crate::models::task::{NewTask, PatchTask, Task};
+use crate::services::task_service::TaskService;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
@@ -6,22 +7,26 @@ use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::ServiceCRUD;
-use crate::models::task::{NewTask, PatchTask, Task};
-use crate::services::task_service::{TaskService};
+use std::error::Error;
 
 pub struct TaskController {}
 
 impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for TaskController {
-    fn get_all(param: &RequestParam<PaginationParam>) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn Error>> {
+    fn get_all(
+        param: &RequestParam<PaginationParam>,
+    ) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn Error>> {
         match TaskService::get_all(param) {
             Ok(data) => {
-                let response =
-                    ApiResponse::new("200".to_string(), "Success".to_string(), data);
+                let response = ApiResponse::new("200".to_string(), "Success".to_string(), data);
                 Ok(response)
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::new("200".to_string(), e.to_string(), Data::new(Vec::new(), Pagination::default())))
+                Ok(ApiResponse::new(
+                    "200".to_string(),
+                    e.to_string(),
+                    Data::new(Vec::new(), Pagination::default()),
+                ))
             }
         }
     }
@@ -53,7 +58,7 @@ impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -65,7 +70,7 @@ impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
@@ -77,9 +82,8 @@ impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::error())
+                Ok(ApiResponse::error(e))
             }
         }
     }
 }
-
