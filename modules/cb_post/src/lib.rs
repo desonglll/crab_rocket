@@ -11,13 +11,9 @@ pub mod models {
 }
 
 pub mod routes {
-    pub mod post_param;
     pub mod post_route;
 }
 
 pub mod services {
     pub mod post_service;
-    pub mod r#impl {
-        pub mod post_impl;
-    }
 }

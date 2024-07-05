@@ -43,12 +43,12 @@ pub fn module_routes() -> Vec<Route> {
         user_route::delete_user_by_id,
         user_route::update_user_by_id,
         // post routes
-        post_route::insert_single_post,
-        post_route::get_all_posts,
+        post_route::get_posts,
+        post_route::get_posts_by_param,
         post_route::get_post_by_id,
+        post_route::insert_single_post,
         post_route::update_post_by_id,
         post_route::delete_post_by_id,
-        post_route::get_posts_by_params,
         post_route::options_post_filter,
         // follow routes
         follow_route::insert_single_follow,

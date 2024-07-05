@@ -1,6 +1,7 @@
 use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
@@ -145,6 +146,17 @@ impl NewPost {
             status,
             created_at,
             updated_at,
+        }
+    }
+
+    pub fn demo() -> Self {
+        Self {
+            title: Some(String::from("demo post")),
+            body: Some(String::from("demo body")),
+            user_id: Some(1),
+            status: Some(String::from("demo status")),
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
         }
     }
 

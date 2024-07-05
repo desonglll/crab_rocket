@@ -1,127 +1,103 @@
-use rocket::{delete, form::FromForm, get, http::Status, options, patch, post, serde::json::Json};
+use crate::controllers::post_controller::PostController;
+use crate::models::post::{NewPost, PatchPost};
+use obj_traits::controller::controller_crud::ControllerCRUD;
+use obj_traits::request::pagination_request_param::PaginationParam;
+use obj_traits::request::request_param::RequestParam;
+use rocket::http::Status;
+use rocket::serde::json::Json;
+use rocket::{delete, get, options, patch, post};
 use serde_json::json;
 
-use crate::{
-    controllers::post_controller,
-    models::post::{NewPost, PatchPost},
-};
-
-use super::post_param::PostParam;
-
-#[derive(FromForm)]
-pub struct PostQuery {
-    pub author_id: Option<i32>,
-    pub category: Option<String>,
-    // 其他可能的查询条件
-}
-#[utoipa::path(
-    responses(
-        (status = 200, description = "found successfully", body = Vec<Post>),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[get("/post")]
-pub fn get_all_posts() -> Json<serde_json::Value> {
+/// # Note
+/// 若业务逻辑复杂则启用controller层
+/// 目前只是把业务逻辑简单包含在路由中
+/// ## Put和Patch
+/// `https://ihower.tw/blog/archives/6483`
+/// PUT 比較正確的定義是 Replace (Create or Update)，
+/// 例如PUT/items/1的意思是替換/items/1，如果已經存在就替換，沒有就新增。
+/// PUT必須包含items/1的所有屬性資料
+#[get("/post?<limit>&<offset>")]
+pub fn get_posts(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
+    if limit.is_none() {
+        limit = Some(10);
+    };
+    if offset.is_none() {
+        offset = Some(0);
+    };
+    let params = RequestParam::new(PaginationParam::new(limit, offset));
+    println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
-    let (code, message, all_posts) = post_controller::get_all_posts_controller();
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":all_posts
-    }))
-    .unwrap();
-    Json(response)
+    let resp = PostController::get_all(&params).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[utoipa::path(
-    responses(
-        (status = 200, description = "found successfully", body = Post),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
+#[post("/ppost", data = "<params>")]
+pub fn get_posts_by_param(
+    mut params: Option<Json<RequestParam<PaginationParam>>>,
+) -> Json<serde_json::Value> {
+    if params.is_none() {
+        params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
+    }
+    println!("{:?}", params);
+    crab_rocket_schema::update_reload::update_reload_count();
+    let resp = PostController::get_all(&params.unwrap()).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
+}
+
 #[get("/post/<id>")]
 pub fn get_post_by_id(id: i32) -> Json<serde_json::Value> {
-    let (code, message, post) = post_controller::get_post_by_id_controller(id);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":post
-    }))
-    .unwrap();
-    Json(response)
+    crab_rocket_schema::update_reload::update_reload_count();
+    let resp = PostController::get_by_id(id).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[utoipa::path(
-    responses(
-        (status = 200, description = "update successfully", body = Post),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[patch("/post/<id>", data = "<post>")]
-pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Value> {
-    let (code, message, updated_post) = post_controller::update_post_by_id_controller(id, &post);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":updated_post
-    }))
-    .unwrap();
-    Json(response)
-}
-
-#[utoipa::path(
-    responses(
-        (status = 200, description = "deleted successfully", body = Post),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[delete("/post/<id>")]
-pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
-    let (code, message, deleted_post) = post_controller::delete_post_by_id_controller(id);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":deleted_post
-    }))
-    .unwrap();
-    Json(response)
-}
-
-#[utoipa::path(
-    responses(
-        (status = 200, description = "created successfully", body = Post),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
 #[post("/post", data = "<post>")]
 pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
-    let (code, message, inserted_post) = post_controller::insert_single_post_controller(&post);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":inserted_post
-    }))
-    .unwrap();
-    Json(response)
+    let mut obj: NewPost = post.into_inner();
+
+    let resp = PostController::add_single(&mut obj).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[utoipa::path(
-    responses(
-        (status = 200, description = "found successfully", body = Vec<Post>),
-        (status = NOT_FOUND, description = "not found")
-    )
-)]
-#[post("/post/filter", data = "<params>")]
-pub fn get_posts_by_params(params: Json<PostParam>) -> Json<serde_json::Value> {
-    let (code, message, post) = post_controller::get_post_by_params_controller(&params);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":post,
-    }))
-    .unwrap();
-    Json(response)
+#[delete("/post/<id>")]
+pub fn delete_post_by_id(id: i32) -> Json<serde_json::Value> {
+    let resp = PostController::delete_by_id(id).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
+
+#[patch("/post/<id>", data = "<post>")]
+pub fn update_post_by_id(id: i32, post: Json<PatchPost>) -> Json<serde_json::Value> {
+    let resp = PostController::update_by_id(id, &post).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
+}
+
+#[get("/")]
+pub fn index() -> &'static str {
+    "hello world!"
+}
+
+#[get("/test")]
+pub fn demo() -> Json<serde_json::Value> {
+    let j = json!({
+        "code": 200,
+        "message": "success",
+        "data": {
+            "user": {
+              "id": 123,
+              "name": "John Doe",
+              "email": "john@example.com"
+            }
+          }
+    });
+    Json(serde_json::from_value(j).unwrap())
+}
+
 #[options("/post/filter")]
 pub fn options_post_filter() -> Status {
     Status::Ok

@@ -1,84 +1,102 @@
 use crate::models::post::{NewPost, PatchPost, Post};
-use crate::routes::post_param::PostParam;
-use crab_rocket_schema::schema::posts::dsl::*; //配合下面的 `posts.filter()`
-use crab_rocket_schema::schema::posts::{self};
+use crab_rocket_schema::schema::posts::dsl;
 use crab_rocket_utils::time::get_e8_time;
+//配合下面的 `posts.filter()`
 use diesel::prelude::*;
+use diesel::result::Error;
+use diesel::PgConnection;
+use obj_traits::mapper::mapper_crud::MapperCRUD;
+use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::data::Data;
+pub struct PostMapper {}
 
-// GOOD:
-pub fn insert_post(conn: &mut PgConnection, post: &NewPost) -> Result<Post, diesel::result::Error> {
-    match diesel::insert_into(posts::table)
-        .values(post)
-        .returning(Post::as_returning())
-        .get_result(conn)
-    {
-        Ok(inserted_post) => Ok(inserted_post),
-        Err(e) => Err(e),
+impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for PostMapper {
+    fn get_all(
+        conn: &mut PgConnection,
+        param: &RequestParam<PaginationParam>,
+    ) -> Result<Data<Vec<Post>>, Error> {
+        // 当前页码（page）
+        // 每页条目数（per_page）
+        //
+        // 总页数（total_pages）
+        //
+        // 公式
+        //
+        // 当前页的 offset: (page - 1) * per_page
+        //
+        // 下一页的 offset: page * per_page
+        //
+        // 上一页的 offset: (page - 2) * per_page （如果 page > 1）
+        //
+        // limit 始终为 per_page
+        // 计算分页相关
+        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
+        let per_page = param.pagination.limit.unwrap();
+        // 获取总记录数
+        let total_count = dsl::posts.count().get_result::<i64>(conn)? as i32;
+        // 计算总页数
+        let total_pages = (total_count + per_page - 1) / per_page;
+
+        let previous_page_offset = (page - 2) * per_page;
+        let next_page_offset = page * per_page;
+        let pagination = Pagination::new(
+            page,
+            per_page,
+            total_pages,
+            total_count,
+            Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
+            Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
+        );
+
+        // 分页查询
+        let data = dsl::posts
+            .order(dsl::updated_at.desc())
+            .limit(per_page as i64)
+            .offset(((page - 1) * per_page) as i64)
+            .load::<Post>(conn)?;
+        let resp_body = Data::new(data, pagination);
+        println!("{resp_body}");
+        Ok(resp_body)
     }
-}
 
-// GOOD:
-pub fn fetch_all_posts(conn: &mut PgConnection) -> Result<Vec<Post>, diesel::result::Error> {
-    posts::table.order(posts::post_id.asc()).load::<Post>(conn)
-}
+    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Post, diesel::result::Error> {
+        // 配合 use crate::schema::posts::dsl::*;
+        dsl::posts.filter(dsl::post_id.eq(pid)).first(conn)
+    }
 
-// GOOD:
-pub fn fetch_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diesel::result::Error> {
-    // 配合 use crate::schema::posts::dsl::*;
-    posts.filter(posts::post_id.eq(id)).first(conn)
-}
-
-// GOOD:
-pub fn update_post_by_id(
-    conn: &mut PgConnection,
-    id: i32,
-    post: &PatchPost,
-) -> Result<Post, diesel::result::Error> {
-    diesel::update(posts.filter(post_id.eq(id)))
-        .set((
-            posts::title.eq(post.title()),
-            posts::body.eq(post.body()),
-            posts::user_id.eq(post.user_id()),
-            posts::status.eq(post.status()),
-            posts::created_at.eq(post.created_at()),
-            posts::updated_at.eq(get_e8_time()),
-        ))
-        .get_result(conn)
-}
-
-pub fn delete_post_by_id(conn: &mut PgConnection, id: i32) -> Result<Post, diesel::result::Error> {
-    diesel::delete(posts.filter(posts::post_id.eq(id))).get_result(conn)
-}
-
-pub fn fetch_posts_by_params(
-    conn: &mut PgConnection,
-    params: &PostParam,
-) -> Result<Vec<Post>, diesel::result::Error> {
-    let mut query = posts.into_boxed();
-
-    if let Some(uid) = params.user_id {
-        if uid != 0 {
-            query = query.filter(posts::user_id.eq(uid));
+    fn add_single(conn: &mut PgConnection, obj: &NewPost) -> Result<Post, diesel::result::Error> {
+        match diesel::insert_into(dsl::posts)
+            .values(obj)
+            .returning(Post::as_returning())
+            .get_result(conn)
+        {
+            Ok(inserted_post) => Ok(inserted_post),
+            Err(e) => Err(e),
         }
     }
-    if let Some(limit) = params.limit {
-        if limit != 0 {
-            query = query.limit(limit.into());
-        }
-    }
-    if let Some(offset) = params.offset {
-        if offset != 0 {
-            query = query.offset(offset.into());
-        }
-    }
-    let filtered_posts = query.order(posts::updated_at.desc()).load::<Post>(conn);
-    filtered_posts
-}
-pub fn get_count(conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
-    let count: i64 = posts.count().first(conn).expect("Error counting posts");
-    Ok(count)
-}
 
+    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Post, diesel::result::Error> {
+        diesel::delete(dsl::posts.filter(dsl::post_id.eq(pid))).get_result(conn)
+    }
+
+    fn update_by_id(
+        conn: &mut PgConnection,
+        pid: i32,
+        obj: &PatchPost,
+    ) -> Result<Post, diesel::result::Error> {
+        diesel::update(dsl::posts.filter(dsl::post_id.eq(pid)))
+            .set((
+                dsl::title.eq(obj.title()),
+                dsl::body.eq(obj.body()),
+                dsl::user_id.eq(obj.user_id()),
+                dsl::status.eq(obj.status()),
+                dsl::created_at.eq(obj.created_at()),
+                dsl::updated_at.eq(get_e8_time()),
+            ))
+            .get_result(conn)
+    }
+}
 #[cfg(test)]
 mod tests {
 
@@ -89,17 +107,10 @@ mod tests {
         match establish_pg_connection() {
             Ok(mut conn) => {
                 // 创建一个新的 NewPost 实例
-                let new_post = NewPost::new(
-                    Some("Test Title".to_string()),
-                    Some("Test Body".to_string()),
-                    Some(4),
-                    Some("Published".to_string()),
-                    Some(chrono::Utc::now().naive_utc()), // 使用当前时间作为创建时间
-                    Some(chrono::Utc::now().naive_utc()), // 使用当前时间作为更新时间
-                );
+                let new_post = NewPost::demo();
 
                 // 调用 insert_post 函数
-                let _ = insert_post(&mut conn, &new_post);
+                let _ = PostMapper::add_single(&mut conn, &new_post);
                 // 删除插入的数据，以便下一次测试
                 // diesel::delete(posts::table.filter(posts::title.eq("Test
                 // Title"))) .execute(&mut conn)
@@ -113,15 +124,14 @@ mod tests {
     fn test_fetch_all_posts() {
         use super::*;
         use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
+        let param = RequestParam::new(PaginationParam::demo());
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match fetch_all_posts(&mut conn) {
-                    Ok(all_posts) => {
-                        println!("{all_posts:?}")
-                    }
-                    Err(_) => (),
+            Ok(mut conn) => match PostMapper::get_all(&mut conn, &param) {
+                Ok(all_posts) => {
+                    println!("{all_posts}")
                 }
-            }
+                Err(_) => (),
+            },
             Err(_) => (),
         }
     }
@@ -131,14 +141,12 @@ mod tests {
         use super::*;
         use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match fetch_post_by_id(&mut conn, 1) {
-                    Ok(post) => {
-                        println!("{post:?}")
-                    }
-                    Err(_) => (),
+            Ok(mut conn) => match PostMapper::get_by_id(&mut conn, 1) {
+                Ok(post) => {
+                    println!("{post:?}")
                 }
-            }
+                Err(_) => (),
+            },
             Err(_) => (),
         }
     }
@@ -147,23 +155,14 @@ mod tests {
     fn test_update_post_by_id() {
         use super::*;
         use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        let new_post = NewPost::new(
-            Some("Test newe".to_string()),
-            Some("Test Body".to_string()),
-            Some(1),
-            Some("Published".to_string()),
-            Some(chrono::Utc::now().naive_utc()), // 使用当前时间作为创建时间
-            Some(chrono::Utc::now().naive_utc()), // 使用当前时间作为更新时间
-        );
+        let new_post = NewPost::demo();
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match update_post_by_id(&mut conn, 4, &new_post.into()) {
-                    Ok(updated_post) => {
-                        println!("{updated_post:?}")
-                    }
-                    Err(_) => (),
+            Ok(mut conn) => match PostMapper::update_by_id(&mut conn, 4, &new_post.into()) {
+                Ok(updated_post) => {
+                    println!("{updated_post:?}")
                 }
-            }
+                Err(_) => (),
+            },
             Err(_) => (),
         }
     }
@@ -173,36 +172,12 @@ mod tests {
         use super::*;
         use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
         match establish_pg_connection() {
-            Ok(mut conn) => {
-                match delete_post_by_id(&mut conn, 1) {
-                    Ok(deleted_post) => {
-                        println!("{deleted_post:?}")
-                    }
-                    Err(_) => (),
+            Ok(mut conn) => match PostMapper::delete_by_id(&mut conn, 1) {
+                Ok(deleted_post) => {
+                    println!("{deleted_post:?}")
                 }
-            }
-            Err(_) => (),
-        }
-    }
-
-    #[test]
-    fn test_fetch_posts_by_params() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        let params = PostParam {
-            user_id: Some(2),
-            limit: None,
-            offset: None,
-        };
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                match fetch_posts_by_params(&mut conn, &params) {
-                    Ok(u_posts) => {
-                        println!("{u_posts:?}")
-                    }
-                    Err(_) => (),
-                }
-            }
+                Err(_) => (),
+            },
             Err(_) => (),
         }
     }
