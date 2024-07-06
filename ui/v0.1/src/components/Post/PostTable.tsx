@@ -15,11 +15,11 @@ interface PostParams {
 export function PostTable() {
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [info, setInfo] = useState<Info>();
+  const [pagination, setPagination] = useState<Pagination>();
   const getPostsByParams = async (params: PostParams) => {
     try {
       const response = await axios.post("/post/filter", params);
-      const mapped_data = response.data.data.map((item: Post) => {
+      const mapped_data = response.data.body.data.map((item: Post) => {
         return {
           ...item,
           created_at: dayjs(item.created_at).format("YYYY年MM月DD日 HH:mm:ss"),
@@ -27,6 +27,7 @@ export function PostTable() {
         };
       });
       setPosts(mapped_data);
+      setPagination(response.data.body.pagination);
     } catch (error) {
       console.log(error);
     }
@@ -37,20 +38,10 @@ export function PostTable() {
       limit: 10,
       offset: 0,
     }).then(() => {
-      fetchInfo().then(() => {
-        setLoading(!loading);
-      });
+      setLoading(!loading);
     });
   }, []);
-  const fetchInfo = async () => {
-    try {
-      const response = await axios.get(`info`);
-      console.log(response.data);
-      setInfo(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
   const columns = [
     {
       title: "文章标题",
@@ -134,7 +125,7 @@ export function PostTable() {
                 };
                 getPostsByParams(params);
               },
-              total: info?.post_count,
+              total: pagination?.count,
             }}
           />
         </Fade>

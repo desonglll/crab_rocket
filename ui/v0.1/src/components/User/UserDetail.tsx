@@ -24,7 +24,9 @@ export function UserDetail() {
   const fetchUser = async () => {
     try {
       const response = await axios.get(`user/${user_id}`);
-      setUser(response.data.data);
+      console.log(response.data);
+
+      setUser(response.data.body);
     } catch (e) {
       console.log(e);
     }
@@ -142,7 +144,11 @@ export function UserDetail() {
                     <AvatarUpload
                       return_uuid={update_uuid}
                       avatar_url={
-                        axios.defaults.baseURL + "/retrieve/" + user?.avatar_url
+                        user?.avatar_url
+                          ? axios.defaults.baseURL +
+                            "/retrieve/" +
+                            user?.avatar_url
+                          : ""
                       }
                     />
                   </div>

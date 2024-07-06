@@ -24,8 +24,7 @@ export function EmployeeDetail() {
     try {
       const response = await axios.get(`employee/${employee_id}`);
       console.log(response.data);
-
-      setEmployee(response.data.data);
+      setEmployee(response.data.body);
     } catch (e) {
       console.log(e);
     }

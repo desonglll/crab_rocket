@@ -13,7 +13,7 @@ export function FileTable() {
     const fetchData = async () => {
       try {
         const resp = await axios.get(`files`);
-        setFiles(resp.data.data);
+        setFiles(resp.data.body);
       } catch (e) {
         console.log(e);
       }
@@ -33,7 +33,7 @@ export function FileTable() {
           hoverable
           onClick={() => {
             const textArea = document.createElement("textarea");
-            textArea.value = file.id;
+            textArea.value = file.file_id;
             document.body.appendChild(textArea);
             textArea.select();
             try {
@@ -49,7 +49,7 @@ export function FileTable() {
           }}
           style={{ width: "max-content" }}
         >
-          <div>{file.id}</div>
+          <div>{file.file_id}</div>
         </Card>
       ),
     },
@@ -62,7 +62,7 @@ export function FileTable() {
           hoverable
           onClick={() => {
             const textArea = document.createElement("textarea");
-            textArea.value = file.id;
+            textArea.value = file.file_id;
             document.body.appendChild(textArea);
             textArea.select();
             try {
@@ -95,7 +95,7 @@ export function FileTable() {
     {
       title: "retrieve",
       render: (_, file: File) => (
-        <Button href={`${axios.defaults.baseURL}/retrieve/${file.id}`}>
+        <Button href={`${axios.defaults.baseURL}/retrieve/${file.file_id}`}>
           retrieve
         </Button>
       ),
@@ -103,7 +103,7 @@ export function FileTable() {
     {
       title: "download",
       render: (_, file: File) => (
-        <Button href={`${axios.defaults.baseURL}/download/${file.id}`}>
+        <Button href={`${axios.defaults.baseURL}/download/${file.file_id}`}>
           download
         </Button>
       ),
@@ -111,7 +111,7 @@ export function FileTable() {
     {
       title: "bytestream",
       render: (_, file: File) => (
-        <Button href={`${axios.defaults.baseURL}/byte/stream/${file.id}`}>
+        <Button href={`${axios.defaults.baseURL}/byte/stream/${file.file_id}`}>
           bytestream
         </Button>
       ),

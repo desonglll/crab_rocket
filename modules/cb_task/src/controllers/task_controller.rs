@@ -20,13 +20,13 @@ impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, Task
     ) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn Error>> {
         match TaskService::get_all(param) {
             Ok(data) => {
-                let response = ApiResponse::new("200".to_string(), "Success".to_string(), data);
+                let response = ApiResponse::new(200, "Success".to_string(), data);
                 Ok(response)
             }
             Err(e) => {
                 println!("{e:?}");
                 Ok(ApiResponse::new(
-                    "200".to_string(),
+                    200,
                     e.to_string(),
                     Data::new(Vec::new(), Pagination::default()),
                 ))
@@ -36,12 +36,12 @@ impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, Task
     fn get_by_id(pid: i32) -> Result<ApiResponse<Task>, Box<dyn Error>> {
         match TaskService::get_by_id(pid) {
             Ok(body) => {
-                let response = ApiResponse::new(String::from("200"), String::from("Success"), body);
+                let response = ApiResponse::new(200, String::from("Success"), body);
                 Ok(response)
             }
             Err(e) => {
                 println!("{e:?}");
-                Ok(ApiResponse::new("200".to_string(), e.to_string(), Task::default()))
+                Ok(ApiResponse::new(200, e.to_string(), Task::default()))
             }
         }
     }
@@ -94,13 +94,13 @@ impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, Task
     ) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn std::error::Error>> {
         match TaskService::filter(param) {
             Ok(data) => {
-                let response = ApiResponse::new("200".to_string(), "Success".to_string(), data);
+                let response = ApiResponse::new(200, "Success".to_string(), data);
                 Ok(response)
             }
             Err(e) => {
                 println!("{e:?}");
                 Ok(ApiResponse::new(
-                    "200".to_string(),
+                    200,
                     e.to_string(),
                     Data::new(Vec::new(), Pagination::default()),
                 ))

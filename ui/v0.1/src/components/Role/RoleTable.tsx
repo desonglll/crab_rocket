@@ -21,6 +21,8 @@ export function RoleTable() {
   const fetchData = async () => {
     try {
       const response = await axios.get("role");
+      console.log(response.data);
+
       const mapped_data = response.data.body.data.map((item: role) => ({
         role_id: item.role_id,
         role_name: item.role_name,

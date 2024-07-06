@@ -15,7 +15,7 @@ interface TaskParams {
 export function TaskTable() {
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [info, setInfo] = useState<Info>();
+  const [pagination, setPagination] = useState<Pagination>();
   const handleDelete = (id: number) => {
     console.log(id);
     try {
@@ -30,7 +30,7 @@ export function TaskTable() {
     try {
       const response = await axios.post("/task/filter", params);
       console.log(response.data);
-      const mapped_data = response.data.data.map((item: Task) => {
+      const mapped_data = response.data.body.data.map((item: Task) => {
         return {
           ...item,
           created_at: dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss"),
@@ -46,7 +46,7 @@ export function TaskTable() {
     try {
       const response = await axios.get(`info`);
       console.log(response.data);
-      setInfo(response.data.data);
+      setPagination(response.data.body.pagination);
     } catch (error) {
       console.log(error);
     }
@@ -68,7 +68,7 @@ export function TaskTable() {
       dataIndex: "title",
       key: "title",
       render: (_: any, task: Task) => (
-        <NavLink to={`/task/detail/${task.id}`}>{task.title}</NavLink>
+        <NavLink to={`/task/detail/${task.task_id}`}>{task.title}</NavLink>
       ),
     },
     {
@@ -91,7 +91,7 @@ export function TaskTable() {
       key: "action",
       render: (_: number, task: Task) => (
         <Space size="middle">
-          <Button danger onClick={() => handleDelete(task.id)}>
+          <Button danger onClick={() => handleDelete(task.task_id)}>
             Delete
           </Button>
         </Space>
@@ -106,11 +106,11 @@ export function TaskTable() {
             size="small"
             columns={columns}
             dataSource={tasks}
-            rowKey={"id"}
+            rowKey={"task_id"}
             pagination={{
               showSizeChanger: true,
               showQuickJumper: true,
-              total: info?.task_count,
+              total: pagination?.count,
               onChange(page, pageSize) {
                 const params: TaskParams = {
                   user_id: null,

@@ -10,6 +10,7 @@ export function UserTable() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const [pagination, setPagination] = useState<Pagination>();
   const navigate = useNavigate();
   const fetchUser = async () => {
     try {
@@ -22,6 +23,7 @@ export function UserTable() {
         };
       });
       setUsers(mapped_data);
+      setPagination(response.data.body.pagination);
     } catch (e) {
       console.log(e);
     }
@@ -138,6 +140,11 @@ export function UserTable() {
               columns={columns}
               rowKey={"user_id"}
               size={"small"}
+              pagination={{
+                showSizeChanger: true,
+                showQuickJumper: true,
+                total: pagination?.count,
+              }}
             />
           </div>
         </Fade>

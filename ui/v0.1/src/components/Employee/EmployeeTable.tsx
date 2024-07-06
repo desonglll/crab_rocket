@@ -77,7 +77,7 @@ function EmployeeTable() {
   };
   const fetchEmployee = async (params: EmployeeParams) => {
     try {
-      const response = await axios.post(`eemployee`, {
+      const response = await axios.post(`employee/filter`, {
         pagination: params,
       });
       const mapped_data = response.data.body.data.map((item: Employee) => {

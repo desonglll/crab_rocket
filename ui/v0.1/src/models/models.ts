@@ -7,7 +7,7 @@ export interface SubmittedRole {
 }
 
 export interface Permission {
-  id: number;
+  permission_id: number;
   permission_name: string;
   permission_description: string | null;
   resource: string;
@@ -92,7 +92,7 @@ export interface PatchPost {
 }
 
 export interface Task {
-  id: number;
+  task_id: number;
   title: string;
   content: string;
   user_id: number;
@@ -107,7 +107,7 @@ export interface PatchTask {
 }
 
 export interface File {
-  id: string;
+  file_id: string;
   file_name: string;
   file_url: string;
   uploaded_at: string;
