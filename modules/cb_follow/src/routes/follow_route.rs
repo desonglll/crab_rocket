@@ -1,7 +1,10 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     controller::controller_crud::ControllerCRUD,
-    request::{pagination_request_param::PaginationParam, request_param::RequestParam},
+    request::{
+        pagination_request_param::{PaginationParam, PaginationParamTrait},
+        request_param::RequestParam,
+    },
 };
 use rocket::{delete, get, patch, post, serde::json::Json};
 
@@ -9,7 +12,10 @@ use crate::{
     controllers::{
         follow_controller::FollowController, follow_controller_trait::FollowControllerTrait,
     },
-    models::follow::{NewFollow, PatchFollow},
+    models::{
+        follow::{NewFollow, PatchFollow},
+        follow_filter::FollowFilter,
+    },
 };
 
 #[get("/follow?<limit>&<offset>")]
@@ -21,20 +27,20 @@ pub fn get_follows(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serd
     if offset.is_none() {
         offset = Some(0);
     };
-    let params = RequestParam::new(PaginationParam::new(limit, offset));
+    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
     let resp = FollowController::get_all(&params).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/ffollow", data = "<params>")]
-pub fn get_follows_by_params(
-    mut params: Option<Json<RequestParam<PaginationParam>>>,
+#[post("/follow/filter", data = "<param>")]
+pub fn filter_follows(
+    param: Option<Json<RequestParam<PaginationParam, FollowFilter>>>,
 ) -> Json<serde_json::Value> {
-    if params.is_none() {
-        params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
-    };
-    let resp = FollowController::get_all(&params.unwrap()).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.into_inner();
+    println!("{param:?}");
+    let resp = FollowController::filter(&param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
@@ -76,22 +82,22 @@ pub fn delete_follow_specifically(follow: Json<NewFollow>) -> Json<serde_json::V
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/follow/<uid>/followeds", data = "<param>")]
-pub fn get_followeds_by_user_id(
-    uid: i32,
-    param: Option<Json<RequestParam<PaginationParam>>>,
-) -> Json<serde_json::Value> {
-    let resp = FollowController::get_followeds_by_user_id(uid, &param.unwrap()).unwrap();
-    let json_value = serde_json::to_value(&resp).unwrap();
-    Json(serde_json::from_value(json_value).unwrap())
-}
+// #[post("/follow/<uid>/followeds", data = "<param>")]
+// pub fn get_followeds_by_user_id(
+//     uid: i32,
+//     param: Option<Json<RequestParam<PaginationParam>>>,
+// ) -> Json<serde_json::Value> {
+//     let resp = FollowController::get_followeds_by_user_id(uid, &param.unwrap()).unwrap();
+//     let json_value = serde_json::to_value(&resp).unwrap();
+//     Json(serde_json::from_value(json_value).unwrap())
+// }
 
-#[post("/ffollow/<uid>/followings", data = "<param>")]
-pub fn get_followings_by_user_id(
-    uid: i32,
-    param: Option<Json<RequestParam<PaginationParam>>>,
-) -> Json<serde_json::Value> {
-    let resp = FollowController::get_followings_by_user_id(uid, &param.unwrap()).unwrap();
-    let json_value = serde_json::to_value(&resp).unwrap();
-    Json(serde_json::from_value(json_value).unwrap())
-}
+// #[post("/ffollow/<uid>/followings", data = "<param>")]
+// pub fn get_followings_by_user_id(
+//     uid: i32,
+//     param: Option<Json<RequestParam<PaginationParam>>>,
+// ) -> Json<serde_json::Value> {
+//     let resp = FollowController::get_followings_by_user_id(uid, &param.unwrap()).unwrap();
+//     let json_value = serde_json::to_value(&resp).unwrap();
+//     Json(serde_json::from_value(json_value).unwrap())
+// }

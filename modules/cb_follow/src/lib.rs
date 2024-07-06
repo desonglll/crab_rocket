@@ -1,5 +1,6 @@
 pub mod models {
     pub mod follow;
+    pub mod follow_filter;
 }
 
 pub mod mappers {

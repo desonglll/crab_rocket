@@ -6,7 +6,10 @@ use obj_traits::{
 };
 
 use crate::{
-    models::follow::{Follow, NewFollow, PatchFollow},
+    models::{
+        follow::{Follow, NewFollow, PatchFollow},
+        follow_filter::FollowFilter,
+    },
     services::{follow_service::FollowService, follow_service_trait::FollowServiceTrait},
 };
 
@@ -14,11 +17,11 @@ use super::follow_controller_trait::FollowControllerTrait;
 
 pub struct FollowController {}
 
-impl ControllerCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam>>
+impl ControllerCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, FollowFilter>>
     for FollowController
 {
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<
         obj_traits::response::api_response::ApiResponse<
             obj_traits::response::data::Data<Vec<Follow>>,
@@ -75,8 +78,24 @@ impl ControllerCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam
             }
         }
     }
+
+    fn filter(
+        param: &RequestParam<PaginationParam, FollowFilter>,
+    ) -> Result<
+        ApiResponse<obj_traits::response::data::Data<Vec<Follow>>>,
+        Box<dyn std::error::Error>,
+    > {
+        match FollowService::filter(param) {
+            Ok(data) => Ok(ApiResponse::success(data)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
+    }
 }
-impl FollowControllerTrait<RequestParam<PaginationParam>> for FollowController {
+
+impl FollowControllerTrait<RequestParam<PaginationParam, FollowFilter>> for FollowController {
     fn delete_follow_specifically(
         obj: &NewFollow,
     ) -> Result<ApiResponse<Follow>, Box<dyn std::error::Error>> {
@@ -91,7 +110,7 @@ impl FollowControllerTrait<RequestParam<PaginationParam>> for FollowController {
 
     fn get_followeds_by_user_id(
         uid: i32,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<
         ApiResponse<obj_traits::response::data::Data<Vec<Follow>>>,
         Box<dyn std::error::Error>,
@@ -107,7 +126,7 @@ impl FollowControllerTrait<RequestParam<PaginationParam>> for FollowController {
 
     fn get_followings_by_user_id(
         uid: i32,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<
         ApiResponse<obj_traits::response::data::Data<Vec<Follow>>>,
         Box<dyn std::error::Error>,

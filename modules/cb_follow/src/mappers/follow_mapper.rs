@@ -7,16 +7,21 @@ use obj_traits::{
     response::data::Data,
 };
 
-use crate::models::follow::{Follow, NewFollow, PatchFollow};
+use crate::models::{
+    follow::{Follow, NewFollow, PatchFollow},
+    follow_filter::FollowFilter,
+};
 use crab_rocket_schema::schema::follows::dsl;
 use diesel::prelude::*;
 
 use super::follow_mapper_trait::FollowMapperTrait;
 pub struct FollowMapper {}
-impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam>> for FollowMapper {
+impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, FollowFilter>>
+    for FollowMapper
+{
     fn get_all(
         conn: &mut diesel::PgConnection,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -104,9 +109,78 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam>> f
             ))
             .get_result(conn)
     }
+
+    fn filter(
+        conn: &mut PgConnection,
+        param: &RequestParam<PaginationParam, FollowFilter>,
+    ) -> Result<Data<Vec<Follow>>, diesel::result::Error> {
+        // 当前页码（page）
+        // 每页条目数（per_page）
+        //
+        // 总页数（total_pages）
+        //
+        // 公式
+        //
+        // 当前页的 offset: (page - 1) * per_page
+        //
+        // 下一页的 offset: page * per_page
+        //
+        // 上一页的 offset: (page - 2) * per_page （如果 page > 1）
+        //
+        // limit 始终为 per_page
+        let filter = &param.filter;
+        println!("{filter:?}");
+        // 计算分页相关
+        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
+        let per_page = param.pagination.limit.unwrap();
+        // 获取总记录数
+        let total_count = dsl::follows.count().get_result::<i64>(conn)? as i32;
+        // 计算总页数
+        let total_pages = (total_count + per_page - 1) / per_page;
+
+        let previous_page_offset = (page - 2) * per_page;
+        let next_page_offset = page * per_page;
+        let pagination = Pagination::new(
+            page,
+            per_page,
+            total_pages,
+            total_count,
+            Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
+            Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
+        );
+
+        let mut query = dsl::follows.into_boxed();
+
+        // 分页查询
+        query = query
+            .order(dsl::created_at.desc())
+            .limit(per_page as i64)
+            .offset(((page - 1) * per_page) as i64);
+
+        if let Some(f) = filter {
+            if let Some(created_at_max) = &f.created_at_max {
+                query = query.filter(dsl::created_at.le(created_at_max));
+            }
+            if let Some(created_at_min) = &f.created_at_min {
+                query = query.filter(dsl::created_at.ge(created_at_min));
+            }
+            if let Some(followed_user_id) = &f.followed_user_id {
+                query = query.filter(dsl::followed_user_id.eq(followed_user_id));
+            }
+            if let Some(following_user_id) = &f.following_user_id {
+                query = query.filter(dsl::following_user_id.eq(following_user_id));
+            }
+            if let Some(follow_id) = &f.follow_id {
+                query = query.filter(dsl::follow_id.eq(follow_id));
+            }
+        }
+        let data = query.load::<Follow>(conn)?;
+        let body = Data::new(data, pagination);
+        Ok(body)
+    }
 }
 
-impl FollowMapperTrait<RequestParam<PaginationParam>> for FollowMapper {
+impl FollowMapperTrait<RequestParam<PaginationParam, FollowFilter>> for FollowMapper {
     fn delete_follow_specifically(
         conn: &mut PgConnection,
         obj: &NewFollow,
@@ -131,7 +205,7 @@ impl FollowMapperTrait<RequestParam<PaginationParam>> for FollowMapper {
     fn get_followings_by_user_id(
         conn: &mut PgConnection,
         uid: i32,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<Data<Vec<Follow>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -181,7 +255,7 @@ impl FollowMapperTrait<RequestParam<PaginationParam>> for FollowMapper {
     fn get_followeds_by_user_id(
         conn: &mut PgConnection,
         uid: i32,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<Data<Vec<Follow>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）

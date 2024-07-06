@@ -7,16 +7,21 @@ use obj_traits::{
 
 use crate::{
     mappers::{follow_mapper::FollowMapper, follow_mapper_trait::FollowMapperTrait},
-    models::follow::{Follow, NewFollow, PatchFollow},
+    models::{
+        follow::{Follow, NewFollow, PatchFollow},
+        follow_filter::FollowFilter,
+    },
 };
 
 use super::follow_service_trait::FollowServiceTrait;
 
 pub struct FollowService {}
 
-impl ServiceCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam>> for FollowService {
+impl ServiceCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, FollowFilter>>
+    for FollowService
+{
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match FollowMapper::get_all(&mut conn, param) {
@@ -96,9 +101,27 @@ impl ServiceCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam>> 
             }
         }
     }
+
+    fn filter(
+        param: &RequestParam<PaginationParam, FollowFilter>,
+    ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match FollowMapper::filter(&mut conn, param) {
+                Ok(all_follows) => Ok(all_follows),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
 }
 
-impl FollowServiceTrait<RequestParam<PaginationParam>> for FollowService {
+impl FollowServiceTrait<RequestParam<PaginationParam, FollowFilter>> for FollowService {
     fn delete_follow_specifically(obj: &NewFollow) -> Result<Follow, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match FollowMapper::delete_follow_specifically(&mut conn, obj) {
@@ -117,7 +140,7 @@ impl FollowServiceTrait<RequestParam<PaginationParam>> for FollowService {
 
     fn get_followeds_by_user_id(
         uid: i32,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match FollowMapper::get_followeds_by_user_id(&mut conn, uid, param) {
@@ -136,7 +159,7 @@ impl FollowServiceTrait<RequestParam<PaginationParam>> for FollowService {
 
     fn get_followings_by_user_id(
         uid: i32,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, FollowFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match FollowMapper::get_followings_by_user_id(&mut conn, uid, param) {
