@@ -1,5 +1,6 @@
 pub mod models {
     pub mod employee;
+    pub mod employee_filter;
 }
 
 pub mod mappers {

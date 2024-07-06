@@ -1,4 +1,5 @@
 use crate::models::employee::{Employee, NewEmployee, PatchEmployee};
+use crate::models::employee_filter::EmployeeFilter;
 use crate::services::employee_service::EmployeeService;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
@@ -10,11 +11,17 @@ use std::error::Error;
 
 pub struct EmployeeController {}
 
-impl ControllerCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationParam>>
-    for EmployeeController
+impl
+    ControllerCRUD<
+        Employee,
+        NewEmployee,
+        PatchEmployee,
+        RequestParam<PaginationParam, EmployeeFilter>,
+        EmployeeFilter,
+    > for EmployeeController
 {
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, EmployeeFilter>,
     ) -> Result<ApiResponse<Data<Vec<Employee>>>, Box<dyn Error>> {
         match EmployeeService::get_all(param) {
             Ok(all_employees) => {
@@ -74,6 +81,27 @@ impl ControllerCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<Paginatio
         match EmployeeService::update_by_id(pid, obj) {
             Ok(employee) => {
                 let response = ApiResponse::success(employee);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
+    }
+    fn filter(
+        param: &Option<EmployeeFilter>,
+    ) -> Result<ApiResponse<Data<Vec<Employee>>>, Box<dyn std::error::Error>> {
+        let mut param = param.clone().unwrap();
+        if param.offset.is_none() {
+            param.offset = Some(0);
+        }
+        if param.limit.is_none() {
+            param.limit = Some(10);
+        }
+        match EmployeeService::filter(&param) {
+            Ok(all_employees) => {
+                let response = ApiResponse::success(all_employees);
                 Ok(response)
             }
             Err(e) => {

@@ -1,5 +1,6 @@
 use crate::mappers::employee_mapper::EmployeeMapper;
 use crate::models::employee::{Employee, NewEmployee, PatchEmployee};
+use crate::models::employee_filter::EmployeeFilter;
 use crab_rocket_schema::establish_pg_connection;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
@@ -10,11 +11,17 @@ use std::error::Error;
 
 pub struct EmployeeService {}
 
-impl ServiceCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationParam>>
-    for EmployeeService
+impl
+    ServiceCRUD<
+        Employee,
+        NewEmployee,
+        PatchEmployee,
+        RequestParam<PaginationParam, EmployeeFilter>,
+        EmployeeFilter,
+    > for EmployeeService
 {
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, Box<dyn Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match EmployeeMapper::get_all(&mut conn, param) {
@@ -93,12 +100,27 @@ impl ServiceCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationPa
             }
         }
     }
+    fn filter(param: &EmployeeFilter) -> Result<Data<Vec<Employee>>, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match EmployeeMapper::filter(&mut conn, param) {
+                Ok(all_employees) => Ok(all_employees),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
     use crate::services::employee_service::EmployeeService;
-    use obj_traits::request::pagination_request_param::PaginationParam;
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
 
@@ -114,7 +136,7 @@ mod test {
 
     #[test]
     fn test_get_all_employees() {
-        let param = RequestParam::new(PaginationParam::demo());
+        let param = RequestParam::new(PaginationParam::demo(), None);
         match EmployeeService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),
