@@ -1,8 +1,8 @@
 use crate::models::post::{NewPost, PatchPost, Post};
 use crate::models::post_filter::PostFilter;
-use crab_rocket_schema::schema::posts::dsl;
+use crab_rocket_schema::schema::post_table::dsl;
 use crab_rocket_utils::time::get_e8_time;
-//配合下面的 `posts.filter()`
+//配合下面的 `post_table.filter()`
 use diesel::prelude::*;
 use diesel::result::Error;
 use diesel::PgConnection;
@@ -37,7 +37,7 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilt
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::posts.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::post_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -53,7 +53,7 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilt
         );
 
         // 分页查询
-        let data = dsl::posts
+        let data = dsl::post_table
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
@@ -64,12 +64,12 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilt
     }
 
     fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Post, diesel::result::Error> {
-        // 配合 use crate::schema::posts::dsl::*;
-        dsl::posts.filter(dsl::post_id.eq(pid)).first(conn)
+        // 配合 use crate::schema::post_table::dsl::*;
+        dsl::post_table.filter(dsl::post_id.eq(pid)).first(conn)
     }
 
     fn add_single(conn: &mut PgConnection, obj: &NewPost) -> Result<Post, diesel::result::Error> {
-        match diesel::insert_into(dsl::posts)
+        match diesel::insert_into(dsl::post_table)
             .values(obj)
             .returning(Post::as_returning())
             .get_result(conn)
@@ -80,7 +80,7 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilt
     }
 
     fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Post, diesel::result::Error> {
-        diesel::delete(dsl::posts.filter(dsl::post_id.eq(pid))).get_result(conn)
+        diesel::delete(dsl::post_table.filter(dsl::post_id.eq(pid))).get_result(conn)
     }
 
     fn update_by_id(
@@ -88,7 +88,7 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilt
         pid: i32,
         obj: &PatchPost,
     ) -> Result<Post, diesel::result::Error> {
-        diesel::update(dsl::posts.filter(dsl::post_id.eq(pid)))
+        diesel::update(dsl::post_table.filter(dsl::post_id.eq(pid)))
             .set((
                 dsl::title.eq(obj.title()),
                 dsl::body.eq(obj.body()),
@@ -121,7 +121,7 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilt
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::posts.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::post_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -135,7 +135,7 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilt
             Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
             Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
         );
-        let mut query = dsl::posts.into_boxed();
+        let mut query = dsl::post_table.into_boxed();
         let filter = &param.filter;
         println!("{filter:?}");
         if let Some(f) = filter {
@@ -192,7 +192,7 @@ mod tests {
                 // 调用 insert_post 函数
                 let _ = PostMapper::add_single(&mut conn, &new_post);
                 // 删除插入的数据，以便下一次测试
-                // diesel::delete(posts::table.filter(posts::title.eq("Test
+                // diesel::delete(post_table::table.filter(post_table::title.eq("Test
                 // Title"))) .execute(&mut conn)
                 // .expect("Failed to delete test data");
             }
@@ -201,14 +201,14 @@ mod tests {
     }
 
     #[test]
-    fn test_fetch_all_posts() {
+    fn test_fetch_all_post_table() {
         use super::*;
         use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
         let param = RequestParam::new(PaginationParam::demo(), None);
         match establish_pg_connection() {
             Ok(mut conn) => match PostMapper::get_all(&mut conn, &param) {
-                Ok(all_posts) => {
-                    println!("{all_posts}")
+                Ok(all_post_table) => {
+                    println!("{all_post_table}")
                 }
                 Err(_) => (),
             },

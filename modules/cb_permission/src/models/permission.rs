@@ -8,7 +8,7 @@ use utoipa::ToSchema;
 #[diesel(table_name = crab_rocket_schema::schema::permission_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Permission {
-    pub id: i32,
+    pub permission_id: i32,
     pub permission_name: String,
     pub permission_description: Option<String>,
     pub resource: String,
@@ -23,7 +23,7 @@ pub struct Permission {
 
 impl Permission {
     pub fn new(
-        id: i32,
+        permission_id: i32,
         permission_name: String,
         permission_description: Option<String>,
         resource: String,
@@ -36,7 +36,7 @@ impl Permission {
         notes: Option<String>,
     ) -> Self {
         Self {
-            id,
+            permission_id,
             permission_name,
             permission_description,
             resource,
@@ -50,8 +50,8 @@ impl Permission {
         }
     }
 
-    pub fn id(&self) -> i32 {
-        self.id
+    pub fn permission_id(&self) -> i32 {
+        self.permission_id
     }
 
     pub fn permission_name(&self) -> &str {
@@ -94,8 +94,8 @@ impl Permission {
         &self.notes
     }
 
-    pub fn set_id(&mut self, id: i32) {
-        self.id = id;
+    pub fn set_permission_id(&mut self, permission_id: i32) {
+        self.permission_id = permission_id;
     }
 
     pub fn set_permission_name(&mut self, permission_name: String) {

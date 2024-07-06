@@ -1,12 +1,12 @@
+use crab_rocket_utils::time::get_e8_time;
 use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crab_rocket_schema::schema::posts)]
+#[diesel(table_name = crab_rocket_schema::schema::post_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Post {
     post_id: i32,
@@ -119,7 +119,7 @@ impl Post {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crab_rocket_schema::schema::posts)]
+#[diesel(table_name = crab_rocket_schema::schema::post_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewPost {
     title: Option<String>,
@@ -212,7 +212,7 @@ impl NewPost {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crab_rocket_schema::schema::posts)]
+#[diesel(table_name = crab_rocket_schema::schema::post_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchPost {
     title: Option<String>,

@@ -7,7 +7,7 @@ use uuid::Uuid; // 添加这一行
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::file_table)]
 pub struct File {
-    pub id: Uuid,
+    pub file_id: Uuid,
     pub file_name: String,
     pub file_url: String,
     pub uploaded_at: Option<NaiveDateTime>,
@@ -17,7 +17,7 @@ pub struct File {
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::file_table)]
 pub struct NewFile<'a> {
-    pub id: Uuid,
+    pub file_id: Uuid,
     pub file_name: &'a str,
     pub file_url: &'a str,
 }

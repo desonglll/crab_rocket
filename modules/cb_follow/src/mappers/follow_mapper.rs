@@ -11,7 +11,7 @@ use crate::models::{
     follow::{Follow, NewFollow, PatchFollow},
     follow_filter::FollowFilter,
 };
-use crab_rocket_schema::schema::follows::dsl;
+use crab_rocket_schema::schema::follow_table::dsl;
 use diesel::prelude::*;
 
 use super::follow_mapper_trait::FollowMapperTrait;
@@ -41,7 +41,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::follows.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -57,7 +57,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
         );
 
         // 分页查询
-        let data = dsl::follows
+        let data = dsl::follow_table
             .order(dsl::created_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
@@ -68,7 +68,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
     }
 
     fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Follow, diesel::result::Error> {
-        dsl::follows.filter(dsl::follow_id.eq(pid)).first(conn)
+        dsl::follow_table.filter(dsl::follow_id.eq(pid)).first(conn)
     }
 
     fn add_single(
@@ -77,7 +77,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
     ) -> Result<Follow, diesel::result::Error> {
         // check if exist before ccreate.
         if !check_exist_follow(conn, obj.following_user_id(), obj.followed_user_id()) {
-            match diesel::insert_into(dsl::follows)
+            match diesel::insert_into(dsl::follow_table)
                 .values(obj)
                 .returning(Follow::as_returning())
                 .get_result(conn)
@@ -94,7 +94,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
     }
 
     fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Follow, diesel::result::Error> {
-        diesel::delete(dsl::follows.filter(dsl::follow_id.eq(pid))).get_result(conn)
+        diesel::delete(dsl::follow_table.filter(dsl::follow_id.eq(pid))).get_result(conn)
     }
 
     fn update_by_id(
@@ -102,7 +102,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
         pid: i32,
         obj: &PatchFollow,
     ) -> Result<Follow, diesel::result::Error> {
-        diesel::update(dsl::follows.filter(dsl::follow_id.eq(pid)))
+        diesel::update(dsl::follow_table.filter(dsl::follow_id.eq(pid)))
             .set((
                 dsl::followed_user_id.eq(obj.followed_user_id()),
                 dsl::following_user_id.eq(obj.following_user_id()),
@@ -134,7 +134,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::follows.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -149,7 +149,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
             Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
         );
 
-        let mut query = dsl::follows.into_boxed();
+        let mut query = dsl::follow_table.into_boxed();
 
         // 分页查询
         query = query
@@ -187,7 +187,7 @@ impl FollowMapperTrait<RequestParam<PaginationParam, FollowFilter>> for FollowMa
     ) -> Result<Follow, diesel::result::Error> {
         if check_exist_follow(conn, obj.following_user_id(), obj.followed_user_id()) {
             diesel::delete(
-                dsl::follows.filter(
+                dsl::follow_table.filter(
                     dsl::following_user_id
                         .eq(obj.following_user_id())
                         .and(dsl::followed_user_id.eq(obj.followed_user_id())),
@@ -225,7 +225,7 @@ impl FollowMapperTrait<RequestParam<PaginationParam, FollowFilter>> for FollowMa
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::follows.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -241,7 +241,7 @@ impl FollowMapperTrait<RequestParam<PaginationParam, FollowFilter>> for FollowMa
         );
 
         // 分页查询
-        let data = dsl::follows
+        let data = dsl::follow_table
             .filter(dsl::followed_user_id.eq(uid))
             .order(dsl::created_at.desc())
             .limit(per_page as i64)
@@ -275,7 +275,7 @@ impl FollowMapperTrait<RequestParam<PaginationParam, FollowFilter>> for FollowMa
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::follows.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -291,7 +291,7 @@ impl FollowMapperTrait<RequestParam<PaginationParam, FollowFilter>> for FollowMa
         );
 
         // 分页查询
-        let data = dsl::follows
+        let data = dsl::follow_table
             .filter(dsl::following_user_id.eq(uid))
             .order(dsl::created_at.desc())
             .limit(per_page as i64)
@@ -309,7 +309,7 @@ pub fn check_exist_follow(
     check_followed_user_id: i32,
 ) -> bool {
     // 执行查询，查看是否存在给定的关注关系
-    match dsl::follows
+    match dsl::follow_table
         .filter(
             dsl::following_user_id
                 .eq(check_following_user_id)

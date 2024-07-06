@@ -1,7 +1,7 @@
 use crate::models::task::{NewTask, PatchTask, Task};
 use crate::models::task_filter::TaskFilter;
-use crab_rocket_schema::schema::tasks::dsl; //配合下面的 `tasks.filter()`
-use crab_rocket_schema::schema::tasks::{self};
+use crab_rocket_schema::schema::task_table::dsl; //配合下面的 `tasks.filter()`
+use crab_rocket_schema::schema::task_table::{self};
 use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
@@ -36,7 +36,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::tasks.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::task_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -52,7 +52,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
         );
 
         // 分页查询
-        let data = dsl::tasks
+        let data = dsl::task_table
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
@@ -63,11 +63,11 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
     }
 
     fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Task, diesel::result::Error> {
-        dsl::tasks.filter(tasks::id.eq(pid)).first(conn)
+        dsl::task_table.filter(task_table::task_id.eq(pid)).first(conn)
     }
 
     fn add_single(conn: &mut PgConnection, obj: &NewTask) -> Result<Task, diesel::result::Error> {
-        match diesel::insert_into(tasks::table)
+        match diesel::insert_into(task_table::table)
             .values(obj)
             .returning(Task::as_returning())
             .get_result(conn)
@@ -81,7 +81,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
     }
 
     fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Task, diesel::result::Error> {
-        diesel::delete(dsl::tasks.filter(tasks::id.eq(pid))).get_result(conn)
+        diesel::delete(dsl::task_table.filter(task_table::task_id.eq(pid))).get_result(conn)
     }
 
     fn update_by_id(
@@ -89,12 +89,12 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
         pid: i32,
         obj: &PatchTask,
     ) -> Result<Task, diesel::result::Error> {
-        diesel::update(dsl::tasks.filter(dsl::id.eq(pid)))
+        diesel::update(dsl::task_table.filter(dsl::task_id.eq(pid)))
             .set((
-                tasks::title.eq(obj.title()),
-                tasks::content.eq(obj.content()),
-                tasks::updated_at.eq(Some(get_e8_time())), //Update time
-                tasks::user_id.eq(obj.user_id()),
+                task_table::title.eq(obj.title()),
+                task_table::content.eq(obj.content()),
+                task_table::updated_at.eq(Some(get_e8_time())), //Update time
+                task_table::user_id.eq(obj.user_id()),
             ))
             .get_result(conn)
     }
@@ -120,7 +120,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::tasks.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::task_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -135,7 +135,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
             Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
         );
 
-        let mut query = dsl::tasks.into_boxed();
+        let mut query = dsl::task_table.into_boxed();
 
         // 分页查询
         query = query
@@ -146,7 +146,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilt
         let filter = &param.filter;
         if let Some(f) = filter {
             if let Some(id) = &f.id {
-                query = query.filter(dsl::id.eq(id));
+                query = query.filter(dsl::task_id.eq(id));
             }
             if let Some(title) = &f.title {
                 query = query.filter(dsl::title.like(format!("%{}%", title)));

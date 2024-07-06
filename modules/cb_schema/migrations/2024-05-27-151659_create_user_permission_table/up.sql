@@ -1,6 +1,6 @@
 -- Your SQL goes here
 CREATE TABLE permission_table (
-    id SERIAL PRIMARY KEY,
+    permission_id SERIAL PRIMARY KEY,
     permission_name VARCHAR(255) NOT NULL,
     permission_description TEXT,
     resource VARCHAR(255) NOT NULL,

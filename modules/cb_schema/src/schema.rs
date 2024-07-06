@@ -69,8 +69,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    file_table (id) {
-        id -> Uuid,
+    file_table (file_id) {
+        file_id -> Uuid,
         file_name -> Varchar,
         file_url -> Varchar,
         uploaded_at -> Nullable<Timestamp>,
@@ -78,7 +78,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    follows (follow_id) {
+    follow_table (follow_id) {
         following_user_id -> Int4,
         followed_user_id -> Int4,
         created_at -> Nullable<Timestamp>,
@@ -87,8 +87,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    permission_table (id) {
-        id -> Int4,
+    permission_table (permission_id) {
+        permission_id -> Int4,
         #[max_length = 255]
         permission_name -> Varchar,
         permission_description -> Nullable<Text>,
@@ -108,7 +108,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    posts (post_id) {
+    post_table (post_id) {
         post_id -> Int4,
         #[max_length = 255]
         title -> Nullable<Varchar>,
@@ -145,8 +145,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    tasks (id) {
-        id -> Int4,
+    task_table (task_id) {
+        task_id -> Int4,
         title -> Text,
         content -> Nullable<Text>,
         created_at -> Nullable<Timestamp>,
@@ -177,18 +177,18 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(tasks -> user_table (user_id));
+diesel::joinable!(task_table -> user_table (user_id));
 diesel::joinable!(user_table -> role_table (role_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     department_table,
     employee_table,
     file_table,
-    follows,
+    follow_table,
     permission_table,
-    posts,
+    post_table,
     reload_counts,
     role_table,
-    tasks,
+    task_table,
     user_table,
 );

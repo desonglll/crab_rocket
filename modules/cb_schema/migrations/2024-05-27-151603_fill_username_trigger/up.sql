@@ -9,7 +9,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER fill_username_trigger
-BEFORE INSERT ON posts
+BEFORE INSERT ON post_table
 FOR EACH ROW EXECUTE FUNCTION fill_username();
 
 

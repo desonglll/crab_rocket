@@ -27,7 +27,7 @@ pub async fn insert_files(
         let file_path = Path::new(upload_folder.as_str()).join(original_file_name.clone());
         println!("file_path: {:?}", file_path.clone().to_str());
         let new_file = NewFile {
-            id: file_uuid,
+            file_id: file_uuid,
             file_name: &original_file_name,
             file_url: file_path.to_str().unwrap(),
         };
@@ -50,7 +50,7 @@ pub fn retrieve_file_url_by_uuid(
     uuid: Uuid,
 ) -> Result<String, diesel::result::Error> {
     println!("enter mapper: {:?}", uuid);
-    file_table.filter(file_table::id.eq(uuid)).select(file_url).first::<String>(conn)
+    file_table.filter(file_table::file_id.eq(uuid)).select(file_url).first::<String>(conn)
 }
 
 pub fn fetch_all_files(conn: &mut PgConnection) -> Result<Vec<File>, diesel::result::Error> {

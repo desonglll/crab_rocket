@@ -1,6 +1,6 @@
 -- Your SQL goes here
 
-CREATE TABLE "posts" (
+CREATE TABLE "post_table" (
   "post_id" serial,
   "title" varchar(255) DEFAULT 'Untitled',
   "body" text DEFAULT 'No Content',
@@ -13,7 +13,7 @@ CREATE TABLE "posts" (
 );
 
 -- 向 posts 表插入示例数据
-INSERT INTO posts (title, body, user_id, status, username, created_at, updated_at)
+INSERT INTO post_table (title, body, user_id, status, username, created_at, updated_at)
 VALUES
 ('Post 1', 'This is post 1', 1, 'active', 'john_doe', '2023-01-01', '2023-01-01'),
 ('Post 2', 'This is post 2', 2, 'active', 'jane_smith', '2023-02-01', '2023-02-01'),
@@ -36,5 +36,5 @@ VALUES
 ('Post 19', 'This is post 19', 6, 'active', 'emily_davis', '2024-07-01', '2024-07-01'),
 ('Post 20', 'This is post 20', 7, 'active', 'robert_martinez', '2024-08-01', '2024-08-01');
 
-ALTER TABLE "posts" ADD CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "user_table" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "posts" ADD CONSTRAINT "username" FOREIGN KEY ("username") REFERENCES "user_table" ("username");
+ALTER TABLE "post_table" ADD CONSTRAINT "user_id" FOREIGN KEY ("user_id") REFERENCES "user_table" ("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "post_table" ADD CONSTRAINT "username" FOREIGN KEY ("username") REFERENCES "user_table" ("username");

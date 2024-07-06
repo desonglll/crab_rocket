@@ -7,10 +7,10 @@ use utoipa::ToSchema;
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = crab_rocket_schema::schema::tasks)]
+#[diesel(table_name = crab_rocket_schema::schema::task_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Task {
-    id: i32,
+    task_id: i32,
     title: String,
     content: Option<String>,
     created_at: Option<chrono::NaiveDateTime>,
@@ -19,8 +19,8 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn id(&self) -> i32 {
-        self.id
+    pub fn task_id(&self) -> i32 {
+        self.task_id
     }
 
     pub fn title(&self) -> &str {
@@ -43,8 +43,8 @@ impl Task {
         self.user_id
     }
 
-    pub fn set_id(&mut self, id: i32) {
-        self.id = id;
+    pub fn set_task_id(&mut self, task_id: i32) {
+        self.task_id = task_id;
     }
 
     pub fn set_title(&mut self, title: String) {
@@ -68,7 +68,7 @@ impl Task {
     }
 
     pub fn new(
-        id: i32,
+        task_id: i32,
         title: String,
         content: Option<String>,
         created_at: Option<chrono::NaiveDateTime>,
@@ -76,7 +76,7 @@ impl Task {
         user_id: Option<i32>,
     ) -> Self {
         Self {
-            id,
+            task_id,
             title,
             content,
             created_at,
@@ -90,8 +90,8 @@ impl Display for Task {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "id: {},\n title: {},\n content: {},\n created_at: {},\n updated_at: {}\n",
-            self.id,
+            "task_id: {},\n title: {},\n content: {},\n created_at: {},\n updated_at: {}\n",
+            self.task_id,
             self.title,
             self.content.clone().unwrap(),
             self.created_at.unwrap(),
@@ -117,7 +117,7 @@ impl Display for TaskList {
 
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-#[diesel(table_name = crab_rocket_schema::schema::tasks)]
+#[diesel(table_name = crab_rocket_schema::schema::task_table)]
 pub struct NewTask {
     title: String,
     content: Option<String>,
@@ -186,7 +186,7 @@ impl NewTask {
 
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-#[diesel(table_name = crab_rocket_schema::schema::tasks)]
+#[diesel(table_name = crab_rocket_schema::schema::task_table)]
 pub struct PatchTask {
     title: String,
     content: Option<String>,
@@ -232,7 +232,7 @@ mod test {
     #[test]
     fn test_task_new() {
         let task = super::Task {
-            id: 1,
+            task_id: 1,
             title: "title".to_string(),
             content: "content".to_string().into(),
             created_at: Some(crab_rocket_utils::time::get_e8_time()),
