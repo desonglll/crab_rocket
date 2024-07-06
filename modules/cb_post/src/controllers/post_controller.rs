@@ -6,15 +6,20 @@ use obj_traits::{
 };
 
 use crate::{
-    models::post::{NewPost, PatchPost, Post},
+    models::{
+        post::{NewPost, PatchPost, Post},
+        post_filter::PostFilter,
+    },
     services::post_service::PostService,
 };
 
 pub struct PostController {}
 
-impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for PostController {
+impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilter>>
+    for PostController
+{
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, PostFilter>,
     ) -> Result<
         obj_traits::response::api_response::ApiResponse<
             obj_traits::response::data::Data<Vec<Post>>,
@@ -66,6 +71,19 @@ impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for
     ) -> Result<ApiResponse<Post>, Box<dyn std::error::Error>> {
         match PostService::update_by_id(pid, obj) {
             Ok(updated_post) => Ok(ApiResponse::success(updated_post)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
+    }
+
+    fn filter(
+        param: &RequestParam<PaginationParam, PostFilter>,
+    ) -> Result<ApiResponse<obj_traits::response::data::Data<Vec<Post>>>, Box<dyn std::error::Error>>
+    {
+        match PostService::filter(param) {
+            Ok(all_posts) => Ok(ApiResponse::success(all_posts)),
             Err(e) => {
                 println!("{e:?}");
                 Ok(ApiResponse::error(e))

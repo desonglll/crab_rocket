@@ -1,4 +1,5 @@
 use crate::models::post::{NewPost, PatchPost, Post};
+use crate::models::post_filter::PostFilter;
 use crab_rocket_schema::schema::posts::dsl;
 use crab_rocket_utils::time::get_e8_time;
 //配合下面的 `posts.filter()`
@@ -11,10 +12,12 @@ use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 pub struct PostMapper {}
 
-impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for PostMapper {
+impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilter>>
+    for PostMapper
+{
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, PostFilter>,
     ) -> Result<Data<Vec<Post>>, Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -96,9 +99,86 @@ impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for Pos
             ))
             .get_result(conn)
     }
+    fn filter(
+        conn: &mut PgConnection,
+        param: &RequestParam<PaginationParam, PostFilter>,
+    ) -> Result<Data<Vec<Post>>, diesel::result::Error> {
+        // 当前页码（page）
+        // 每页条目数（per_page）
+        //
+        // 总页数（total_pages）
+        //
+        // 公式
+        //
+        // 当前页的 offset: (page - 1) * per_page
+        //
+        // 下一页的 offset: page * per_page
+        //
+        // 上一页的 offset: (page - 2) * per_page （如果 page > 1）
+        //
+        // limit 始终为 per_page
+        // 计算分页相关
+        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
+        let per_page = param.pagination.limit.unwrap();
+        // 获取总记录数
+        let total_count = dsl::posts.count().get_result::<i64>(conn)? as i32;
+        // 计算总页数
+        let total_pages = (total_count + per_page - 1) / per_page;
+
+        let previous_page_offset = (page - 2) * per_page;
+        let next_page_offset = page * per_page;
+        let pagination = Pagination::new(
+            page,
+            per_page,
+            total_pages,
+            total_count,
+            Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
+            Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
+        );
+        let mut query = dsl::posts.into_boxed();
+        let filter = &param.filter;
+        println!("{filter:?}");
+        if let Some(f) = filter {
+            if let Some(post_id) = &f.post_id {
+                query = query.filter(dsl::post_id.eq(post_id));
+            }
+            if let Some(title) = &f.title {
+                query = query.filter(dsl::title.like(format!("%{}%", title)));
+            }
+            if let Some(body) = &f.body {
+                query = query.filter(dsl::body.like(format!("%{}%", body)));
+            }
+            if let Some(user_id) = &f.user_id {
+                query = query.filter(dsl::user_id.eq(user_id));
+            }
+            if let Some(status) = &f.status {
+                query = query.filter(dsl::status.eq(status));
+            }
+            if let Some(created_at_min) = &f.created_at_min {
+                query = query.filter(dsl::created_at.ge(created_at_min));
+            }
+            if let Some(created_at_max) = &f.created_at_max {
+                query = query.filter(dsl::created_at.le(created_at_max));
+            }
+            if let Some(updated_at_min) = &f.updated_at_min {
+                query = query.filter(dsl::updated_at.ge(updated_at_min));
+            }
+            if let Some(updated_at_max) = &f.updated_at_max {
+                query = query.filter(dsl::updated_at.le(updated_at_max));
+            }
+            if let Some(username) = &f.username {
+                query = query.filter(dsl::username.like(format!("%{}%", username)));
+            }
+        }
+
+        let data = query.load::<Post>(conn)?;
+        let body = Data::new(data, pagination);
+        Ok(body)
+    }
 }
 #[cfg(test)]
 mod tests {
+    use obj_traits::request::pagination_request_param::PaginationParamTrait;
 
     #[test]
     fn test_insert_post() {
@@ -124,7 +204,7 @@ mod tests {
     fn test_fetch_all_posts() {
         use super::*;
         use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        let param = RequestParam::new(PaginationParam::demo());
+        let param = RequestParam::new(PaginationParam::demo(), None);
         match establish_pg_connection() {
             Ok(mut conn) => match PostMapper::get_all(&mut conn, &param) {
                 Ok(all_posts) => {

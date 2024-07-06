@@ -1,7 +1,8 @@
 use crate::controllers::post_controller::PostController;
 use crate::models::post::{NewPost, PatchPost};
+use crate::models::post_filter::PostFilter;
 use obj_traits::controller::controller_crud::ControllerCRUD;
-use obj_traits::request::pagination_request_param::PaginationParam;
+use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 use obj_traits::request::request_param::RequestParam;
 use rocket::http::Status;
 use rocket::serde::json::Json;
@@ -24,7 +25,7 @@ pub fn get_posts(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
     if offset.is_none() {
         offset = Some(0);
     };
-    let params = RequestParam::new(PaginationParam::new(limit, offset));
+    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = PostController::get_all(&params).unwrap();
@@ -32,16 +33,14 @@ pub fn get_posts(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/ppost", data = "<params>")]
-pub fn get_posts_by_param(
-    mut params: Option<Json<RequestParam<PaginationParam>>>,
+#[post("/post/filter", data = "<param>")]
+pub fn filter_posts(
+    param: Option<Json<RequestParam<PaginationParam, PostFilter>>>,
 ) -> Json<serde_json::Value> {
-    if params.is_none() {
-        params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
-    }
-    println!("{:?}", params);
-    crab_rocket_schema::update_reload::update_reload_count();
-    let resp = PostController::get_all(&params.unwrap()).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.into_inner();
+    println!("{param:?}");
+    let resp = PostController::filter(&param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

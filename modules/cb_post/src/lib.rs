@@ -8,6 +8,7 @@ pub mod mappers {
 
 pub mod models {
     pub mod post;
+    pub mod post_filter;
 }
 
 pub mod routes {

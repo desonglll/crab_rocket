@@ -7,13 +7,18 @@ use obj_traits::{
 
 use crate::{
     mappers::post_mapper::PostMapper,
-    models::post::{NewPost, PatchPost, Post},
+    models::{
+        post::{NewPost, PatchPost, Post},
+        post_filter::PostFilter,
+    },
 };
 
 pub struct PostService {}
-impl ServiceCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for PostService {
+impl ServiceCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilter>>
+    for PostService
+{
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, PostFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Post>>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match PostMapper::get_all(&mut conn, param) {
@@ -93,12 +98,32 @@ impl ServiceCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam>> for Po
             }
         }
     }
+    fn filter(
+        param: &RequestParam<PaginationParam, PostFilter>,
+    ) -> Result<obj_traits::response::data::Data<Vec<Post>>, Box<dyn std::error::Error>> {
+        match establish_pg_connection() {
+            Ok(mut conn) => match PostMapper::filter(&mut conn, param) {
+                Ok(all_posts) => Ok(all_posts),
+                Err(e) => {
+                    println!("{e:?}");
+                    Err(Box::new(e))
+                }
+            },
+            Err(e) => {
+                println!("{e:?}");
+                Err(Box::new(e))
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
     use obj_traits::{
-        request::{pagination_request_param::PaginationParam, request_param::RequestParam},
+        request::{
+            pagination_request_param::{PaginationParam, PaginationParamTrait},
+            request_param::RequestParam,
+        },
         service::service_crud::ServiceCRUD,
     };
 
@@ -113,7 +138,7 @@ mod test {
     }
     #[test]
     fn test_get_all_posts() {
-        let param = RequestParam::new(PaginationParam::demo());
+        let param = RequestParam::new(PaginationParam::demo(), None);
         match PostService::get_all(&param) {
             Ok(all_posts) => {
                 println!("{all_posts}");
