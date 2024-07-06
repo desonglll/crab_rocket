@@ -14,7 +14,7 @@ export function UserTable() {
   const fetchUser = async () => {
     try {
       const response = await axios.get(`user`);
-      const mapped_data = response.data.data.map((item: User) => {
+      const mapped_data = response.data.body.data.map((item: User) => {
         return {
           ...item,
           created_at: dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss"),

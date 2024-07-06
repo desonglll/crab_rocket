@@ -8,7 +8,6 @@ use obj_traits::request::pagination_request_param::{Pagination, PaginationParam}
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 
-
 pub struct TaskMapper {}
 
 impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for TaskMapper {
@@ -40,8 +39,14 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for Tas
 
         let previous_page_offset = (page - 2) * per_page;
         let next_page_offset = page * per_page;
-        let pagination =
-            Pagination::new(page, per_page, total_pages, total_count, Some(format!("?limit={}&offset={}", per_page, next_page_offset)), Some(format!("?limit={}&offset={}", per_page, previous_page_offset)));
+        let pagination = Pagination::new(
+            page,
+            per_page,
+            total_pages,
+            total_count,
+            Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
+            Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
+        );
 
         // 分页查询
         let data = dsl::tasks
@@ -50,7 +55,7 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for Tas
             .offset(((page - 1) * per_page) as i64)
             .load::<Task>(conn)?;
         let body = Data::new(data, pagination);
-        println!("{body}");
+        println!("Getting tasks successfully.");
         Ok(body)
     }
 

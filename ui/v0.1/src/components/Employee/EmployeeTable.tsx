@@ -14,7 +14,7 @@ interface EmployeeParams {
 function EmployeeTable() {
   const [loading, setLoading] = useState(true);
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [info, setInfo] = useState<Info>();
+  const [pagination, setPagination] = useState<Pagination>();
   const [messageApi, contextHolder] = message.useMessage();
   const columns = [
     {
@@ -75,25 +75,19 @@ function EmployeeTable() {
       console.log(error);
     }
   };
-  const fetchInfo = async () => {
-    try {
-      const response = await axios.get(`info`);
-      console.log(response.data);
-      setInfo(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const fetchEmployee = async (params: EmployeeParams) => {
     try {
-      const response = await axios.post(`employee/filter`, params);
-      const mapped_data = response.data.data.map((item: Employee) => {
+      const response = await axios.post(`eemployee`, {
+        pagination: params,
+      });
+      const mapped_data = response.data.body.data.map((item: Employee) => {
         return {
           ...item,
           last_update: dayjs(item.last_update).format("YYYY-MM-DD HH:mm:ss"),
         };
       });
       setEmployees(mapped_data);
+      setPagination(response.data.body.pagination);
       console.log(response.data);
     } catch (error) {
       console.log(error);
@@ -108,7 +102,6 @@ function EmployeeTable() {
     fetchEmployee(params).then(() => {
       setLoading(!loading);
     });
-    fetchInfo();
   }, []);
   return (
     <>
@@ -139,7 +132,7 @@ function EmployeeTable() {
                 };
                 fetchEmployee(params);
               },
-              total: info?.employee_count,
+              total: pagination?.count,
             }}
           />
         </div>

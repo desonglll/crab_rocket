@@ -20,8 +20,8 @@ export function RoleTable() {
   const [messageApi, contextHolder] = message.useMessage();
   const fetchData = async () => {
     try {
-      const data = await axios.get("role");
-      const mapped_data = data.data.data.map((item: role) => ({
+      const response = await axios.get("role");
+      const mapped_data = response.data.body.data.map((item: role) => ({
         role_id: item.role_id,
         role_name: item.role_name,
         permissions: item.permissions,

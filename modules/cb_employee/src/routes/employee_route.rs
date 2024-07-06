@@ -22,10 +22,11 @@ pub fn get_employees(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<se
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/uemployee", data = "<params>")]
+#[post("/eemployee", data = "<params>")]
 pub fn get_employees_by_param(
     mut params: Option<Json<RequestParam<PaginationParam>>>,
 ) -> Json<serde_json::Value> {
+    println!("{params:?}");
     if params.is_none() {
         params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
     }

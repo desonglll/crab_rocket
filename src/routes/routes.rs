@@ -65,6 +65,7 @@ pub fn module_routes() -> Vec<Route> {
         //
         employee_route::get_employees,
         employee_route::get_employee_by_id,
+        employee_route::get_employees_by_param,
         employee_route::insert_single_employee,
         employee_route::delete_employee_by_id,
         employee_route::update_employee_by_id,

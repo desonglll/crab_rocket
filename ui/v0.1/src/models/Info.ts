@@ -1,6 +1,7 @@
-interface Info {
-	employee_count: number;
-	post_count: number;
-	task_count: number;
-	user_count: number;
+interface Pagination {
+  count: number;
+  next: string;
+  page: number;
+  previous: string;
+  total_pages: number;
 }

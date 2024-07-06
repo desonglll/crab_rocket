@@ -9,10 +9,16 @@ pub struct PaginationParam {
 
 impl PaginationParam {
     pub fn new(limit: Option<i32>, offset: Option<i32>) -> Self {
-        Self { limit, offset }
+        Self {
+            limit,
+            offset,
+        }
     }
     pub fn demo() -> Self {
-        Self { limit: Some(10), offset: Some(0) }
+        Self {
+            limit: Some(10),
+            offset: Some(0),
+        }
     }
 }
 
