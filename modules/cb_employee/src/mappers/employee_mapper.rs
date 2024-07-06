@@ -127,7 +127,6 @@ impl MapperCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationPar
         // limit 始终为 per_page
         let filter = &param.filter;
         println!("{filter:?}");
-        println!("{:?}", filter.as_ref().unwrap().city);
         // 计算分页相关
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();

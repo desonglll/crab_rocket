@@ -1,10 +1,11 @@
 use obj_traits::controller::controller_crud::ControllerCRUD;
-use obj_traits::request::pagination_request_param::PaginationParam;
+use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 use obj_traits::request::request_param::RequestParam;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::user_controller::UserController;
 use crate::models::user::{NewUser, PatchUser};
+use crate::models::user_filter::UserFilter;
 
 #[get("/user?<limit>&<offset>")]
 pub fn get_users(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
@@ -14,7 +15,7 @@ pub fn get_users(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
     if offset.is_none() {
         offset = Some(0);
     };
-    let params = RequestParam::new(PaginationParam::new(limit, offset));
+    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = UserController::get_all(&params).unwrap();
@@ -22,16 +23,15 @@ pub fn get_users(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/uuser", data = "<params>")]
-pub fn get_users_by_param(
-    mut params: Option<Json<RequestParam<PaginationParam>>>,
+#[post("/user/filter", data = "<param>")]
+pub fn filter_users(
+    param: Option<Json<RequestParam<PaginationParam, UserFilter>>>,
 ) -> Json<serde_json::Value> {
-    if params.is_none() {
-        params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
-    }
-    println!("{:?}", params);
+    println!("{:?}", param);
+    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count();
-    let resp = UserController::get_all(&params.unwrap()).unwrap();
+    let resp = UserController::filter(&param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

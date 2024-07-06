@@ -26,8 +26,8 @@ pub fn get_employees(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<se
 pub fn filter_employees(
     param: Option<Json<RequestParam<PaginationParam, EmployeeFilter>>>,
 ) -> Json<serde_json::Value> {
-    println!("{:?}", param);
-    let param = param.unwrap().into_inner();
+    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = EmployeeController::filter(&param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();

@@ -1,19 +1,18 @@
 #[macro_use]
 extern crate rocket;
 
-use crab_rocket::{env_variables, routes::routes::module_routes};
+use crab_rocket_user::routes::user_route::*;
 use crab_rocket_utils;
 use dotenvy::dotenv;
-use rocket::{http::Method, Route};
+use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use std::env;
-
 #[launch]
 fn rocket() -> _ {
     // Clear environment variable before running.
     env::remove_var("DATABASE_URL");
     // Load env
-    env_variables::load_env();
+    // env_variables::load_env();
     dotenv().ok();
 
     crab_rocket_utils::run_preload();
@@ -48,14 +47,18 @@ fn rocket() -> _ {
     .to_cors()
     .unwrap();
 
-    let mut routes = Vec::<Route>::new();
-
-    let module_routes = module_routes();
-
-    // let doc_routes = routes![docs::doc];
-
-    // routes.extend(doc_routes.clone());
-    routes.extend(module_routes.clone());
-
-    rocket::build().mount("/api", routes).attach(cors)
+    rocket::build()
+        .mount(
+            "/api",
+            routes![
+                get_users,
+                filter_users,
+                get_user_by_id,
+                insert_single_user,
+                delete_user_by_id,
+                update_user_by_id,
+                options_user
+            ],
+        )
+        .attach(cors)
 }
