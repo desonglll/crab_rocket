@@ -1,11 +1,12 @@
+use crate::controllers::role_controller::RoleController;
+use crate::models::role::{NewRole, PatchRole};
+use crate::models::role_filter::RoleFilter;
+use obj_traits::controller::controller_crud::ControllerCRUD;
+use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+use obj_traits::request::request_param::RequestParam;
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::{delete, get, options, patch, post};
-use obj_traits::controller::controller_crud::ControllerCRUD;
-use obj_traits::request::pagination_request_param::PaginationParam;
-use obj_traits::request::request_param::RequestParam;
-use crate::controllers::role_controller::RoleController;
-use crate::models::role::{NewRole, PatchRole};
 
 /// # Note
 /// 若业务逻辑复杂则启用controller层
@@ -23,7 +24,7 @@ pub fn get_roles(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
     if offset.is_none() {
         offset = Some(0);
     };
-    let params = RequestParam::new(PaginationParam::new(limit, offset));
+    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = RoleController::get_all(&params).unwrap();
@@ -31,14 +32,14 @@ pub fn get_roles(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/rrole", data = "<params>")]
-pub fn get_roles_by_param(mut params: Option<Json<RequestParam<PaginationParam>>>) -> Json<serde_json::Value> {
-    if params.is_none() {
-        params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)))));
-    }
-    println!("{:?}", params);
-    crab_rocket_schema::update_reload::update_reload_count();
-    let resp = RoleController::get_all(&params.unwrap()).unwrap();
+#[post("/role/filter", data = "<param>")]
+pub fn filter_roles(
+    param: Option<Json<RequestParam<PaginationParam, RoleFilter>>>,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.into_inner();
+    println!("{param:?}");
+    let resp = RoleController::filter(&param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

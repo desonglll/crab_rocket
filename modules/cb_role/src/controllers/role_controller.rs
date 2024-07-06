@@ -1,4 +1,5 @@
 use crate::models::role::{NewRole, PatchRole, Role};
+use crate::models::role_filter::RoleFilter;
 use crate::services::role_service::RoleService;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
@@ -10,9 +11,11 @@ use std::error::Error;
 
 pub struct RoleController {}
 
-impl ControllerCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam>> for RoleController {
+impl ControllerCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam, RoleFilter>>
+    for RoleController
+{
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, RoleFilter>,
     ) -> Result<ApiResponse<Data<Vec<Role>>>, Box<dyn Error>> {
         match RoleService::get_all(param) {
             Ok(all_roles) => Ok(ApiResponse::success(all_roles)),
@@ -56,6 +59,17 @@ impl ControllerCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam>> for
     fn update_by_id(pid: i32, obj: &PatchRole) -> Result<ApiResponse<Role>, Box<dyn Error>> {
         match RoleService::update_by_id(pid, obj) {
             Ok(updated_role) => Ok(ApiResponse::success(updated_role)),
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::error(e))
+            }
+        }
+    }
+    fn filter(
+        param: &RequestParam<PaginationParam, RoleFilter>,
+    ) -> Result<ApiResponse<Data<Vec<Role>>>, Box<dyn std::error::Error>> {
+        match RoleService::filter(param) {
+            Ok(all_roles) => Ok(ApiResponse::success(all_roles)),
             Err(e) => {
                 println!("{e:?}");
                 Ok(ApiResponse::error(e))

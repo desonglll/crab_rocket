@@ -8,8 +8,8 @@ pub mod mappers {
 
 pub mod models {
     pub mod role;
+    pub mod role_filter;
 }
-
 
 pub mod routes {
     pub mod role_route;
