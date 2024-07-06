@@ -116,8 +116,6 @@ impl MapperCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam, RoleFilt
         // 上一页的 offset: (page - 2) * per_page （如果 page > 1）
         //
         // limit 始终为 per_page
-        let filter = &param.filter;
-        println!("{filter:?}");
         // 计算分页相关
         let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
         let per_page = param.pagination.limit.unwrap();
@@ -145,6 +143,7 @@ impl MapperCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam, RoleFilt
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64);
 
+        let filter = &param.filter;
         if let Some(f) = filter {
             if let Some(role_id) = &f.role_id {
                 query = query.filter(dsl::role_id.eq(role_id));

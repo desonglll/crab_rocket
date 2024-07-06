@@ -1,4 +1,5 @@
 use crate::models::task::{NewTask, PatchTask, Task};
+use crate::models::task_filter::TaskFilter;
 use crate::services::task_service::TaskService;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::controller::controller_crud::ControllerCRUD;
@@ -11,9 +12,11 @@ use std::error::Error;
 
 pub struct TaskController {}
 
-impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for TaskController {
+impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilter>>
+    for TaskController
+{
     fn get_all(
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, TaskFilter>,
     ) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn Error>> {
         match TaskService::get_all(param) {
             Ok(data) => {
@@ -83,6 +86,24 @@ impl ControllerCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for
             Err(e) => {
                 println!("{e:?}");
                 Ok(ApiResponse::error(e))
+            }
+        }
+    }
+    fn filter(
+        param: &RequestParam<PaginationParam, TaskFilter>,
+    ) -> Result<ApiResponse<Data<Vec<Task>>>, Box<dyn std::error::Error>> {
+        match TaskService::filter(param) {
+            Ok(data) => {
+                let response = ApiResponse::new("200".to_string(), "Success".to_string(), data);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("{e:?}");
+                Ok(ApiResponse::new(
+                    "200".to_string(),
+                    e.to_string(),
+                    Data::new(Vec::new(), Pagination::default()),
+                ))
             }
         }
     }

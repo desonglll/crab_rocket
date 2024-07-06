@@ -291,8 +291,10 @@ dependencies = [
  "crab_rocket_schema",
  "crab_rocket_utils",
  "diesel",
+ "dotenvy",
  "obj_traits",
  "rocket",
+ "rocket_cors",
  "serde_json",
  "utoipa",
 ]
@@ -332,8 +334,10 @@ dependencies = [
  "crab_rocket_schema",
  "crab_rocket_utils",
  "diesel",
+ "dotenvy",
  "obj_traits",
  "rocket",
+ "rocket_cors",
  "serde_json",
  "utoipa",
 ]
@@ -347,8 +351,10 @@ dependencies = [
  "crab_rocket_schema",
  "crab_rocket_utils",
  "diesel",
+ "dotenvy",
  "obj_traits",
  "rocket",
+ "rocket_cors",
  "serde_json",
  "utoipa",
 ]
@@ -375,8 +381,10 @@ dependencies = [
  "crab_rocket_schema",
  "crab_rocket_utils",
  "diesel",
+ "dotenvy",
  "obj_traits",
  "rocket",
+ "rocket_cors",
  "serde_json",
  "utoipa",
 ]

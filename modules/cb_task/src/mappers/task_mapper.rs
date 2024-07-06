@@ -1,4 +1,5 @@
 use crate::models::task::{NewTask, PatchTask, Task};
+use crate::models::task_filter::TaskFilter;
 use crab_rocket_schema::schema::tasks::dsl; //配合下面的 `tasks.filter()`
 use crab_rocket_schema::schema::tasks::{self};
 use crab_rocket_utils::time::get_e8_time;
@@ -10,10 +11,12 @@ use obj_traits::response::data::Data;
 
 pub struct TaskMapper {}
 
-impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for TaskMapper {
+impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilter>>
+    for TaskMapper
+{
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam>,
+        param: &RequestParam<PaginationParam, TaskFilter>,
     ) -> Result<Data<Vec<Task>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -95,6 +98,82 @@ impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam>> for Tas
             ))
             .get_result(conn)
     }
+    fn filter(
+        conn: &mut PgConnection,
+        param: &RequestParam<PaginationParam, TaskFilter>,
+    ) -> Result<Data<Vec<Task>>, diesel::result::Error> {
+        // 当前页码（page）
+        // 每页条目数（per_page）
+        //
+        // 总页数（total_pages）
+        //
+        // 公式
+        //
+        // 当前页的 offset: (page - 1) * per_page
+        //
+        // 下一页的 offset: page * per_page
+        //
+        // 上一页的 offset: (page - 2) * per_page （如果 page > 1）
+        //
+        // limit 始终为 per_page
+        // 计算分页相关
+        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
+        let per_page = param.pagination.limit.unwrap();
+        // 获取总记录数
+        let total_count = dsl::tasks.count().get_result::<i64>(conn)? as i32;
+        // 计算总页数
+        let total_pages = (total_count + per_page - 1) / per_page;
+
+        let previous_page_offset = (page - 2) * per_page;
+        let next_page_offset = page * per_page;
+        let pagination = Pagination::new(
+            page,
+            per_page,
+            total_pages,
+            total_count,
+            Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
+            Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
+        );
+
+        let mut query = dsl::tasks.into_boxed();
+
+        // 分页查询
+        query = query
+            .order(dsl::created_at.desc())
+            .limit(per_page as i64)
+            .offset(((page - 1) * per_page) as i64);
+
+        let filter = &param.filter;
+        if let Some(f) = filter {
+            if let Some(id) = &f.id {
+                query = query.filter(dsl::id.eq(id));
+            }
+            if let Some(title) = &f.title {
+                query = query.filter(dsl::title.like(format!("%{}%", title)));
+            }
+            if let Some(content) = &f.content {
+                query = query.filter(dsl::content.like(format!("%{}%", content)));
+            }
+            if let Some(created_at_min) = &f.created_at_min {
+                query = query.filter(dsl::created_at.ge(created_at_min));
+            }
+            if let Some(created_at_max) = &f.created_at_max {
+                query = query.filter(dsl::created_at.le(created_at_max));
+            }
+            if let Some(updated_at_min) = &f.updated_at_min {
+                query = query.filter(dsl::updated_at.ge(updated_at_min));
+            }
+            if let Some(updated_at_max) = &f.updated_at_max {
+                query = query.filter(dsl::updated_at.le(updated_at_max));
+            }
+            if let Some(user_id) = &f.user_id {
+                query = query.filter(dsl::user_id.eq(user_id));
+            }
+        }
+        let data = query.load::<Task>(conn)?;
+        let body = Data::new(data, pagination);
+        Ok(body)
+    }
 }
 
 #[cfg(test)]
@@ -103,7 +182,7 @@ mod tests {
     use crate::models::task::{NewTask, PatchTask};
     use crab_rocket_schema::establish_pg_connection;
     use obj_traits::mapper::mapper_crud::MapperCRUD;
-    use obj_traits::request::pagination_request_param::PaginationParam;
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
 
     #[test]
@@ -127,7 +206,7 @@ mod tests {
     fn test_fetch_all_tasks() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let param = RequestParam::new(PaginationParam::demo());
+                let param = RequestParam::new(PaginationParam::demo(), None);
                 let all_tasks = TaskMapper::get_all(&mut conn, &param).unwrap();
                 let json_string = serde_json::to_string_pretty(&all_tasks).unwrap();
                 println!("{json_string:?}");

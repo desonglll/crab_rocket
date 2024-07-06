@@ -10,6 +10,7 @@ pub mod mappers {
 
 pub mod models {
     pub mod task;
+    pub mod task_filter;
 }
 
 pub mod routes {
