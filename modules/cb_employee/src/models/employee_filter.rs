@@ -24,9 +24,6 @@ pub struct EmployeeFilter {
     pub last_update_max: Option<chrono::NaiveDateTime>,
     pub role_name: Option<String>,
     pub role_id: Option<i32>,
-    // Pagination
-    pub limit: Option<i32>,
-    pub offset: Option<i32>,
 }
 impl EmployeeFilter {
     // 方法：从 JSON 字符串解析为 EmployeeFilter 实例

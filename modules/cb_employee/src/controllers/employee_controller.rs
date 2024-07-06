@@ -17,7 +17,6 @@ impl
         NewEmployee,
         PatchEmployee,
         RequestParam<PaginationParam, EmployeeFilter>,
-        EmployeeFilter,
     > for EmployeeController
 {
     fn get_all(
@@ -90,16 +89,9 @@ impl
         }
     }
     fn filter(
-        param: &Option<EmployeeFilter>,
+        param: &RequestParam<PaginationParam, EmployeeFilter>,
     ) -> Result<ApiResponse<Data<Vec<Employee>>>, Box<dyn std::error::Error>> {
-        let mut param = param.clone().unwrap();
-        if param.offset.is_none() {
-            param.offset = Some(0);
-        }
-        if param.limit.is_none() {
-            param.limit = Some(10);
-        }
-        match EmployeeService::filter(&param) {
+        match EmployeeService::filter(param) {
             Ok(all_employees) => {
                 let response = ApiResponse::success(all_employees);
                 Ok(response)

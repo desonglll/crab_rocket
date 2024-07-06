@@ -12,4 +12,5 @@ pub trait ServiceCRUD<T, U, V, P> {
     fn add_single(obj: &U) -> Result<T, Box<dyn std::error::Error>>;
     fn delete_by_id(pid: i32) -> Result<T, Box<dyn std::error::Error>>;
     fn update_by_id(pid: i32, obj: &V) -> Result<T, Box<dyn std::error::Error>>;
+    fn filter(param: &P) -> Result<Data<Vec<T>>, Box<dyn std::error::Error>>;
 }

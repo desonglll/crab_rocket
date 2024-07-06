@@ -6,15 +6,25 @@ pub struct PaginationParam {
     pub limit: Option<i32>,
     pub offset: Option<i32>,
 }
-
-impl PaginationParam {
-    pub fn new(limit: Option<i32>, offset: Option<i32>) -> Self {
+pub trait PaginationParamTrait {
+    fn new(limit: Option<i32>, offset: Option<i32>) -> Self;
+    fn demo() -> Self;
+    fn default() -> Self;
+}
+impl PaginationParamTrait for PaginationParam {
+    fn new(limit: Option<i32>, offset: Option<i32>) -> Self {
         Self {
             limit,
             offset,
         }
     }
-    pub fn demo() -> Self {
+    fn demo() -> Self {
+        Self {
+            limit: Some(10),
+            offset: Some(0),
+        }
+    }
+    fn default() -> Self {
         Self {
             limit: Some(10),
             offset: Some(0),

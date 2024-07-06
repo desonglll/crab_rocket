@@ -23,28 +23,16 @@ pub fn get_employees(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<se
     Json(serde_json::from_value(json_value).unwrap())
 }
 #[post("/employee/filter", data = "<param>")]
-pub fn filter_employees(param: Option<Json<EmployeeFilter>>) -> Json<serde_json::Value> {
+pub fn filter_employees(
+    param: Option<Json<RequestParam<PaginationParam, EmployeeFilter>>>,
+) -> Json<serde_json::Value> {
     println!("{:?}", param);
     let param = param.unwrap().into_inner();
     crab_rocket_schema::update_reload::update_reload_count();
-    let resp = EmployeeController::filter(&Some(param)).unwrap();
+    let resp = EmployeeController::filter(&param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
-// #[post("/eemployee", data = "<params>")]
-// pub fn get_employees_by_param(
-//     mut params: Option<Json<RequestParam<PaginationParam, EmployeeFilter>>>,
-// ) -> Json<serde_json::Value> {
-//     println!("{params:?}");
-//     if params.is_none() {
-//         params = Some(Json(RequestParam::new(PaginationParam::new(Some(10), Some(0)), None)));
-//     }
-//     println!("{:?}", params);
-//     crab_rocket_schema::update_reload::update_reload_count();
-//     let resp = EmployeeController::get_all(&params.unwrap()).unwrap();
-//     let json_value = serde_json::to_value(&resp).unwrap();
-//     Json(serde_json::from_value(json_value).unwrap())
-// }
 
 #[get("/employee/<id>")]
 pub fn get_employee_by_id(id: i32) -> Json<serde_json::Value> {

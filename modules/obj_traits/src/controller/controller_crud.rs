@@ -13,4 +13,5 @@ pub trait ControllerCRUD<T, U, V, P> {
     fn add_single(obj: &mut U) -> Result<ApiResponse<T>, Box<dyn std::error::Error>>;
     fn delete_by_id(pid: i32) -> Result<ApiResponse<T>, Box<dyn std::error::Error>>;
     fn update_by_id(pid: i32, obj: &V) -> Result<ApiResponse<T>, Box<dyn std::error::Error>>;
+    fn filter(param: &P) -> Result<ApiResponse<Data<Vec<T>>>, Box<dyn std::error::Error>>;
 }

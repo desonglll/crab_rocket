@@ -12,13 +12,8 @@ use std::error::Error;
 pub struct EmployeeService {}
 
 impl
-    ServiceCRUD<
-        Employee,
-        NewEmployee,
-        PatchEmployee,
-        RequestParam<PaginationParam, EmployeeFilter>,
-        EmployeeFilter,
-    > for EmployeeService
+    ServiceCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationParam, EmployeeFilter>>
+    for EmployeeService
 {
     fn get_all(
         param: &RequestParam<PaginationParam, EmployeeFilter>,
@@ -100,7 +95,9 @@ impl
             }
         }
     }
-    fn filter(param: &EmployeeFilter) -> Result<Data<Vec<Employee>>, Box<dyn std::error::Error>> {
+    fn filter(
+        param: &RequestParam<PaginationParam, EmployeeFilter>,
+    ) -> Result<Data<Vec<Employee>>, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match EmployeeMapper::filter(&mut conn, param) {
                 Ok(all_employees) => Ok(all_employees),
