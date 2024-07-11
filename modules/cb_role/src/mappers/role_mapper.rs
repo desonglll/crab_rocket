@@ -13,9 +13,11 @@ use obj_traits::response::data::Data;
 
 pub struct RoleMapper {}
 
-impl MapperCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam, RoleFilter>>
-    for RoleMapper
-{
+impl MapperCRUD for RoleMapper {
+    type Item = Role;
+    type NewItem = NewRole;
+    type PatchItem = PatchRole;
+    type Param = RequestParam<PaginationParam, RoleFilter>;
     fn get_all(
         conn: &mut PgConnection,
         param: &RequestParam<PaginationParam, RoleFilter>,

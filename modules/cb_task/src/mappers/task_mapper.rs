@@ -11,9 +11,11 @@ use obj_traits::response::data::Data;
 
 pub struct TaskMapper {}
 
-impl MapperCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilter>>
-    for TaskMapper
-{
+impl MapperCRUD for TaskMapper {
+    type Item = Task;
+    type NewItem = NewTask;
+    type PatchItem = PatchTask;
+    type Param = RequestParam<PaginationParam, TaskFilter>;
     fn get_all(
         conn: &mut PgConnection,
         param: &RequestParam<PaginationParam, TaskFilter>,

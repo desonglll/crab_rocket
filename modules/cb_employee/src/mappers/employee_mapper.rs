@@ -16,9 +16,11 @@ use crab_rocket_schema::schema::employee_table::dsl;
 use diesel::{prelude::*, result::Error};
 pub struct EmployeeMapper {}
 
-impl MapperCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationParam, EmployeeFilter>>
-    for EmployeeMapper
-{
+impl MapperCRUD for EmployeeMapper {
+    type Item = Employee;
+    type NewItem = NewEmployee;
+    type PatchItem = PatchEmployee;
+    type Param = RequestParam<PaginationParam, EmployeeFilter>;
     fn get_all(
         conn: &mut PgConnection,
         param: &RequestParam<PaginationParam, EmployeeFilter>,

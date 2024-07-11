@@ -12,9 +12,11 @@ use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 pub struct PostMapper {}
 
-impl MapperCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilter>>
-    for PostMapper
-{
+impl MapperCRUD for PostMapper {
+    type Item = Post;
+    type NewItem = NewPost;
+    type PatchItem = PatchPost;
+    type Param = RequestParam<PaginationParam, PostFilter>;
     fn get_all(
         conn: &mut PgConnection,
         param: &RequestParam<PaginationParam, PostFilter>,

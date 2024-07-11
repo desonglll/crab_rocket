@@ -12,9 +12,11 @@ use obj_traits::response::data::Data;
 
 pub struct UserMapper {}
 
-impl MapperCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam, UserFilter>>
-    for UserMapper
-{
+impl MapperCRUD for UserMapper {
+    type Item = User;
+    type NewItem = NewUser;
+    type PatchItem = PatchUser;
+    type Param = RequestParam<PaginationParam, UserFilter>;
     fn get_all(
         conn: &mut PgConnection,
         param: &RequestParam<PaginationParam, UserFilter>,

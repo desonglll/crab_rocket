@@ -16,9 +16,12 @@ use diesel::prelude::*;
 
 use super::follow_mapper_trait::FollowMapperTrait;
 pub struct FollowMapper {}
-impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, FollowFilter>>
-    for FollowMapper
-{
+impl MapperCRUD for FollowMapper {
+    type Item = Follow;
+    type NewItem = NewFollow;
+    type PatchItem = PatchFollow;
+    type Param = RequestParam<PaginationParam, FollowFilter>;
+
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &RequestParam<PaginationParam, FollowFilter>,
@@ -180,7 +183,7 @@ impl MapperCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, Fo
     }
 }
 
-impl FollowMapperTrait<RequestParam<PaginationParam, FollowFilter>> for FollowMapper {
+impl FollowMapperTrait for FollowMapper {
     fn delete_follow_specifically(
         conn: &mut PgConnection,
         obj: &NewFollow,
