@@ -15,7 +15,6 @@
       <sourceFolder url="file://$MODULE_DIR$/modules/cb_utils/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/modules/obj_traits/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/modules/cb_product/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

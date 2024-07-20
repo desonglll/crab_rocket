@@ -2,11 +2,18 @@ use rocket::serde::{Deserialize, Serialize};
 
 use super::pagination_request_param::PaginationParamTrait;
 
+/// ## Json Deserialize for passing request param.
+/// ```
+///pub struct RequestParam<PaginationParamGeneric, FilterParamGeneric> {
+///    pub pagination: PaginationParamGeneric,
+///    pub filter: Option<FilterParamGeneric>,
+///}
+/// ```
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
-pub struct RequestParam<P, T> {
-    pub pagination: P,
-    pub filter: Option<T>,
+pub struct RequestParam<PaginationParamGeneric, FilterParamGeneric> {
+    pub pagination: PaginationParamGeneric,
+    pub filter: Option<FilterParamGeneric>,
 }
 
 impl<P: PaginationParamTrait, T> RequestParam<P, T> {
