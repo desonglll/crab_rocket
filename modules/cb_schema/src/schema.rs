@@ -146,8 +146,8 @@ diesel::table! {
         sku -> Varchar,
         #[max_length = 255]
         image -> Nullable<Varchar>,
-        price -> Nullable<Numeric>,
-        discount_price -> Nullable<Numeric>,
+        price -> Nullable<Float8>,
+        discount_price -> Nullable<Float8>,
         is_discounted -> Nullable<Bool>,
         is_valid -> Nullable<Bool>,
         stock_quantity -> Nullable<Int4>,
@@ -155,7 +155,7 @@ diesel::table! {
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
         supplier_id -> Nullable<Int4>,
-        weight -> Nullable<Numeric>,
+        weight -> Nullable<Float8>,
         #[max_length = 50]
         dimensions -> Nullable<Varchar>,
         #[max_length = 20]
