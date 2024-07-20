@@ -13,6 +13,19 @@ diesel::table! {
 }
 
 diesel::table! {
+    customer_table (customer_id) {
+        customer_id -> Int4,
+        #[max_length = 255]
+        name -> Varchar,
+        #[max_length = 255]
+        email -> Varchar,
+        #[max_length = 20]
+        phone -> Nullable<Varchar>,
+        address -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     department_table (department_id) {
         department_id -> Int4,
         #[max_length = 255]
@@ -110,6 +123,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    order_table (order_id) {
+        order_id -> Int4,
+        customer_id -> Nullable<Int4>,
+        order_date -> Nullable<Timestamp>,
+        total_amount -> Nullable<Numeric>,
+        #[max_length = 50]
+        status -> Nullable<Varchar>,
+    }
+}
+
+diesel::table! {
     permission_table (permission_id) {
         permission_id -> Int4,
         #[max_length = 255]
@@ -197,6 +221,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    shipment_table (shipment_id) {
+        shipment_id -> Int4,
+        order_id -> Nullable<Int4>,
+        shipment_date -> Nullable<Timestamp>,
+        delivery_address -> Nullable<Text>,
+        #[max_length = 50]
+        status -> Nullable<Varchar>,
+    }
+}
+
+diesel::table! {
     supplier_table (supplier_id) {
         supplier_id -> Int4,
         #[max_length = 255]
@@ -246,23 +281,28 @@ diesel::table! {
 }
 
 diesel::joinable!(inventory_table -> product_table (product_id));
+diesel::joinable!(order_table -> customer_table (customer_id));
 diesel::joinable!(product_table -> supplier_table (supplier_id));
 diesel::joinable!(product_table -> user_table (user_id));
+diesel::joinable!(shipment_table -> order_table (order_id));
 diesel::joinable!(task_table -> user_table (user_id));
 diesel::joinable!(user_table -> role_table (role_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     category_table,
+    customer_table,
     department_table,
     employee_table,
     file_table,
     follow_table,
     inventory_table,
+    order_table,
     permission_table,
     post_table,
     product_table,
     reload_counts,
     role_table,
+    shipment_table,
     supplier_table,
     task_table,
     user_table,
