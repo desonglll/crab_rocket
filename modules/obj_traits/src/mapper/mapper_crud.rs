@@ -22,7 +22,7 @@ pub trait MapperCRUD {
         obj: &Self::PostItem,
     ) -> Result<Self::Item, diesel::result::Error>;
     fn delete_by_id(conn: &mut PgConnection, pid: i32)
-                    -> Result<Self::Item, diesel::result::Error>;
+        -> Result<Self::Item, diesel::result::Error>;
     fn update_by_id(
         conn: &mut PgConnection,
         pid: i32,
