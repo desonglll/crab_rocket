@@ -1,3 +1,4 @@
+use crab_rocket_category::routes::category_route::*;
 use crab_rocket_employee::routes::employee_route::*;
 use crab_rocket_file::routes::{bin_file_route, form_file_route};
 use crab_rocket_follow::routes::follow_route::*;
@@ -6,6 +7,7 @@ use crab_rocket_permission::routes::permission_route::*;
 use crab_rocket_post::routes::post_route::*;
 use crab_rocket_role::routes::role_route::*;
 use crab_rocket_schema::routes::schema_routes;
+use crab_rocket_supplier::routes::supplier_route::*;
 use crab_rocket_task::routes::task_route::*;
 use crab_rocket_user::routes::user_route::*;
 use rocket::{get, routes, Route};
@@ -80,6 +82,22 @@ pub fn module_routes() -> Vec<Route> {
         delete_permission_by_id,
         update_permission_by_id,
         options_permission,
+        //supplier routes
+        get_suppliers,
+        filter_suppliers,
+        get_supplier_by_id,
+        insert_single_supplier,
+        delete_supplier_by_id,
+        update_supplier_by_id,
+        options_supplier,
+        //category routes
+        get_categorys,
+        filter_categorys,
+        get_category_by_id,
+        insert_single_category,
+        delete_category_by_id,
+        update_category_by_id,
+        options_category,
         // schema_routes
         schema_routes::get_reload_count
     ]

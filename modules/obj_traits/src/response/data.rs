@@ -1,7 +1,7 @@
 use crate::request::pagination_request_param::Pagination;
 use rocket::serde::Serialize;
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct Data<T> {
     data: T,

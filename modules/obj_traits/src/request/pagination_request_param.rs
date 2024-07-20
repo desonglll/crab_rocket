@@ -32,7 +32,7 @@ impl PaginationParamTrait for PaginationParam {
     }
 }
 
-#[derive(Serialize, Default, Clone)]
+#[derive(Serialize, Default, Clone, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct Pagination {
     page: i32,
