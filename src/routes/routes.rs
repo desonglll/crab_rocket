@@ -9,6 +9,7 @@ use crab_rocket_post::routes::post_route::*;
 use crab_rocket_product::routes::product_route::*;
 use crab_rocket_role::routes::role_route::*;
 use crab_rocket_schema::routes::schema_routes;
+use crab_rocket_shipment::routes::shipment_route::*;
 use crab_rocket_supplier::routes::supplier_route::*;
 use crab_rocket_task::routes::task_route::*;
 use crab_rocket_user::routes::user_route::*;
@@ -116,6 +117,14 @@ pub fn module_routes() -> Vec<Route> {
         delete_inventory_by_id,
         update_inventory_by_id,
         options_inventory,
+        //shipment routes
+        get_shipments,
+        filter_shipments,
+        get_shipment_by_id,
+        insert_single_shipment,
+        delete_shipment_by_id,
+        update_shipment_by_id,
+        options_shipment,
         // schema_routes
         schema_routes::get_reload_count
     ]
