@@ -1,0 +1,38 @@
+[package]
+name = "crab_rocket"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["modules/*"]
+
+[dependencies]
+rocket = { version = "0.5.1", features = ["json", "uuid"] }
+chrono = { version = "0.4.19", features = ["serde"] }
+chrono-tz = "0.9.0"
+rocket_cors = "0.6.0"
+diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
+# Need to enable `chrono` feature to handle DateTime.
+# https://docs.diesel.rs/master/diesel/sql_types/struct.Datetime.html
+dotenvy = "0.15"
+serde_json = "1.0.117"
+colored = "2.1.0"
+utoipa = { version = "4", features = ["rocket_extras"] }
+crab_rocket_utils = { path = "./modules/cb_utils" }
+crab_rocket_task = { path = "./modules/cb_task" }
+crab_rocket_post = { path = "./modules/cb_post" }
+crab_rocket_follow = { path = "./modules/cb_follow" }
+crab_rocket_role = { path = "./modules/cb_role" }
+crab_rocket_permission = { path = "./modules/cb_permission" }
+crab_rocket_user = { path = "./modules/cb_user" }
+crab_rocket_employee = { path = "./modules/cb_employee" }
+crab_rocket_info = { path = "./modules/cb_info" }
+crab_rocket_file = { path = "./modules/cb_file" }
+crab_rocket_schema = { path = "./modules/cb_schema" }
+
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3

@@ -1,0 +1,51 @@
+## Change Log
+
+- 2024.04.04:
+  - `058525fee31c1c4a56a48c795e015c86d76a4143`
+    - Initiate project, and finish project structure building.
+- 2024.04.05:
+  - `16e7b5e52d3808252a392be375d9df6ee77a1fc7`
+    - Finish `GET`, `POST`, `PATCH`, `DELETE`.
+- 2024.04.06:
+  - `daaa418b093be85ae2c99f03b8d4e038cabfc575`
+    - Finish `Task` CRUD.
+  - `7c76dac6b5e34ae2d710555ed1fc5a40195b82ac`
+    - Add `users, follows, posts` table, finish `User` structure and implemented some `GET` and `POST` for `User`.
+  - `3dc550964f18eb0cd0841d318d2df8cf8d3ae568`
+    - Finish `CRUD` for `User`
+  - `12eb9752c308816175737f4221b869cfe7df01cd`
+    - Finish `Post` structure and make test more strong.
+  - `b57067207387523b6153bf880075f1c5c52bb568`
+    - Make `establish_pg_connection` more strong.
+  - `84a29814ff7b3f82e5f841cf59a057510369a156`
+    - Fix `test_insert_single_user` for `cargo run` in github workflow.
+  - `f7292ed2924d8580f4c74f5e2adf29c849605455`
+    - Finish `post_route::insert_single_post`.
+- 2024.04.07:
+  - `12c2762dbc54542d549c7db8d9e5567d516e08e8`
+    - Fix database foreign key to `CASCADE`.
+    - Finish `CRUD` for `Post`.
+    - Make `Error` stuff more strong.
+  - `05daeae984034e8a4965a79f67c82007745b7e49`
+    - Finish `get_follows_by_id`
+    - Finish `CRUD` for `Follow`.
+  - `12f58c948e720434ab53bc690ab40ef135d02d86`
+    - Add follow filter to route.
+    - Rebuild mapper for follow.
+- 2024.04.08:
+  - `b9a4b132a061fe4acb16f206d0657c7807bf4a72`
+    - Add task filter to route.
+    - Rename filter stuff to filter\_\*.
+  - `cb6e3c3f007ae7bafb138b462a3249167aaf3ffb`
+    - Change `cors` strategy.
+    - Connect to frontend.
+    - Change model `PatchPost`.
+- 2024.04.10:
+  - `bbb02994e65590d2890d57233d6a9c234f68455c`
+    - BBBBBig change.
+    - Make params more flexible.
+    - Change return type to tuple in service level.
+- 2024.04.16:
+  - `
+    - Change response format of controllers.
+    - Add some trigger.

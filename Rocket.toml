@@ -1,0 +1,8 @@
+[default]
+address = "0.0.0.0"
+# limits = { form = "5 MiB", json = "5 MiB" }
+[global.limits]
+forms = 10485760000
+form = 10485760000
+file = 10485760000
+data-form = 10485760000
