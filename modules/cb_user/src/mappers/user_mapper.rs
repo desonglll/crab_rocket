@@ -1,4 +1,4 @@
-use crate::models::user::{NewUser, PatchUser, User};
+use crate::models::user::{PostUser, PatchUser, User};
 use crate::models::user_filter::UserFilter;
 use crab_rocket_schema::schema::user_table::dsl;
 use crab_rocket_schema::schema::user_table::{self};
@@ -14,7 +14,7 @@ pub struct UserMapper {}
 
 impl MapperCRUD for UserMapper {
     type Item = User;
-    type NewItem = NewUser;
+    type PostItem = PostUser;
     type PatchItem = PatchUser;
     type Param = RequestParam<PaginationParam, UserFilter>;
     fn get_all(
@@ -66,7 +66,7 @@ impl MapperCRUD for UserMapper {
     fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<User, Error> {
         dsl::user_table.filter(dsl::user_id.eq(pid)).first(conn)
     }
-    fn add_single(conn: &mut PgConnection, obj: &NewUser) -> Result<User, Error> {
+    fn add_single(conn: &mut PgConnection, obj: &PostUser) -> Result<User, Error> {
         diesel::insert_into(dsl::user_table)
             .values(obj)
             .returning(User::as_returning())
@@ -177,7 +177,7 @@ impl MapperCRUD for UserMapper {
 #[cfg(test)]
 mod test {
     use crate::mappers::user_mapper::UserMapper;
-    use crate::models::user::{NewUser, PatchUser};
+    use crate::models::user::{PostUser, PatchUser};
     use obj_traits::mapper::mapper_crud::MapperCRUD;
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
@@ -186,7 +186,7 @@ mod test {
     fn test_insert_user() {
         use crab_rocket_schema::establish_pg_connection;
 
-        let user = NewUser::demo();
+        let user = PostUser::demo();
         println!("{user:?}");
         match establish_pg_connection() {
             Ok(mut conn) => match UserMapper::add_single(&mut conn, &user) {

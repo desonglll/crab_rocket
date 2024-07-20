@@ -4,7 +4,7 @@ use obj_traits::request::request_param::RequestParam;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::employee_controller::EmployeeController;
-use crate::models::employee::{NewEmployee, PatchEmployee};
+use crate::models::employee::{PostEmployee, PatchEmployee};
 use crate::models::employee_filter::EmployeeFilter;
 
 #[get("/employee?<limit>&<offset>")]
@@ -43,8 +43,8 @@ pub fn get_employee_by_id(id: i32) -> Json<serde_json::Value> {
 }
 
 #[post("/employee", data = "<employee>")]
-pub fn insert_single_employee(employee: Json<NewEmployee>) -> Json<serde_json::Value> {
-    let mut obj: NewEmployee = employee.into_inner();
+pub fn insert_single_employee(employee: Json<PostEmployee>) -> Json<serde_json::Value> {
+    let mut obj: PostEmployee = employee.into_inner();
 
     let resp = EmployeeController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();

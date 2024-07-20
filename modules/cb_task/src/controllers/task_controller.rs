@@ -1,4 +1,4 @@
-use crate::models::task::{NewTask, PatchTask, Task};
+use crate::models::task::{PostTask, PatchTask, Task};
 use crate::models::task_filter::TaskFilter;
 use crate::services::task_service::TaskService;
 use obj_traits::controller::controller_crud::{
@@ -15,7 +15,7 @@ pub struct TaskController {}
 
 impl ControllerCRUD for TaskController {
     type Item = Task;
-    type NewItem = NewTask;
+    type PostItem = PostTask;
     type PatchItem = PatchTask;
     type Param = RequestParam<PaginationParam, TaskFilter>;
     fn get_all(
@@ -28,8 +28,8 @@ impl ControllerCRUD for TaskController {
         controller_get_by_id::<Self::Item, TaskService>(pid)
     }
 
-    fn add_single(obj: &mut NewTask) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_add_single::<Self::Item, TaskService, NewTask>(obj)
+    fn add_single(obj: &mut PostTask) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, TaskService, PostTask>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {

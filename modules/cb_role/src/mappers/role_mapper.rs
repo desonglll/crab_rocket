@@ -1,4 +1,4 @@
-use crate::models::role::{NewRole, PatchRole, Role};
+use crate::models::role::{PostRole, PatchRole, Role};
 use crate::models::role_filter::RoleFilter;
 use crab_rocket_schema::schema::role_table::dsl; //配合下面的 `posts.filter()`
 use crab_rocket_schema::schema::role_table::{self};
@@ -15,7 +15,7 @@ pub struct RoleMapper {}
 
 impl MapperCRUD for RoleMapper {
     type Item = Role;
-    type NewItem = NewRole;
+    type PostItem = PostRole;
     type PatchItem = PatchRole;
     type Param = RequestParam<PaginationParam, RoleFilter>;
     fn get_all(
@@ -71,7 +71,7 @@ impl MapperCRUD for RoleMapper {
         dsl::role_table.filter(dsl::role_id.eq(pid)).first(conn)
     }
 
-    fn add_single(conn: &mut PgConnection, obj: &NewRole) -> Result<Role, Error> {
+    fn add_single(conn: &mut PgConnection, obj: &PostRole) -> Result<Role, Error> {
         match diesel::insert_into(role_table::table)
             .values(obj)
             .returning(Role::as_returning())
@@ -189,7 +189,7 @@ mod test {
         match establish_pg_connection() {
             Ok(mut conn) => {
                 // 创建一个新的 NewPost 实例
-                let new_role = NewRole::demo();
+                let new_role = PostRole::demo();
                 let _ = RoleMapper::add_single(&mut conn, &new_role);
             }
             Err(_) => (),

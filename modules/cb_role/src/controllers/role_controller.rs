@@ -1,4 +1,4 @@
-use crate::models::role::{NewRole, PatchRole, Role};
+use crate::models::role::{PostRole, PatchRole, Role};
 use crate::models::role_filter::RoleFilter;
 use crate::services::role_service::RoleService;
 use obj_traits::controller::controller_crud::{
@@ -15,7 +15,7 @@ pub struct RoleController {}
 
 impl ControllerCRUD for RoleController {
     type Item = Role;
-    type NewItem = NewRole;
+    type PostItem = PostRole;
     type PatchItem = PatchRole;
     type Param = RequestParam<PaginationParam, RoleFilter>;
     fn get_all(
@@ -28,8 +28,8 @@ impl ControllerCRUD for RoleController {
         controller_get_by_id::<Self::Item, RoleService>(pid)
     }
 
-    fn add_single(obj: &mut NewRole) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_add_single::<Self::Item, RoleService, NewRole>(obj)
+    fn add_single(obj: &mut PostRole) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, RoleService, PostRole>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {

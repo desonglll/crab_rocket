@@ -11,7 +11,7 @@ use obj_traits::{
 
 use crate::{
     models::{
-        follow::{Follow, NewFollow, PatchFollow},
+        follow::{Follow, PostFollow, PatchFollow},
         follow_filter::FollowFilter,
     },
     services::{follow_service::FollowService, follow_service_trait::FollowServiceTrait},
@@ -23,7 +23,7 @@ pub struct FollowController {}
 
 impl ControllerCRUD for FollowController {
     type Item = Follow;
-    type NewItem = NewFollow;
+    type PostItem = PostFollow;
     type PatchItem = PatchFollow;
     type Param = RequestParam<PaginationParam, FollowFilter>;
 
@@ -37,8 +37,8 @@ impl ControllerCRUD for FollowController {
         controller_get_by_id::<Self::Item, FollowService>(pid)
     }
 
-    fn add_single(obj: &mut NewFollow) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_add_single::<Self::Item, FollowService, NewFollow>(obj)
+    fn add_single(obj: &mut PostFollow) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, FollowService, PostFollow>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
@@ -60,7 +60,7 @@ impl ControllerCRUD for FollowController {
 
 impl FollowControllerTrait<RequestParam<PaginationParam, FollowFilter>> for FollowController {
     fn delete_follow_specifically(
-        obj: &NewFollow,
+        obj: &PostFollow,
     ) -> Result<ApiResponse<Follow>, Box<dyn std::error::Error>> {
         match FollowService::delete_follow_specifically(obj) {
             Ok(data) => Ok(ApiResponse::success(data)),

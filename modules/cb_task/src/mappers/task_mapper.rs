@@ -1,4 +1,4 @@
-use crate::models::task::{NewTask, PatchTask, Task};
+use crate::models::task::{PostTask, PatchTask, Task};
 use crate::models::task_filter::TaskFilter;
 use crab_rocket_schema::schema::task_table::dsl; //配合下面的 `tasks.filter()`
 use crab_rocket_schema::schema::task_table::{self};
@@ -13,7 +13,7 @@ pub struct TaskMapper {}
 
 impl MapperCRUD for TaskMapper {
     type Item = Task;
-    type NewItem = NewTask;
+    type PostItem = PostTask;
     type PatchItem = PatchTask;
     type Param = RequestParam<PaginationParam, TaskFilter>;
     fn get_all(
@@ -68,7 +68,7 @@ impl MapperCRUD for TaskMapper {
         dsl::task_table.filter(task_table::task_id.eq(pid)).first(conn)
     }
 
-    fn add_single(conn: &mut PgConnection, obj: &NewTask) -> Result<Task, diesel::result::Error> {
+    fn add_single(conn: &mut PgConnection, obj: &PostTask) -> Result<Task, diesel::result::Error> {
         match diesel::insert_into(task_table::table)
             .values(obj)
             .returning(Task::as_returning())
@@ -181,7 +181,7 @@ impl MapperCRUD for TaskMapper {
 #[cfg(test)]
 mod tests {
     use super::TaskMapper;
-    use crate::models::task::{NewTask, PatchTask};
+    use crate::models::task::{PostTask, PatchTask};
     use crab_rocket_schema::establish_pg_connection;
     use obj_traits::mapper::mapper_crud::MapperCRUD;
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
@@ -191,7 +191,7 @@ mod tests {
     fn test_insert_task() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let task = NewTask::new(
+                let task = PostTask::new(
                     "title".to_string().into(),
                     "new content".to_string().into(),
                     Some(chrono::Local::now().naive_utc()),

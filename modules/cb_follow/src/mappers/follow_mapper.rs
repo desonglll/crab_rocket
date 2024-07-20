@@ -8,7 +8,7 @@ use obj_traits::{
 };
 
 use crate::models::{
-    follow::{Follow, NewFollow, PatchFollow},
+    follow::{Follow, PostFollow, PatchFollow},
     follow_filter::FollowFilter,
 };
 use crab_rocket_schema::schema::follow_table::dsl;
@@ -18,7 +18,7 @@ use super::follow_mapper_trait::FollowMapperTrait;
 pub struct FollowMapper {}
 impl MapperCRUD for FollowMapper {
     type Item = Follow;
-    type NewItem = NewFollow;
+    type PostItem = PostFollow;
     type PatchItem = PatchFollow;
     type Param = RequestParam<PaginationParam, FollowFilter>;
 
@@ -76,7 +76,7 @@ impl MapperCRUD for FollowMapper {
 
     fn add_single(
         conn: &mut PgConnection,
-        obj: &NewFollow,
+        obj: &PostFollow,
     ) -> Result<Follow, diesel::result::Error> {
         // check if exist before ccreate.
         if !check_exist_follow(conn, obj.following_user_id(), obj.followed_user_id()) {
@@ -186,7 +186,7 @@ impl MapperCRUD for FollowMapper {
 impl FollowMapperTrait for FollowMapper {
     fn delete_follow_specifically(
         conn: &mut PgConnection,
-        obj: &NewFollow,
+        obj: &PostFollow,
     ) -> Result<Follow, diesel::result::Error> {
         if check_exist_follow(conn, obj.following_user_id(), obj.followed_user_id()) {
             diesel::delete(
@@ -331,14 +331,14 @@ mod test {
 
     use crate::{
         mappers::{follow_mapper::FollowMapper, follow_mapper_trait::FollowMapperTrait},
-        models::follow::NewFollow,
+        models::follow::PostFollow,
     };
 
     #[test]
     fn test_create_new_follow() {
-        use crate::models::follow::NewFollow;
+        use crate::models::follow::PostFollow;
         use crab_rocket_schema::establish_pg_connection;
-        let follow = NewFollow::new(1, 3, None);
+        let follow = PostFollow::new(1, 3, None);
         match establish_pg_connection() {
             Ok(mut conn) => match FollowMapper::add_single(&mut conn, &follow) {
                 Ok(inserted_follow) => println!("{inserted_follow:?}"),
@@ -381,7 +381,7 @@ mod test {
     #[test]
     fn test_delete_follow_specifically() {
         use crab_rocket_schema::establish_pg_connection;
-        let follow = NewFollow::demo();
+        let follow = PostFollow::demo();
         match establish_pg_connection() {
             Ok(mut conn) => {
                 let deleted_follow = FollowMapper::delete_follow_specifically(&mut conn, &follow);

@@ -1,5 +1,5 @@
 use crate::mappers::employee_mapper::EmployeeMapper;
-use crate::models::employee::{Employee, NewEmployee, PatchEmployee};
+use crate::models::employee::{Employee, PostEmployee, PatchEmployee};
 use crate::models::employee_filter::EmployeeFilter;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
@@ -14,7 +14,7 @@ pub struct EmployeeService {}
 
 impl ServiceCRUD for EmployeeService {
     type Item = Employee;
-    type NewItem = NewEmployee;
+    type PostItem = PostEmployee;
     type PatchItem = PatchEmployee;
     type Param = RequestParam<PaginationParam, EmployeeFilter>;
     fn get_all(
@@ -26,8 +26,8 @@ impl ServiceCRUD for EmployeeService {
         service_get_by_id::<Employee, EmployeeMapper>(pid)
     }
 
-    fn add_single(obj: &NewEmployee) -> Result<Employee, Box<dyn Error>> {
-        service_add_single::<Employee, EmployeeMapper, NewEmployee>(obj)
+    fn add_single(obj: &PostEmployee) -> Result<Employee, Box<dyn Error>> {
+        service_add_single::<Employee, EmployeeMapper, PostEmployee>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<Employee, Box<dyn Error>> {
@@ -53,8 +53,8 @@ mod test {
 
     #[test]
     fn test_insert_single_employee() {
-        use crate::models::employee::NewEmployee;
-        let employee = NewEmployee::demo();
+        use crate::models::employee::PostEmployee;
+        let employee = PostEmployee::demo();
         match EmployeeService::add_single(&employee) {
             Ok(result) => println!("{result:?}"),
             Err(e) => println!("{e:?}"),

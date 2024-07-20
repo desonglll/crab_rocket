@@ -1,5 +1,5 @@
 use crate::controllers::role_controller::RoleController;
-use crate::models::role::{NewRole, PatchRole};
+use crate::models::role::{PostRole, PatchRole};
 use crate::models::role_filter::RoleFilter;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
@@ -53,8 +53,8 @@ pub fn get_role_by_id(id: i32) -> Json<serde_json::Value> {
 }
 
 #[post("/role", data = "<role>")]
-pub fn insert_single_role(role: Json<NewRole>) -> Json<serde_json::Value> {
-    let mut obj: NewRole = role.into_inner();
+pub fn insert_single_role(role: Json<PostRole>) -> Json<serde_json::Value> {
+    let mut obj: PostRole = role.into_inner();
 
     let resp = RoleController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();

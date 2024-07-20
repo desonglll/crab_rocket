@@ -1,5 +1,5 @@
 use crate::mappers::user_mapper::UserMapper;
-use crate::models::user::{NewUser, PatchUser, User};
+use crate::models::user::{PostUser, PatchUser, User};
 use crate::models::user_filter::UserFilter;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
@@ -14,7 +14,7 @@ pub struct UserService {}
 
 impl ServiceCRUD for UserService {
     type Item = User;
-    type NewItem = NewUser;
+    type PostItem = PostUser;
     type PatchItem = PatchUser;
     type Param = RequestParam<PaginationParam, UserFilter>;
     fn get_all(
@@ -26,8 +26,8 @@ impl ServiceCRUD for UserService {
         service_get_by_id::<User, UserMapper>(pid)
     }
 
-    fn add_single(obj: &NewUser) -> Result<User, Box<dyn Error>> {
-        service_add_single::<User, UserMapper, NewUser>(obj)
+    fn add_single(obj: &PostUser) -> Result<User, Box<dyn Error>> {
+        service_add_single::<User, UserMapper, PostUser>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<User, Box<dyn Error>> {
@@ -53,8 +53,8 @@ mod test {
 
     #[test]
     fn test_insert_single_user() {
-        use crate::models::user::NewUser;
-        let user = NewUser::demo();
+        use crate::models::user::PostUser;
+        let user = PostUser::demo();
         match UserService::add_single(&user) {
             Ok(result) => println!("{result}"),
             Err(e) => println!("{e:?}"),

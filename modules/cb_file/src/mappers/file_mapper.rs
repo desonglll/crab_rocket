@@ -1,4 +1,4 @@
-use crate::models::file::{File, NewFile};
+use crate::models::file::{File, PostFile};
 use crab_rocket_schema::schema::file_table::dsl::*;
 use crab_rocket_schema::schema::file_table::{self};
 use diesel::prelude::*;
@@ -26,7 +26,7 @@ pub async fn insert_files(
         println!("file_uuid: {:?}", file_uuid.to_string());
         let file_path = Path::new(upload_folder.as_str()).join(original_file_name.clone());
         println!("file_path: {:?}", file_path.clone().to_str());
-        let new_file = NewFile {
+        let new_file = PostFile {
             file_id: file_uuid,
             file_name: &original_file_name,
             file_url: file_path.to_str().unwrap(),

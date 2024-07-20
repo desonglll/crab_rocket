@@ -89,13 +89,13 @@ impl Role {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crab_rocket_schema::schema::role_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewRole {
+pub struct PostRole {
     role_name: String,
     description: Option<String>,
     permissions: Option<String>,
 }
 
-impl NewRole {
+impl PostRole {
     pub fn new(
         role_name: String,
         description: Option<String>,

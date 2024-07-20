@@ -9,7 +9,7 @@ use obj_traits::{
 };
 
 use crate::models::{
-    employee::{Employee, NewEmployee, PatchEmployee},
+    employee::{Employee, PostEmployee, PatchEmployee},
     employee_filter::EmployeeFilter,
 };
 use crab_rocket_schema::schema::employee_table::dsl;
@@ -18,7 +18,7 @@ pub struct EmployeeMapper {}
 
 impl MapperCRUD for EmployeeMapper {
     type Item = Employee;
-    type NewItem = NewEmployee;
+    type PostItem = PostEmployee;
     type PatchItem = PatchEmployee;
     type Param = RequestParam<PaginationParam, EmployeeFilter>;
     fn get_all(
@@ -70,7 +70,7 @@ impl MapperCRUD for EmployeeMapper {
     fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Employee, Error> {
         dsl::employee_table.filter(dsl::employee_id.eq(pid)).first(conn)
     }
-    fn add_single(conn: &mut PgConnection, obj: &NewEmployee) -> Result<Employee, Error> {
+    fn add_single(conn: &mut PgConnection, obj: &PostEmployee) -> Result<Employee, Error> {
         diesel::insert_into(dsl::employee_table)
             .values(obj)
             .returning(Employee::as_returning())
@@ -229,7 +229,7 @@ impl MapperCRUD for EmployeeMapper {
 #[cfg(test)]
 mod test {
     use crate::models::{
-        employee::{NewEmployee, PatchEmployee},
+        employee::{PostEmployee, PatchEmployee},
         employee_filter::EmployeeFilter,
     };
     use crab_rocket_schema::establish_pg_connection;
@@ -245,7 +245,7 @@ mod test {
 
     #[test]
     fn test_insert_employee() {
-        let new_employee = NewEmployee::default();
+        let new_employee = PostEmployee::default();
         match establish_pg_connection() {
             Ok(mut conn) => match EmployeeMapper::add_single(&mut conn, &new_employee) {
                 Ok(inserted_employee) => println!("{inserted_employee:?}"),

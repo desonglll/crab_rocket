@@ -1,5 +1,5 @@
 use crate::controllers::task_controller::TaskController;
-use crate::models::task::{NewTask, PatchTask};
+use crate::models::task::{PostTask, PatchTask};
 use crate::models::task_filter::TaskFilter;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
@@ -54,8 +54,8 @@ pub fn get_task_by_id(id: i32) -> Json<serde_json::Value> {
 }
 
 #[post("/task", data = "<task>")]
-pub fn insert_single_task(task: Json<NewTask>) -> Json<serde_json::Value> {
-    let mut obj: NewTask = task.into_inner();
+pub fn insert_single_task(task: Json<PostTask>) -> Json<serde_json::Value> {
+    let mut obj: PostTask = task.into_inner();
 
     let resp = TaskController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();

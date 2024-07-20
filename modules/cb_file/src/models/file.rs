@@ -16,7 +16,7 @@ pub struct File {
 #[derive(Insertable, Serialize, Deserialize, Selectable, Debug, Queryable, Default)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::file_table)]
-pub struct NewFile<'a> {
+pub struct PostFile<'a> {
     pub file_id: Uuid,
     pub file_name: &'a str,
     pub file_url: &'a str,

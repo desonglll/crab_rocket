@@ -165,7 +165,7 @@ impl Display for User {
 #[derive(Queryable, Selectable, Insertable, Default)]
 #[diesel(table_name = crab_rocket_schema::schema::user_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewUser {
+pub struct PostUser {
     username: String,
     role_id: Option<i32>,
     created_at: Option<chrono::NaiveDateTime>,
@@ -178,7 +178,7 @@ pub struct NewUser {
     mobile_phone: String,
 }
 
-impl NewUser {
+impl PostUser {
     pub fn new(
         username: String,
         role_id: Option<i32>,

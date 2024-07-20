@@ -1,5 +1,5 @@
 use crate::models::{
-    permission::{NewPermission, PatchPermission, Permission},
+    permission::{PostPermission, PatchPermission, Permission},
     permission_filter::PermissionFilter,
 };
 use crab_rocket_schema::schema::permission_table::dsl;
@@ -17,7 +17,7 @@ pub struct PermissionMapper {}
 
 impl MapperCRUD for PermissionMapper {
     type Item = Permission;
-    type NewItem = NewPermission;
+    type PostItem = PostPermission;
     type PatchItem = PatchPermission;
     type Param = RequestParam<PaginationParam, PermissionFilter>;
     fn get_all(
@@ -73,7 +73,7 @@ impl MapperCRUD for PermissionMapper {
         dsl::permission_table.filter(dsl::permission_id.eq(pid)).first(conn)
     }
 
-    fn add_single(conn: &mut PgConnection, obj: &NewPermission) -> Result<Permission, Error> {
+    fn add_single(conn: &mut PgConnection, obj: &PostPermission) -> Result<Permission, Error> {
         match diesel::insert_into(dsl::permission_table)
             .values(obj)
             .returning(Permission::as_returning())

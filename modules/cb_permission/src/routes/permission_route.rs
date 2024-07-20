@@ -1,5 +1,5 @@
 use crate::controllers::permission_controller::PermissionController;
-use crate::models::permission::{NewPermission, PatchPermission};
+use crate::models::permission::{PostPermission, PatchPermission};
 use crate::models::permission_filter::PermissionFilter;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
@@ -53,8 +53,8 @@ pub fn get_permission_by_id(id: i32) -> Json<serde_json::Value> {
 }
 
 #[post("/permission", data = "<permission>")]
-pub fn insert_single_permission(permission: Json<NewPermission>) -> Json<serde_json::Value> {
-    let mut obj: NewPermission = permission.into_inner();
+pub fn insert_single_permission(permission: Json<PostPermission>) -> Json<serde_json::Value> {
+    let mut obj: PostPermission = permission.into_inner();
 
     let resp = PermissionController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();

@@ -13,7 +13,7 @@ use crate::{
         follow_controller::FollowController, follow_controller_trait::FollowControllerTrait,
     },
     models::{
-        follow::{NewFollow, PatchFollow},
+        follow::{PostFollow, PatchFollow},
         follow_filter::FollowFilter,
     },
 };
@@ -47,15 +47,15 @@ pub fn filter_follows(
 
 #[post("/follow?<follower_id>&<follow_id>")]
 pub fn insert_single_follow(follower_id: i32, follow_id: i32) -> Json<serde_json::Value> {
-    let mut obj: NewFollow = NewFollow::new(follower_id, follow_id, Some(get_e8_time()));
+    let mut obj: PostFollow = PostFollow::new(follower_id, follow_id, Some(get_e8_time()));
     let resp = FollowController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[post("/follow", data = "<follow>")]
-pub fn insert_single_follow_by_params(follow: Json<NewFollow>) -> Json<serde_json::Value> {
-    let mut obj: NewFollow = follow.into_inner();
+pub fn insert_single_follow_by_params(follow: Json<PostFollow>) -> Json<serde_json::Value> {
+    let mut obj: PostFollow = follow.into_inner();
     let resp = FollowController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
@@ -76,7 +76,7 @@ pub fn update_follow_by_id(id: i32, follow: Json<PatchFollow>) -> Json<serde_jso
 }
 
 #[delete("/follow/spec", data = "<follow>")]
-pub fn delete_follow_specifically(follow: Json<NewFollow>) -> Json<serde_json::Value> {
+pub fn delete_follow_specifically(follow: Json<PostFollow>) -> Json<serde_json::Value> {
     let resp = FollowController::delete_follow_specifically(&follow).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())

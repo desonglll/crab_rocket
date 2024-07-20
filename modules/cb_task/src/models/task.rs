@@ -118,7 +118,7 @@ impl Display for TaskList {
 #[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::task_table)]
-pub struct NewTask {
+pub struct PostTask {
     title: String,
     content: Option<String>,
     created_at: Option<chrono::NaiveDateTime>,
@@ -126,7 +126,7 @@ pub struct NewTask {
     user_id: Option<i32>,
 }
 
-impl NewTask {
+impl PostTask {
     pub fn title(&self) -> &str {
         &self.title
     }

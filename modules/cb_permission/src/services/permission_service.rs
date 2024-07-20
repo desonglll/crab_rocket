@@ -1,5 +1,5 @@
 use crate::mappers::permission_mapper::PermissionMapper;
-use crate::models::permission::{NewPermission, PatchPermission, Permission};
+use crate::models::permission::{PostPermission, PatchPermission, Permission};
 use crate::models::permission_filter::PermissionFilter;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
@@ -14,7 +14,7 @@ pub struct PermissionService {}
 
 impl ServiceCRUD for PermissionService {
     type Item = Permission;
-    type NewItem = NewPermission;
+    type PostItem = PostPermission;
     type PatchItem = PatchPermission;
     type Param = RequestParam<PaginationParam, PermissionFilter>;
     fn get_all(
@@ -26,8 +26,8 @@ impl ServiceCRUD for PermissionService {
         service_get_by_id::<Permission, PermissionMapper>(pid)
     }
 
-    fn add_single(obj: &NewPermission) -> Result<Permission, Box<dyn Error>> {
-        service_add_single::<Permission, PermissionMapper, NewPermission>(obj)
+    fn add_single(obj: &PostPermission) -> Result<Permission, Box<dyn Error>> {
+        service_add_single::<Permission, PermissionMapper, PostPermission>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<Permission, Box<dyn Error>> {

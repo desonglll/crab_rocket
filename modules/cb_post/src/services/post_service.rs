@@ -12,7 +12,7 @@ use obj_traits::{
 use crate::{
     mappers::post_mapper::PostMapper,
     models::{
-        post::{NewPost, PatchPost, Post},
+        post::{PostPost, PatchPost, Post},
         post_filter::PostFilter,
     },
 };
@@ -20,7 +20,7 @@ use crate::{
 pub struct PostService {}
 impl ServiceCRUD for PostService {
     type Item = Post;
-    type NewItem = NewPost;
+    type PostItem = PostPost;
     type PatchItem = PatchPost;
     type Param = RequestParam<PaginationParam, PostFilter>;
     fn get_all(
@@ -32,8 +32,8 @@ impl ServiceCRUD for PostService {
         service_get_by_id::<Post, PostMapper>(pid)
     }
 
-    fn add_single(obj: &NewPost) -> Result<Post, Box<dyn Error>> {
-        service_add_single::<Post, PostMapper, NewPost>(obj)
+    fn add_single(obj: &PostPost) -> Result<Post, Box<dyn Error>> {
+        service_add_single::<Post, PostMapper, PostPost>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<Post, Box<dyn Error>> {
@@ -64,8 +64,8 @@ mod test {
 
     #[test]
     fn test_insert_single_post() {
-        use crate::models::post::NewPost;
-        let post = NewPost::demo();
+        use crate::models::post::PostPost;
+        let post = PostPost::demo();
         let inserted_post = PostService::add_single(&post);
         println!("{inserted_post:?}");
     }

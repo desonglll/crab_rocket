@@ -27,7 +27,7 @@ pub struct Permission {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crab_rocket_schema::schema::permission_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewPermission {
+pub struct PostPermission {
     pub permission_name: String,
     pub permission_description: Option<String>,
     pub resource: String,
@@ -178,15 +178,15 @@ impl Permission {
 
 ///
 /// Demo
-/// ```
-/// {
-///    "permission_name": "read_articles",
-///    "resource": "articles",
-///    "action": "read",
-///    "is_active": true
-/// }
-/// ```
-impl NewPermission {
+// ```
+// {
+//    "permission_name": "read_articles",
+//    "resource": "articles",
+//    "action": "read",
+//    "is_active": true
+// }
+// ```
+impl PostPermission {
     pub fn new(
         permission_name: String,
         permission_description: Option<String>,

@@ -14,7 +14,7 @@ use crate::service::service_crud::ServiceCRUD;
 /// V is for the updated object, typically for no id.
 pub trait ControllerCRUD {
     type Item;
-    type NewItem;
+    type PostItem;
     type PatchItem;
     type Param;
     fn get_all(
@@ -22,7 +22,7 @@ pub trait ControllerCRUD {
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>>;
     fn get_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn std::error::Error>>;
     fn add_single(
-        obj: &mut Self::NewItem,
+        obj: &mut Self::PostItem,
     ) -> Result<ApiResponse<Self::Item>, Box<dyn std::error::Error>>;
     fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn std::error::Error>>;
     fn update_by_id(
@@ -38,7 +38,7 @@ pub fn controller_get_all<Obj, ObjService, ObjFilter>(
     param: &RequestParam<PaginationParam, ObjFilter>,
 ) -> Result<ApiResponse<Data<Vec<Obj>>>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item = Obj, Param = RequestParam<PaginationParam, ObjFilter>>,
+    ObjService: ServiceCRUD<Item=Obj, Param=RequestParam<PaginationParam, ObjFilter>>,
 {
     match ObjService::get_all(param) {
         Ok(all_employees) => {
@@ -54,7 +54,7 @@ where
 
 pub fn controller_get_by_id<Obj, ObjService>(pid: i32) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item = Obj>,
+    ObjService: ServiceCRUD<Item=Obj>,
     Obj: std::default::Default,
 {
     match ObjService::get_by_id(pid) {
@@ -72,7 +72,7 @@ pub fn controller_add_single<Obj, ObjService, NewObj>(
     obj: &mut NewObj,
 ) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item = Obj, NewItem = NewObj>,
+    ObjService: ServiceCRUD<Item=Obj, PostItem=NewObj>,
     Obj: std::default::Default,
 {
     match ObjService::add_single(obj) {
@@ -90,7 +90,7 @@ pub fn controller_delete_by_id<Obj, ObjService>(
     pid: i32,
 ) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item = Obj>,
+    ObjService: ServiceCRUD<Item=Obj>,
     Obj: std::default::Default,
 {
     match ObjService::delete_by_id(pid) {
@@ -109,7 +109,7 @@ pub fn controller_update_by_id<Obj, ObjService, PatchObj>(
     obj: &PatchObj,
 ) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item = Obj, PatchItem = PatchObj>,
+    ObjService: ServiceCRUD<Item=Obj, PatchItem=PatchObj>,
     Obj: std::default::Default,
 {
     match ObjService::update_by_id(pid, obj) {
@@ -127,7 +127,7 @@ pub fn controller_filter<Obj, ObjService, ObjFilter>(
     param: &RequestParam<PaginationParam, ObjFilter>,
 ) -> Result<ApiResponse<Data<Vec<Obj>>>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item = Obj, Param = RequestParam<PaginationParam, ObjFilter>>,
+    ObjService: ServiceCRUD<Item=Obj, Param=RequestParam<PaginationParam, ObjFilter>>,
 {
     match ObjService::filter(param) {
         Ok(all_employees) => {

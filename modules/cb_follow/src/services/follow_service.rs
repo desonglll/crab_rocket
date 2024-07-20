@@ -13,7 +13,7 @@ use obj_traits::{
 use crate::{
     mappers::{follow_mapper::FollowMapper, follow_mapper_trait::FollowMapperTrait},
     models::{
-        follow::{Follow, NewFollow, PatchFollow},
+        follow::{Follow, PostFollow, PatchFollow},
         follow_filter::FollowFilter,
     },
 };
@@ -24,7 +24,7 @@ pub struct FollowService {}
 
 impl ServiceCRUD for FollowService {
     type Item = Follow;
-    type NewItem = NewFollow;
+    type PostItem = PostFollow;
     type PatchItem = PatchFollow;
     type Param = RequestParam<PaginationParam, FollowFilter>;
     fn get_all(
@@ -36,8 +36,8 @@ impl ServiceCRUD for FollowService {
         service_get_by_id::<Follow, FollowMapper>(pid)
     }
 
-    fn add_single(obj: &NewFollow) -> Result<Follow, Box<dyn Error>> {
-        service_add_single::<Follow, FollowMapper, NewFollow>(obj)
+    fn add_single(obj: &PostFollow) -> Result<Follow, Box<dyn Error>> {
+        service_add_single::<Follow, FollowMapper, PostFollow>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<Follow, Box<dyn Error>> {
@@ -55,7 +55,7 @@ impl ServiceCRUD for FollowService {
 }
 
 impl FollowServiceTrait<RequestParam<PaginationParam, FollowFilter>> for FollowService {
-    fn delete_follow_specifically(obj: &NewFollow) -> Result<Follow, Box<dyn std::error::Error>> {
+    fn delete_follow_specifically(obj: &PostFollow) -> Result<Follow, Box<dyn std::error::Error>> {
         match establish_pg_connection() {
             Ok(mut conn) => match FollowMapper::delete_follow_specifically(&mut conn, obj) {
                 Ok(data) => Ok(data),

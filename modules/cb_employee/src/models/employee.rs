@@ -254,7 +254,7 @@ impl Employee {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crab_rocket_schema::schema::employee_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewEmployee {
+pub struct PostEmployee {
     employee_name: String,
     first_name: Option<String>,
     last_name: Option<String>,
@@ -276,7 +276,7 @@ pub struct NewEmployee {
     role_id: Option<i32>,
 }
 
-impl NewEmployee {
+impl PostEmployee {
     pub fn new(
         employee_name: String,
         first_name: Option<String>,

@@ -11,7 +11,7 @@ use obj_traits::{
 
 use crate::{
     models::{
-        post::{NewPost, PatchPost, Post},
+        post::{PostPost, PatchPost, Post},
         post_filter::PostFilter,
     },
     services::post_service::PostService,
@@ -21,7 +21,7 @@ pub struct PostController {}
 
 impl ControllerCRUD for PostController {
     type Item = Post;
-    type NewItem = NewPost;
+    type PostItem = PostPost;
     type PatchItem = PatchPost;
     type Param = RequestParam<PaginationParam, PostFilter>;
     fn get_all(
@@ -34,8 +34,8 @@ impl ControllerCRUD for PostController {
         controller_get_by_id::<Self::Item, PostService>(pid)
     }
 
-    fn add_single(obj: &mut NewPost) -> Result<ApiResponse<Post>, Box<dyn Error>> {
-        controller_add_single::<Self::Item, PostService, NewPost>(obj)
+    fn add_single(obj: &mut PostPost) -> Result<ApiResponse<Post>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, PostService, PostPost>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {

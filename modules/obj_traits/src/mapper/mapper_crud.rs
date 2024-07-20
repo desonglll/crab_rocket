@@ -9,7 +9,7 @@ use diesel::PgConnection;
 /// V is for the updated object, typically for no id.
 pub trait MapperCRUD {
     type Item;
-    type NewItem;
+    type PostItem;
     type PatchItem;
     type Param;
     fn get_all(
@@ -19,10 +19,10 @@ pub trait MapperCRUD {
     fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Self::Item, diesel::result::Error>;
     fn add_single(
         conn: &mut PgConnection,
-        obj: &Self::NewItem,
+        obj: &Self::PostItem,
     ) -> Result<Self::Item, diesel::result::Error>;
     fn delete_by_id(conn: &mut PgConnection, pid: i32)
-        -> Result<Self::Item, diesel::result::Error>;
+                    -> Result<Self::Item, diesel::result::Error>;
     fn update_by_id(
         conn: &mut PgConnection,
         pid: i32,

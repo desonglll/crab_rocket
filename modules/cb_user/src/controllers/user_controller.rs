@@ -1,4 +1,4 @@
-use crate::models::user::{NewUser, PatchUser, User};
+use crate::models::user::{PostUser, PatchUser, User};
 use crate::models::user_filter::UserFilter;
 use crate::services::user_service::UserService;
 use obj_traits::controller::controller_crud::{
@@ -15,7 +15,7 @@ pub struct UserController {}
 
 impl ControllerCRUD for UserController {
     type Item = User;
-    type NewItem = NewUser;
+    type PostItem = PostUser;
     type PatchItem = PatchUser;
     type Param = RequestParam<PaginationParam, UserFilter>;
     fn get_all(
@@ -28,8 +28,8 @@ impl ControllerCRUD for UserController {
         controller_get_by_id::<Self::Item, UserService>(pid)
     }
 
-    fn add_single(obj: &mut NewUser) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_add_single::<Self::Item, UserService, NewUser>(obj)
+    fn add_single(obj: &mut PostUser) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, UserService, PostUser>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {

@@ -121,7 +121,7 @@ impl Post {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crab_rocket_schema::schema::post_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewPost {
+pub struct PostPost {
     title: Option<String>,
     body: Option<String>,
     user_id: Option<i32>,
@@ -130,7 +130,7 @@ pub struct NewPost {
     updated_at: Option<chrono::NaiveDateTime>,
 }
 
-impl NewPost {
+impl PostPost {
     pub fn new(
         title: Option<String>,
         body: Option<String>,
@@ -291,7 +291,7 @@ impl PatchPost {
     }
 }
 
-impl Into<PatchPost> for NewPost {
+impl Into<PatchPost> for PostPost {
     fn into(self) -> PatchPost {
         PatchPost {
             title: self.title,
@@ -351,7 +351,7 @@ mod tests {
 
     #[test]
     fn test_new_post_new() {
-        let new_post = NewPost::new(
+        let new_post = PostPost::new(
             Some("Title".to_string()),
             Some("Body".to_string()),
             Some(123),
@@ -376,7 +376,7 @@ mod tests {
 
     #[test]
     fn test_new_post_new_empty() {
-        let new_post = NewPost::default();
+        let new_post = PostPost::default();
         assert_eq!(new_post.title, None);
         assert_eq!(new_post.body, None);
         assert_eq!(new_post.user_id, None);

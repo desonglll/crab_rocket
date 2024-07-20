@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use crate::mappers::task_mapper::TaskMapper;
-use crate::models::task::{NewTask, PatchTask, Task};
+use crate::models::task::{PostTask, PatchTask, Task};
 use crate::models::task_filter::TaskFilter;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
@@ -15,7 +15,7 @@ pub struct TaskService {}
 
 impl ServiceCRUD for TaskService {
     type Item = Task;
-    type NewItem = NewTask;
+    type PostItem = PostTask;
     type PatchItem = PatchTask;
     type Param = RequestParam<PaginationParam, TaskFilter>;
     fn get_all(
@@ -27,8 +27,8 @@ impl ServiceCRUD for TaskService {
         service_get_by_id::<Task, TaskMapper>(pid)
     }
 
-    fn add_single(obj: &NewTask) -> Result<Task, Box<dyn Error>> {
-        service_add_single::<Task, TaskMapper, NewTask>(obj)
+    fn add_single(obj: &PostTask) -> Result<Task, Box<dyn Error>> {
+        service_add_single::<Task, TaskMapper, PostTask>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<Task, Box<dyn Error>> {
@@ -48,13 +48,13 @@ impl ServiceCRUD for TaskService {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::task::NewTask;
+    use crate::models::task::PostTask;
     use crab_rocket_utils::time::get_e8_time;
     use obj_traits::request::pagination_request_param::PaginationParamTrait;
 
     #[test]
     fn test_insert_single_task() {
-        let task = NewTask::new(
+        let task = PostTask::new(
             "Get up late".to_string(),
             None,
             Some(get_e8_time()),

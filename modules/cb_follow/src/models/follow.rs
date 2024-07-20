@@ -68,13 +68,13 @@ impl Follow {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crab_rocket_schema::schema::follow_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewFollow {
+pub struct PostFollow {
     following_user_id: i32,
     followed_user_id: i32,
     created_at: Option<chrono::NaiveDateTime>,
 }
 
-impl NewFollow {
+impl PostFollow {
     pub fn new(
         following_user_id: i32,
         followed_user_id: i32,

@@ -1,5 +1,5 @@
 use crate::mappers::role_mapper::RoleMapper;
-use crate::models::role::{NewRole, PatchRole, Role};
+use crate::models::role::{PostRole, PatchRole, Role};
 use crate::models::role_filter::RoleFilter;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
@@ -14,7 +14,7 @@ pub struct RoleService {}
 
 impl ServiceCRUD for RoleService {
     type Item = Role;
-    type NewItem = NewRole;
+    type PostItem = PostRole;
     type PatchItem = PatchRole;
     type Param = RequestParam<PaginationParam, RoleFilter>;
     fn get_all(
@@ -26,8 +26,8 @@ impl ServiceCRUD for RoleService {
         service_get_by_id::<Role, RoleMapper>(pid)
     }
 
-    fn add_single(obj: &NewRole) -> Result<Role, Box<dyn Error>> {
-        service_add_single::<Role, RoleMapper, NewRole>(obj)
+    fn add_single(obj: &PostRole) -> Result<Role, Box<dyn Error>> {
+        service_add_single::<Role, RoleMapper, PostRole>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<Role, Box<dyn Error>> {

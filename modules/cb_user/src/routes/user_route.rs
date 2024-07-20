@@ -4,7 +4,7 @@ use obj_traits::request::request_param::RequestParam;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::user_controller::UserController;
-use crate::models::user::{NewUser, PatchUser};
+use crate::models::user::{PostUser, PatchUser};
 use crate::models::user_filter::UserFilter;
 
 #[get("/user?<limit>&<offset>")]
@@ -45,8 +45,8 @@ pub fn get_user_by_id(id: i32) -> Json<serde_json::Value> {
 }
 
 #[post("/user", data = "<user>")]
-pub fn insert_single_user(user: Json<NewUser>) -> Json<serde_json::Value> {
-    let mut obj: NewUser = user.into_inner();
+pub fn insert_single_user(user: Json<PostUser>) -> Json<serde_json::Value> {
+    let mut obj: PostUser = user.into_inner();
 
     let resp = UserController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();

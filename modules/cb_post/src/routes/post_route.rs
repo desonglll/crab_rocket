@@ -1,5 +1,5 @@
 use crate::controllers::post_controller::PostController;
-use crate::models::post::{NewPost, PatchPost};
+use crate::models::post::{PostPost, PatchPost};
 use crate::models::post_filter::PostFilter;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
@@ -54,8 +54,8 @@ pub fn get_post_by_id(id: i32) -> Json<serde_json::Value> {
 }
 
 #[post("/post", data = "<post>")]
-pub fn insert_single_post(post: Json<NewPost>) -> Json<serde_json::Value> {
-    let mut obj: NewPost = post.into_inner();
+pub fn insert_single_post(post: Json<PostPost>) -> Json<serde_json::Value> {
+    let mut obj: PostPost = post.into_inner();
 
     let resp = PostController::add_single(&mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();

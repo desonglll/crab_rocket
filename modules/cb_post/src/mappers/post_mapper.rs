@@ -1,4 +1,4 @@
-use crate::models::post::{NewPost, PatchPost, Post};
+use crate::models::post::{PostPost, PatchPost, Post};
 use crate::models::post_filter::PostFilter;
 use crab_rocket_schema::schema::post_table::dsl;
 use crab_rocket_utils::time::get_e8_time;
@@ -14,7 +14,7 @@ pub struct PostMapper {}
 
 impl MapperCRUD for PostMapper {
     type Item = Post;
-    type NewItem = NewPost;
+    type PostItem = PostPost;
     type PatchItem = PatchPost;
     type Param = RequestParam<PaginationParam, PostFilter>;
     fn get_all(
@@ -70,7 +70,7 @@ impl MapperCRUD for PostMapper {
         dsl::post_table.filter(dsl::post_id.eq(pid)).first(conn)
     }
 
-    fn add_single(conn: &mut PgConnection, obj: &NewPost) -> Result<Post, diesel::result::Error> {
+    fn add_single(conn: &mut PgConnection, obj: &PostPost) -> Result<Post, diesel::result::Error> {
         match diesel::insert_into(dsl::post_table)
             .values(obj)
             .returning(Post::as_returning())
@@ -189,7 +189,7 @@ mod tests {
         match establish_pg_connection() {
             Ok(mut conn) => {
                 // 创建一个新的 NewPost 实例
-                let new_post = NewPost::demo();
+                let new_post = PostPost::demo();
 
                 // 调用 insert_post 函数
                 let _ = PostMapper::add_single(&mut conn, &new_post);
@@ -237,7 +237,7 @@ mod tests {
     fn test_update_post_by_id() {
         use super::*;
         use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        let new_post = NewPost::demo();
+        let new_post = PostPost::demo();
         match establish_pg_connection() {
             Ok(mut conn) => match PostMapper::update_by_id(&mut conn, 4, &new_post.into()) {
                 Ok(updated_post) => {
