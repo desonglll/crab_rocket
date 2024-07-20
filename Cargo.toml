@@ -30,6 +30,9 @@ crab_rocket_supplier = { path = "./modules/cb_supplier" }
 crab_rocket_category = { path = "./modules/cb_category" }
 crab_rocket_product = { path = "./modules/cb_product" }
 crab_rocket_inventory = { path = "./modules/cb_inventory" }
+crab_rocket_shipment = { path = "./modules/cb_shipment" }
+crab_rocket_order = { path = "./modules/cb_order" }
+crab_rocket_customer = { path = "./modules/cb_customer" }
 crab_rocket_info = { path = "./modules/cb_info" }
 crab_rocket_file = { path = "./modules/cb_file" }
 crab_rocket_schema = { path = "./modules/cb_schema" }

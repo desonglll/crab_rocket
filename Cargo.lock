@@ -311,16 +311,19 @@ dependencies = [
  "chrono-tz",
  "colored",
  "crab_rocket_category",
+ "crab_rocket_customer",
  "crab_rocket_employee",
  "crab_rocket_file",
  "crab_rocket_follow",
  "crab_rocket_info",
  "crab_rocket_inventory",
+ "crab_rocket_order",
  "crab_rocket_permission",
  "crab_rocket_post",
  "crab_rocket_product",
  "crab_rocket_role",
  "crab_rocket_schema",
+ "crab_rocket_shipment",
  "crab_rocket_supplier",
  "crab_rocket_task",
  "crab_rocket_user",
@@ -335,6 +338,23 @@ dependencies = [
 
 [[package]]
 name = "crab_rocket_category"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "crab_rocket_schema",
+ "crab_rocket_utils",
+ "diesel",
+ "dotenvy",
+ "obj_traits",
+ "rocket",
+ "rocket_cors",
+ "serde_json",
+ "utoipa",
+]
+
+[[package]]
+name = "crab_rocket_customer"
 version = "0.1.0"
 dependencies = [
  "chrono",
@@ -432,6 +452,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "crab_rocket_order"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "crab_rocket_schema",
+ "crab_rocket_utils",
+ "diesel",
+ "dotenvy",
+ "obj_traits",
+ "rocket",
+ "rocket_cors",
+ "serde_json",
+ "utoipa",
+]
+
+[[package]]
 name = "crab_rocket_permission"
 version = "0.1.0"
 dependencies = [
@@ -509,6 +546,23 @@ dependencies = [
  "rocket",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "crab_rocket_shipment"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "crab_rocket_schema",
+ "crab_rocket_utils",
+ "diesel",
+ "dotenvy",
+ "obj_traits",
+ "rocket",
+ "rocket_cors",
+ "serde_json",
+ "utoipa",
 ]
 
 [[package]]

@@ -1,14 +1,17 @@
 use crab_rocket_category::routes::category_route::*;
+use crab_rocket_customer::routes::customer_route::*;
 use crab_rocket_employee::routes::employee_route::*;
 use crab_rocket_file::routes::{bin_file_route, form_file_route};
 use crab_rocket_follow::routes::follow_route::*;
 use crab_rocket_info::routes::info_route;
 use crab_rocket_inventory::routes::inventory_route::*;
+use crab_rocket_order::routes::order_route::*;
 use crab_rocket_permission::routes::permission_route::*;
 use crab_rocket_post::routes::post_route::*;
 use crab_rocket_product::routes::product_route::*;
 use crab_rocket_role::routes::role_route::*;
 use crab_rocket_schema::routes::schema_routes;
+use crab_rocket_shipment::routes::shipment_route::*;
 use crab_rocket_supplier::routes::supplier_route::*;
 use crab_rocket_task::routes::task_route::*;
 use crab_rocket_user::routes::user_route::*;
@@ -116,6 +119,30 @@ pub fn module_routes() -> Vec<Route> {
         delete_inventory_by_id,
         update_inventory_by_id,
         options_inventory,
+        //shipment routes
+        get_shipments,
+        filter_shipments,
+        get_shipment_by_id,
+        insert_single_shipment,
+        delete_shipment_by_id,
+        update_shipment_by_id,
+        options_shipment,
+        //order routes
+        get_orders,
+        filter_orders,
+        get_order_by_id,
+        insert_single_order,
+        delete_order_by_id,
+        update_order_by_id,
+        options_order,
+        //customer routes
+        get_customers,
+        filter_customers,
+        get_customer_by_id,
+        insert_single_customer,
+        delete_customer_by_id,
+        update_customer_by_id,
+        options_customer,
         // schema_routes
         schema_routes::get_reload_count
     ]
