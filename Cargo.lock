@@ -311,6 +311,7 @@ dependencies = [
  "chrono-tz",
  "colored",
  "crab_rocket_category",
+ "crab_rocket_customer",
  "crab_rocket_employee",
  "crab_rocket_file",
  "crab_rocket_follow",
@@ -337,6 +338,23 @@ dependencies = [
 
 [[package]]
 name = "crab_rocket_category"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "crab_rocket_schema",
+ "crab_rocket_utils",
+ "diesel",
+ "dotenvy",
+ "obj_traits",
+ "rocket",
+ "rocket_cors",
+ "serde_json",
+ "utoipa",
+]
+
+[[package]]
+name = "crab_rocket_customer"
 version = "0.1.0"
 dependencies = [
  "chrono",

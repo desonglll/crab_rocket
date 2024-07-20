@@ -1,4 +1,5 @@
 use crab_rocket_category::routes::category_route::*;
+use crab_rocket_customer::routes::customer_route::*;
 use crab_rocket_employee::routes::employee_route::*;
 use crab_rocket_file::routes::{bin_file_route, form_file_route};
 use crab_rocket_follow::routes::follow_route::*;
@@ -134,6 +135,14 @@ pub fn module_routes() -> Vec<Route> {
         delete_order_by_id,
         update_order_by_id,
         options_order,
+        //customer routes
+        get_customers,
+        filter_customers,
+        get_customer_by_id,
+        insert_single_customer,
+        delete_customer_by_id,
+        update_customer_by_id,
+        options_customer,
         // schema_routes
         schema_routes::get_reload_count
     ]
