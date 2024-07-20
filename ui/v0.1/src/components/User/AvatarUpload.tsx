@@ -68,7 +68,7 @@ const AvatarUpload = ({
         className="avatar-uploader"
         showUploadList={false}
         action={`${axios.defaults.baseURL}/avatar_upload`}
-        beforeUpload={beforeUpload}
+        // beforeUpload={beforeUpload}
         customRequest={customRequest}
       >
         {imageUrl ? (

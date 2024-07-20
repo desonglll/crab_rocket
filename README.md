@@ -186,3 +186,12 @@ services:
     environment:
       POSTGRES_PASSWORD: changemeinpred!
 ```
+
+## Using Posting
+```shell
+pip install posting
+```
+
+```shell
+posting --collection ./posting
+```

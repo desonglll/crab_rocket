@@ -8,10 +8,11 @@ use crab_rocket_role::routes::role_route::*;
 use crab_rocket_schema::routes::schema_routes;
 use crab_rocket_task::routes::task_route::*;
 use crab_rocket_user::routes::user_route::*;
-use rocket::{routes, Route};
+use rocket::{get, routes, Route};
 
 pub fn module_routes() -> Vec<Route> {
     routes![
+        root,
         bin_file_route::files,
         bin_file_route::retrieve_bin,
         bin_file_route::upload_bin,
@@ -76,4 +77,8 @@ pub fn module_routes() -> Vec<Route> {
         // schema_routes
         schema_routes::get_reload_count
     ]
+}
+#[get("/")]
+pub fn root() -> String {
+    String::from("hello")
 }

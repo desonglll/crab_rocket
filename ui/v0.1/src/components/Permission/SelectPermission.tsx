@@ -21,8 +21,7 @@ export function SelectPermission({
   const fetchData = async () => {
     try {
       const response = await axios.get(`permission`);
-      console.log(response.data.body);
-      const mapped_data: SelectProps["options"] = response.data.body.map(
+      const mapped_data: SelectProps["options"] = response.data.body.data.map(
         (item: Permission) => ({
           label: item.permission_name,
           value: item.permission_id.toString(),
