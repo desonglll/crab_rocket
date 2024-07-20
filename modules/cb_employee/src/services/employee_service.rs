@@ -1,116 +1,46 @@
 use crate::mappers::employee_mapper::EmployeeMapper;
 use crate::models::employee::{Employee, NewEmployee, PatchEmployee};
 use crate::models::employee_filter::EmployeeFilter;
-use crab_rocket_schema::establish_pg_connection;
-use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::ServiceCRUD;
+use obj_traits::service::service_crud::{
+    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
+    service_update_by_id, ServiceCRUD,
+};
 use std::error::Error;
 
 pub struct EmployeeService {}
 
-impl
-    ServiceCRUD<Employee, NewEmployee, PatchEmployee, RequestParam<PaginationParam, EmployeeFilter>>
-    for EmployeeService
-{
+impl ServiceCRUD for EmployeeService {
+    type Item = Employee;
+    type NewItem = NewEmployee;
+    type PatchItem = PatchEmployee;
+    type Param = RequestParam<PaginationParam, EmployeeFilter>;
     fn get_all(
         param: &RequestParam<PaginationParam, EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::get_all(&mut conn, param) {
-                Ok(all_employees) => Ok(all_employees),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_get_all::<Employee, EmployeeMapper, EmployeeFilter>(param)
     }
     fn get_by_id(pid: i32) -> Result<Employee, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::get_by_id(&mut conn, pid) {
-                Ok(employee) => Ok(employee),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_get_by_id::<Employee, EmployeeMapper>(pid)
     }
 
     fn add_single(obj: &NewEmployee) -> Result<Employee, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::add_single(&mut conn, obj) {
-                Ok(employee) => Ok(employee),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_add_single::<Employee, EmployeeMapper, NewEmployee>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<Employee, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::delete_by_id(&mut conn, pid) {
-                Ok(deleted_employee) => Ok(deleted_employee),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_delete_by_id::<Employee, EmployeeMapper>(pid)
     }
 
     fn update_by_id(pid: i32, obj: &PatchEmployee) -> Result<Employee, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::update_by_id(&mut conn, pid, obj) {
-                Ok(updated_employee) => Ok(updated_employee),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_update_by_id::<Employee, EmployeeMapper, PatchEmployee>(pid, obj)
     }
     fn filter(
         param: &RequestParam<PaginationParam, EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::filter(&mut conn, param) {
-                Ok(all_employees) => Ok(all_employees),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_filter::<Employee, EmployeeMapper, EmployeeFilter>(param)
     }
 }
 

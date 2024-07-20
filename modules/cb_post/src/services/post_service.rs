@@ -1,8 +1,12 @@
-use crab_rocket_schema::establish_pg_connection;
+use std::error::Error;
+
 use obj_traits::{
-    mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::PaginationParam, request_param::RequestParam},
-    service::service_crud::ServiceCRUD,
+    response::data::Data,
+    service::service_crud::{
+        service_add_single, service_delete_by_id, service_filter, service_get_all,
+        service_get_by_id, service_update_by_id, ServiceCRUD,
+    },
 };
 
 use crate::{
@@ -14,106 +18,35 @@ use crate::{
 };
 
 pub struct PostService {}
-impl ServiceCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilter>>
-    for PostService
-{
+impl ServiceCRUD for PostService {
+    type Item = Post;
+    type NewItem = NewPost;
+    type PatchItem = PatchPost;
+    type Param = RequestParam<PaginationParam, PostFilter>;
     fn get_all(
         param: &RequestParam<PaginationParam, PostFilter>,
-    ) -> Result<obj_traits::response::data::Data<Vec<Post>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::get_all(&mut conn, param) {
-                Ok(all_posts) => Ok(all_posts),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    ) -> Result<Data<Vec<Post>>, Box<dyn Error>> {
+        service_get_all::<Post, PostMapper, PostFilter>(param)
+    }
+    fn get_by_id(pid: i32) -> Result<Post, Box<dyn Error>> {
+        service_get_by_id::<Post, PostMapper>(pid)
     }
 
-    fn get_by_id(pid: i32) -> Result<Post, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::get_by_id(&mut conn, pid) {
-                Ok(post) => Ok(post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn add_single(obj: &NewPost) -> Result<Post, Box<dyn Error>> {
+        service_add_single::<Post, PostMapper, NewPost>(obj)
     }
 
-    fn add_single(obj: &NewPost) -> Result<Post, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::add_single(&mut conn, obj) {
-                Ok(inserted_post) => Ok(inserted_post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn delete_by_id(pid: i32) -> Result<Post, Box<dyn Error>> {
+        service_delete_by_id::<Post, PostMapper>(pid)
     }
 
-    fn delete_by_id(pid: i32) -> Result<Post, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::delete_by_id(&mut conn, pid) {
-                Ok(deleted_post) => Ok(deleted_post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
-    }
-
-    fn update_by_id(pid: i32, obj: &PatchPost) -> Result<Post, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::update_by_id(&mut conn, pid, obj) {
-                Ok(updated_post) => Ok(updated_post),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn update_by_id(pid: i32, obj: &PatchPost) -> Result<Post, Box<dyn Error>> {
+        service_update_by_id::<Post, PostMapper, PatchPost>(pid, obj)
     }
     fn filter(
         param: &RequestParam<PaginationParam, PostFilter>,
-    ) -> Result<obj_traits::response::data::Data<Vec<Post>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::filter(&mut conn, param) {
-                Ok(all_posts) => Ok(all_posts),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    ) -> Result<Data<Vec<Post>>, Box<dyn std::error::Error>> {
+        service_filter::<Post, PostMapper, PostFilter>(param)
     }
 }
 

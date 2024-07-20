@@ -1,5 +1,5 @@
-use rocket::serde::Serialize;
 use crate::request::pagination_request_param::Pagination;
+use rocket::serde::Serialize;
 
 #[derive(Serialize, Default)]
 #[serde(crate = "rocket::serde")]
@@ -25,7 +25,6 @@ impl<T> Data<T> {
         &self.pagination
     }
 }
-
 
 impl<T> Data<T> {
     pub fn new(data: T, pagination: Pagination) -> Self {

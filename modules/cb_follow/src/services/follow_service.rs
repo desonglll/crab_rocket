@@ -1,8 +1,13 @@
+use std::error::Error;
+
 use crab_rocket_schema::establish_pg_connection;
 use obj_traits::{
-    mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::PaginationParam, request_param::RequestParam},
-    service::service_crud::ServiceCRUD,
+    response::data::Data,
+    service::service_crud::{
+        service_add_single, service_delete_by_id, service_filter, service_get_all,
+        service_get_by_id, service_update_by_id, ServiceCRUD,
+    },
 };
 
 use crate::{
@@ -17,107 +22,35 @@ use super::follow_service_trait::FollowServiceTrait;
 
 pub struct FollowService {}
 
-impl ServiceCRUD<Follow, NewFollow, PatchFollow, RequestParam<PaginationParam, FollowFilter>>
-    for FollowService
-{
+impl ServiceCRUD for FollowService {
+    type Item = Follow;
+    type NewItem = NewFollow;
+    type PatchItem = PatchFollow;
+    type Param = RequestParam<PaginationParam, FollowFilter>;
     fn get_all(
         param: &RequestParam<PaginationParam, FollowFilter>,
-    ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match FollowMapper::get_all(&mut conn, param) {
-                Ok(all_follows) => Ok(all_follows),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    ) -> Result<Data<Vec<Follow>>, Box<dyn Error>> {
+        service_get_all::<Follow, FollowMapper, FollowFilter>(param)
+    }
+    fn get_by_id(pid: i32) -> Result<Follow, Box<dyn Error>> {
+        service_get_by_id::<Follow, FollowMapper>(pid)
     }
 
-    fn get_by_id(pid: i32) -> Result<Follow, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match FollowMapper::get_by_id(&mut conn, pid) {
-                Ok(follow) => Ok(follow),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn add_single(obj: &NewFollow) -> Result<Follow, Box<dyn Error>> {
+        service_add_single::<Follow, FollowMapper, NewFollow>(obj)
     }
 
-    fn add_single(obj: &NewFollow) -> Result<Follow, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match FollowMapper::add_single(&mut conn, obj) {
-                Ok(inserted_follow) => Ok(inserted_follow),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn delete_by_id(pid: i32) -> Result<Follow, Box<dyn Error>> {
+        service_delete_by_id::<Follow, FollowMapper>(pid)
     }
 
-    fn delete_by_id(pid: i32) -> Result<Follow, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match FollowMapper::delete_by_id(&mut conn, pid) {
-                Ok(deleted_follow) => Ok(deleted_follow),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn update_by_id(pid: i32, obj: &PatchFollow) -> Result<Follow, Box<dyn Error>> {
+        service_update_by_id::<Follow, FollowMapper, PatchFollow>(pid, obj)
     }
-
-    fn update_by_id(pid: i32, obj: &PatchFollow) -> Result<Follow, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match FollowMapper::update_by_id(&mut conn, pid, obj) {
-                Ok(updated_follow) => Ok(updated_follow),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
-    }
-
     fn filter(
         param: &RequestParam<PaginationParam, FollowFilter>,
-    ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match FollowMapper::filter(&mut conn, param) {
-                Ok(all_follows) => Ok(all_follows),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    ) -> Result<Data<Vec<Follow>>, Box<dyn std::error::Error>> {
+        service_filter::<Follow, FollowMapper, FollowFilter>(param)
     }
 }
 

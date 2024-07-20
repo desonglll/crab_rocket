@@ -2,7 +2,7 @@ use crab_rocket_employee::routes::employee_route::*;
 use crab_rocket_file::routes::{bin_file_route, form_file_route};
 use crab_rocket_follow::routes::follow_route::*;
 use crab_rocket_info::routes::info_route;
-use crab_rocket_permission::routes::permission_route;
+use crab_rocket_permission::routes::permission_route::*;
 use crab_rocket_post::routes::post_route::*;
 use crab_rocket_role::routes::role_route::*;
 use crab_rocket_schema::routes::schema_routes;
@@ -73,7 +73,13 @@ pub fn module_routes() -> Vec<Route> {
         update_role_by_id,
         options_role,
         // permission routes
-        permission_route::get_all_permissions,
+        get_permissions,
+        filter_permissions,
+        get_permission_by_id,
+        insert_single_permission,
+        delete_permission_by_id,
+        update_permission_by_id,
+        options_permission,
         // schema_routes
         schema_routes::get_reload_count
     ]

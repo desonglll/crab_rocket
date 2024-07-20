@@ -319,7 +319,9 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "crab_rocket_schema",
+ "crab_rocket_utils",
  "diesel",
+ "obj_traits",
  "rocket",
  "serde_json",
  "utoipa",
@@ -1067,6 +1069,7 @@ dependencies = [
 name = "obj_traits"
 version = "0.1.0"
 dependencies = [
+ "crab_rocket_schema",
  "diesel",
  "rocket",
 ]

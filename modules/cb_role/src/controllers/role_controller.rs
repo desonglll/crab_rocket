@@ -1,79 +1,47 @@
 use crate::models::role::{NewRole, PatchRole, Role};
 use crate::models::role_filter::RoleFilter;
 use crate::services::role_service::RoleService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
+use obj_traits::controller::controller_crud::{
+    controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
+    controller_get_by_id, controller_update_by_id, ControllerCRUD,
+};
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::ServiceCRUD;
 use std::error::Error;
 
 pub struct RoleController {}
 
-impl ControllerCRUD<Role, NewRole, PatchRole, RequestParam<PaginationParam, RoleFilter>>
-    for RoleController
-{
+impl ControllerCRUD for RoleController {
+    type Item = Role;
+    type NewItem = NewRole;
+    type PatchItem = PatchRole;
+    type Param = RequestParam<PaginationParam, RoleFilter>;
     fn get_all(
         param: &RequestParam<PaginationParam, RoleFilter>,
-    ) -> Result<ApiResponse<Data<Vec<Role>>>, Box<dyn Error>> {
-        match RoleService::get_all(param) {
-            Ok(all_roles) => Ok(ApiResponse::success(all_roles)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn Error>> {
+        controller_get_all::<Self::Item, RoleService, RoleFilter>(param)
     }
 
-    fn get_by_id(pid: i32) -> Result<ApiResponse<Role>, Box<dyn Error>> {
-        match RoleService::get_by_id(pid) {
-            Ok(role) => Ok(ApiResponse::success(role)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn get_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_get_by_id::<Self::Item, RoleService>(pid)
     }
 
-    fn add_single(obj: &mut NewRole) -> Result<ApiResponse<Role>, Box<dyn Error>> {
-        match RoleService::add_single(obj) {
-            Ok(result_task) => Ok(ApiResponse::success(result_task)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn add_single(obj: &mut NewRole) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, RoleService, NewRole>(obj)
     }
 
-    fn delete_by_id(pid: i32) -> Result<ApiResponse<Role>, Box<dyn Error>> {
-        match RoleService::delete_by_id(pid) {
-            Ok(deleted_role) => Ok(ApiResponse::success(deleted_role)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_delete_by_id::<Self::Item, RoleService>(pid)
     }
 
-    fn update_by_id(pid: i32, obj: &PatchRole) -> Result<ApiResponse<Role>, Box<dyn Error>> {
-        match RoleService::update_by_id(pid, obj) {
-            Ok(updated_role) => Ok(ApiResponse::success(updated_role)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn update_by_id(pid: i32, obj: &PatchRole) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_update_by_id::<Self::Item, RoleService, PatchRole>(pid, obj)
     }
     fn filter(
         param: &RequestParam<PaginationParam, RoleFilter>,
-    ) -> Result<ApiResponse<Data<Vec<Role>>>, Box<dyn std::error::Error>> {
-        match RoleService::filter(param) {
-            Ok(all_roles) => Ok(ApiResponse::success(all_roles)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
+        controller_filter::<Self::Item, RoleService, RoleFilter>(param)
     }
 }

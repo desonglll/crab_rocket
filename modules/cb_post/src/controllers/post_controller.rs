@@ -1,8 +1,12 @@
+use std::error::Error;
+
 use obj_traits::{
-    controller::controller_crud::ControllerCRUD,
+    controller::controller_crud::{
+        controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
+        controller_get_by_id, controller_update_by_id, ControllerCRUD,
+    },
     request::{pagination_request_param::PaginationParam, request_param::RequestParam},
-    response::api_response::ApiResponse,
-    service::service_crud::ServiceCRUD,
+    response::{api_response::ApiResponse, data::Data},
 };
 
 use crate::{
@@ -15,79 +19,35 @@ use crate::{
 
 pub struct PostController {}
 
-impl ControllerCRUD<Post, NewPost, PatchPost, RequestParam<PaginationParam, PostFilter>>
-    for PostController
-{
+impl ControllerCRUD for PostController {
+    type Item = Post;
+    type NewItem = NewPost;
+    type PatchItem = PatchPost;
+    type Param = RequestParam<PaginationParam, PostFilter>;
     fn get_all(
         param: &RequestParam<PaginationParam, PostFilter>,
-    ) -> Result<
-        obj_traits::response::api_response::ApiResponse<
-            obj_traits::response::data::Data<Vec<Post>>,
-        >,
-        Box<dyn std::error::Error>,
-    > {
-        match PostService::get_all(param) {
-            Ok(all_posts) => Ok(ApiResponse::success(all_posts)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn Error>> {
+        controller_get_all::<Self::Item, PostService, PostFilter>(param)
     }
 
-    fn get_by_id(pid: i32) -> Result<ApiResponse<Post>, Box<dyn std::error::Error>> {
-        match PostService::get_by_id(pid) {
-            Ok(post) => Ok(ApiResponse::success(post)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn get_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_get_by_id::<Self::Item, PostService>(pid)
     }
 
-    fn add_single(obj: &mut NewPost) -> Result<ApiResponse<Post>, Box<dyn std::error::Error>> {
-        match PostService::add_single(&obj) {
-            Ok(result) => Ok(ApiResponse::success(result)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn add_single(obj: &mut NewPost) -> Result<ApiResponse<Post>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, PostService, NewPost>(obj)
     }
 
-    fn delete_by_id(pid: i32) -> Result<ApiResponse<Post>, Box<dyn std::error::Error>> {
-        match PostService::delete_by_id(pid) {
-            Ok(deleted_post) => Ok(ApiResponse::success(deleted_post)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_delete_by_id::<Self::Item, PostService>(pid)
     }
 
-    fn update_by_id(
-        pid: i32,
-        obj: &PatchPost,
-    ) -> Result<ApiResponse<Post>, Box<dyn std::error::Error>> {
-        match PostService::update_by_id(pid, obj) {
-            Ok(updated_post) => Ok(ApiResponse::success(updated_post)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    fn update_by_id(pid: i32, obj: &PatchPost) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_update_by_id::<Self::Item, PostService, PatchPost>(pid, obj)
     }
-
     fn filter(
         param: &RequestParam<PaginationParam, PostFilter>,
-    ) -> Result<ApiResponse<obj_traits::response::data::Data<Vec<Post>>>, Box<dyn std::error::Error>>
-    {
-        match PostService::filter(param) {
-            Ok(all_posts) => Ok(ApiResponse::success(all_posts)),
-            Err(e) => {
-                println!("{e:?}");
-                Ok(ApiResponse::error(e))
-            }
-        }
+    ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
+        controller_filter::<Self::Item, PostService, PostFilter>(param)
     }
 }

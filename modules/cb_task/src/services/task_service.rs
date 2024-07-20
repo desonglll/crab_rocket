@@ -1,131 +1,47 @@
+use std::error::Error;
+
 use crate::mappers::task_mapper::TaskMapper;
 use crate::models::task::{NewTask, PatchTask, Task};
 use crate::models::task_filter::TaskFilter;
-use crab_rocket_schema::establish_pg_connection;
-use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::ServiceCRUD;
+use obj_traits::service::service_crud::{
+    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
+    service_update_by_id, ServiceCRUD,
+};
 
 pub struct TaskService {}
 
-impl ServiceCRUD<Task, NewTask, PatchTask, RequestParam<PaginationParam, TaskFilter>>
-    for TaskService
-{
+impl ServiceCRUD for TaskService {
+    type Item = Task;
+    type NewItem = NewTask;
+    type PatchItem = PatchTask;
+    type Param = RequestParam<PaginationParam, TaskFilter>;
     fn get_all(
         param: &RequestParam<PaginationParam, TaskFilter>,
-    ) -> Result<Data<Vec<Task>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                match TaskMapper::get_all(&mut conn, param) {
-                    Ok(data) => {
-                        // if all_tasks.len() != 0 {
-                        //     Ok(all_tasks)
-                        // } else {
-                        //     println!("Empty query.");
-                        //     Err(Box::new(diesel::result::Error::NotFound))
-                        // }
-                        Ok(data)
-                    }
-                    Err(e) => {
-                        // panic!("oWo! Please add task first!");
-
-                        println!("{e:?}");
-                        Err(Box::new(e))
-                    }
-                }
-            }
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    ) -> Result<Data<Vec<Task>>, Box<dyn Error>> {
+        service_get_all::<Task, TaskMapper, TaskFilter>(param)
+    }
+    fn get_by_id(pid: i32) -> Result<Task, Box<dyn Error>> {
+        service_get_by_id::<Task, TaskMapper>(pid)
     }
 
-    fn get_by_id(pid: i32) -> Result<Task, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match TaskMapper::get_by_id(&mut conn, pid) {
-                Ok(task) => Ok(task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn add_single(obj: &NewTask) -> Result<Task, Box<dyn Error>> {
+        service_add_single::<Task, TaskMapper, NewTask>(obj)
     }
 
-    fn add_single(obj: &NewTask) -> Result<Task, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match TaskMapper::add_single(&mut conn, obj) {
-                Ok(inserted_task) => Ok(inserted_task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn delete_by_id(pid: i32) -> Result<Task, Box<dyn Error>> {
+        service_delete_by_id::<Task, TaskMapper>(pid)
     }
 
-    fn delete_by_id(pid: i32) -> Result<Task, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match TaskMapper::delete_by_id(&mut conn, pid) {
-                Ok(deleted_task) => Ok(deleted_task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
-    }
-
-    fn update_by_id(pid: i32, obj: &PatchTask) -> Result<Task, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match TaskMapper::update_by_id(&mut conn, pid, &obj) {
-                Ok(task) => Ok(task),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+    fn update_by_id(pid: i32, obj: &PatchTask) -> Result<Task, Box<dyn Error>> {
+        service_update_by_id::<Task, TaskMapper, PatchTask>(pid, obj)
     }
     fn filter(
         param: &RequestParam<PaginationParam, TaskFilter>,
     ) -> Result<Data<Vec<Task>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                match TaskMapper::filter(&mut conn, param) {
-                    Ok(data) => Ok(data),
-                    Err(e) => {
-                        // panic!("oWo! Please add task first!");
-
-                        println!("{e:?}");
-                        Err(Box::new(e))
-                    }
-                }
-            }
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_filter::<Task, TaskMapper, TaskFilter>(param)
     }
 }
 

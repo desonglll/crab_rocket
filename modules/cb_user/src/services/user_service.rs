@@ -1,116 +1,46 @@
 use crate::mappers::user_mapper::UserMapper;
 use crate::models::user::{NewUser, PatchUser, User};
 use crate::models::user_filter::UserFilter;
-use crab_rocket_schema::establish_pg_connection;
-use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::ServiceCRUD;
+use obj_traits::service::service_crud::{
+    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
+    service_update_by_id, ServiceCRUD,
+};
 use std::error::Error;
 
 pub struct UserService {}
 
-impl ServiceCRUD<User, NewUser, PatchUser, RequestParam<PaginationParam, UserFilter>>
-    for UserService
-{
+impl ServiceCRUD for UserService {
+    type Item = User;
+    type NewItem = NewUser;
+    type PatchItem = PatchUser;
+    type Param = RequestParam<PaginationParam, UserFilter>;
     fn get_all(
         param: &RequestParam<PaginationParam, UserFilter>,
     ) -> Result<Data<Vec<User>>, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match UserMapper::get_all(&mut conn, param) {
-                Ok(all_users) => Ok(all_users),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_get_all::<User, UserMapper, UserFilter>(param)
     }
     fn get_by_id(pid: i32) -> Result<User, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match UserMapper::get_by_id(&mut conn, pid) {
-                Ok(user) => Ok(user),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_get_by_id::<User, UserMapper>(pid)
     }
 
     fn add_single(obj: &NewUser) -> Result<User, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match UserMapper::add_single(&mut conn, obj) {
-                Ok(user) => Ok(user),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_add_single::<User, UserMapper, NewUser>(obj)
     }
 
     fn delete_by_id(pid: i32) -> Result<User, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match UserMapper::delete_by_id(&mut conn, pid) {
-                Ok(deleted_user) => Ok(deleted_user),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_delete_by_id::<User, UserMapper>(pid)
     }
 
     fn update_by_id(pid: i32, obj: &PatchUser) -> Result<User, Box<dyn Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match UserMapper::update_by_id(&mut conn, pid, obj) {
-                Ok(updated_user) => Ok(updated_user),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_update_by_id::<User, UserMapper, PatchUser>(pid, obj)
     }
-
     fn filter(
         param: &RequestParam<PaginationParam, UserFilter>,
     ) -> Result<Data<Vec<User>>, Box<dyn std::error::Error>> {
-        match establish_pg_connection() {
-            Ok(mut conn) => match UserMapper::filter(&mut conn, param) {
-                Ok(all_users) => Ok(all_users),
-                Err(e) => {
-                    println!("{e:?}");
-                    Err(Box::new(e))
-                }
-            },
-            Err(e) => {
-                println!("{e:?}");
-                Err(Box::new(e))
-            }
-        }
+        service_filter::<User, UserMapper, UserFilter>(param)
     }
 }
 

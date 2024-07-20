@@ -1,5 +1,6 @@
 pub mod models {
     pub mod permission;
+    pub mod permission_filter;
 }
 
 pub mod mappers {
@@ -15,7 +16,4 @@ pub mod routes {
 }
 pub mod services {
     pub mod permission_service;
-    pub mod r#impl {
-        pub mod permission_impl;
-    }
 }
