@@ -1,6 +1,18 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    category_table (category_id) {
+        category_id -> Int4,
+        #[max_length = 100]
+        name -> Varchar,
+        description -> Nullable<Text>,
+        parent_id -> Nullable<Int4>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     department_table (department_id) {
         department_id -> Int4,
         #[max_length = 255]
@@ -124,6 +136,35 @@ diesel::table! {
 }
 
 diesel::table! {
+    product_table (product_id) {
+        product_id -> Int4,
+        user_id -> Nullable<Int4>,
+        #[max_length = 255]
+        name -> Varchar,
+        description -> Nullable<Text>,
+        #[max_length = 50]
+        sku -> Varchar,
+        #[max_length = 255]
+        image -> Nullable<Varchar>,
+        price -> Nullable<Numeric>,
+        discount_price -> Nullable<Numeric>,
+        is_discounted -> Nullable<Bool>,
+        is_valid -> Nullable<Bool>,
+        stock_quantity -> Nullable<Int4>,
+        is_in_stock -> Nullable<Bool>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+        supplier_id -> Nullable<Int4>,
+        weight -> Nullable<Numeric>,
+        #[max_length = 50]
+        dimensions -> Nullable<Varchar>,
+        #[max_length = 20]
+        status -> Nullable<Varchar>,
+        public -> Nullable<Bool>,
+    }
+}
+
+diesel::table! {
     reload_counts (reload_date) {
         reload_date -> Date,
         count -> Int4,
@@ -139,6 +180,22 @@ diesel::table! {
         description -> Nullable<Varchar>,
         #[max_length = 255]
         permissions -> Nullable<Varchar>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    supplier_table (supplier_id) {
+        supplier_id -> Int4,
+        #[max_length = 255]
+        name -> Varchar,
+        #[max_length = 255]
+        address -> Nullable<Varchar>,
+        #[max_length = 20]
+        phone_number -> Nullable<Varchar>,
+        #[max_length = 255]
+        email -> Nullable<Varchar>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
@@ -177,18 +234,23 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(product_table -> supplier_table (supplier_id));
+diesel::joinable!(product_table -> user_table (user_id));
 diesel::joinable!(task_table -> user_table (user_id));
 diesel::joinable!(user_table -> role_table (role_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    category_table,
     department_table,
     employee_table,
     file_table,
     follow_table,
     permission_table,
     post_table,
+    product_table,
     reload_counts,
     role_table,
+    supplier_table,
     task_table,
     user_table,
 );
