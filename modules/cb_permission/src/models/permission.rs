@@ -28,7 +28,6 @@ pub struct Permission {
 #[diesel(table_name = crab_rocket_schema::schema::permission_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewPermission {
-    pub permission_id: i32,
     pub permission_name: String,
     pub permission_description: Option<String>,
     pub resource: String,
@@ -47,7 +46,6 @@ pub struct NewPermission {
 #[diesel(table_name = crab_rocket_schema::schema::permission_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchPermission {
-    pub permission_id: i32,
     pub permission_name: String,
     pub permission_description: Option<String>,
     pub resource: String,
@@ -178,9 +176,18 @@ impl Permission {
     }
 }
 
+///
+/// Demo
+/// ```
+/// {
+///    "permission_name": "read_articles",
+///    "resource": "articles",
+///    "action": "read",
+///    "is_active": true
+/// }
+/// ```
 impl NewPermission {
     pub fn new(
-        permission_id: i32,
         permission_name: String,
         permission_description: Option<String>,
         resource: String,
@@ -193,7 +200,6 @@ impl NewPermission {
         notes: Option<String>,
     ) -> Self {
         Self {
-            permission_id,
             permission_name,
             permission_description,
             resource,
@@ -208,7 +214,6 @@ impl NewPermission {
     }
     pub fn demo() -> Self {
         Self {
-            permission_id: 1,
             permission_name: String::from("demo"),
             permission_description: Some(String::from("demo")),
             resource: String::from("hello"),
@@ -224,7 +229,6 @@ impl NewPermission {
 }
 impl PatchPermission {
     pub fn new(
-        permission_id: i32,
         permission_name: String,
         permission_description: Option<String>,
         resource: String,
@@ -237,7 +241,6 @@ impl PatchPermission {
         notes: Option<String>,
     ) -> Self {
         Self {
-            permission_id,
             permission_name,
             permission_description,
             resource,

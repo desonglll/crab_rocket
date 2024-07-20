@@ -13,7 +13,7 @@ export function FileTable() {
     const fetchData = async () => {
       try {
         const resp = await axios.get(`files`);
-        setFiles(resp.data.body);
+        setFiles(resp.data.data);
       } catch (e) {
         console.log(e);
       }
@@ -127,7 +127,7 @@ export function FileTable() {
               size="middle"
               columns={columns}
               dataSource={files}
-              rowKey={"id"}
+              rowKey={"file_id"}
             />
           </div>
         </>
