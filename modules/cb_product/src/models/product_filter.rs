@@ -16,8 +16,8 @@ pub struct ProductFilter {
     pub discount_price_max: Option<f64>, // 新增字段 discount_price_max
     pub is_discounted: Option<bool>,     // 新增字段 is_discounted
     pub is_valid: Option<bool>,          // 新增字段 is_valid
-    pub stock_quantity_min: Option<i32>, // 新增字段 stock_quantity_min
-    pub stock_quantity_max: Option<i32>, // 新增字段 stock_quantity_max
+    pub inventory_min: Option<i32>,      // 新增字段 inventory_min
+    pub inventory_max: Option<i32>,      // 新增字段 inventory_max
     pub is_in_stock: Option<bool>,       // 新增字段 is_in_stock
     pub created_at_min: Option<NaiveDateTime>,
     pub created_at_max: Option<NaiveDateTime>,

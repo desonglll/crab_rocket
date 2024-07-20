@@ -99,6 +99,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    inventory_table (inventory_id) {
+        inventory_id -> Int4,
+        product_id -> Nullable<Int4>,
+        #[max_length = 255]
+        location -> Nullable<Varchar>,
+        quantity -> Nullable<Int4>,
+        last_updated -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     permission_table (permission_id) {
         permission_id -> Int4,
         #[max_length = 255]
@@ -150,7 +161,7 @@ diesel::table! {
         discount_price -> Nullable<Float8>,
         is_discounted -> Nullable<Bool>,
         is_valid -> Nullable<Bool>,
-        stock_quantity -> Nullable<Int4>,
+        inventory -> Nullable<Int4>,
         is_in_stock -> Nullable<Bool>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
@@ -234,6 +245,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(inventory_table -> product_table (product_id));
 diesel::joinable!(product_table -> supplier_table (supplier_id));
 diesel::joinable!(product_table -> user_table (user_id));
 diesel::joinable!(task_table -> user_table (user_id));
@@ -245,6 +257,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     employee_table,
     file_table,
     follow_table,
+    inventory_table,
     permission_table,
     post_table,
     product_table,
