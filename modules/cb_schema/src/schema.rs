@@ -127,7 +127,7 @@ diesel::table! {
         order_id -> Int4,
         customer_id -> Nullable<Int4>,
         order_date -> Nullable<Timestamp>,
-        total_amount -> Nullable<Numeric>,
+        total_amount -> Nullable<Float8>,
         #[max_length = 50]
         status -> Nullable<Varchar>,
     }
