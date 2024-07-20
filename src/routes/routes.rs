@@ -5,6 +5,7 @@ use crab_rocket_follow::routes::follow_route::*;
 use crab_rocket_info::routes::info_route;
 use crab_rocket_permission::routes::permission_route::*;
 use crab_rocket_post::routes::post_route::*;
+use crab_rocket_product::routes::product_route::*;
 use crab_rocket_role::routes::role_route::*;
 use crab_rocket_schema::routes::schema_routes;
 use crab_rocket_supplier::routes::supplier_route::*;
@@ -98,6 +99,14 @@ pub fn module_routes() -> Vec<Route> {
         delete_category_by_id,
         update_category_by_id,
         options_category,
+        //product routes
+        get_products,
+        filter_products,
+        get_product_by_id,
+        insert_single_product,
+        delete_product_by_id,
+        update_product_by_id,
+        options_product,
         // schema_routes
         schema_routes::get_reload_count
     ]

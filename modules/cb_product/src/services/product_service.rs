@@ -54,7 +54,7 @@ mod test {
     #[test]
     fn test_insert_single_product() {
         use crate::models::product::PostProduct;
-        let product = PostProduct::demo();
+        let product = PostProduct::default();
         match ProductService::add_single(&product) {
             Ok(result) => println!("{result:?}"),
             Err(e) => println!("{e:?}"),

@@ -101,12 +101,21 @@ impl MapperCRUD for ProductMapper {
     ) -> Result<Product, diesel::result::Error> {
         diesel::update(dsl::product_table.filter(dsl::product_id.eq(pid)))
             .set((
-                dsl::name.eq(obj.name()),
-                dsl::address.eq(obj.address()),
-                dsl::phone_number.eq(obj.phone_number()),
-                dsl::email.eq(obj.email()),
-                dsl::created_at.eq(obj.created_at()),
+                dsl::user_id.eq(obj.user_id),
+                dsl::name.eq(&obj.name),
+                dsl::description.eq(&obj.description),
+                dsl::price.eq(obj.price),
+                dsl::discount_price.eq(obj.discount_price),
+                dsl::is_discounted.eq(obj.is_discounted),
+                dsl::is_valid.eq(obj.is_valid),
+                dsl::stock_quantity.eq(obj.stock_quantity),
+                dsl::is_in_stock.eq(obj.is_in_stock),
                 dsl::updated_at.eq(get_e8_time()),
+                dsl::supplier_id.eq(obj.supplier_id),
+                dsl::weight.eq(obj.weight),
+                dsl::dimensions.eq(&obj.dimensions),
+                dsl::status.eq(&obj.status),
+                dsl::public.eq(obj.public),
             ))
             .get_result(conn)
     }
@@ -149,32 +158,105 @@ impl MapperCRUD for ProductMapper {
         let mut query = dsl::product_table.into_boxed();
         let filter = &param.filter;
         if let Some(f) = filter {
+            // 篩選條件
             if let Some(product_id) = f.product_id {
                 query = query.filter(dsl::product_id.eq(product_id));
             }
+
+            if let Some(user_id) = f.user_id {
+                query = query.filter(dsl::user_id.eq(user_id));
+            }
+
             if let Some(name) = &f.name {
-                query = query.filter(dsl::name.like(format!("%{}%", name)));
+                query = query.filter(dsl::name.ilike(format!("%{}%", name)));
             }
-            if let Some(address) = &f.address {
-                query = query.filter(dsl::address.like(format!("%{}%", address)));
+
+            if let Some(description) = &f.description {
+                query = query.filter(dsl::description.ilike(format!("%{}%", description)));
             }
-            if let Some(phone_number) = &f.phone_number {
-                query = query.filter(dsl::phone_number.like(format!("%{}%", phone_number)));
+
+            if let Some(sku) = &f.sku {
+                query = query.filter(dsl::sku.eq(sku));
             }
-            if let Some(email) = &f.email {
-                query = query.filter(dsl::email.like(format!("%{}%", email)));
+
+            if let Some(image) = &f.image {
+                query = query.filter(dsl::image.ilike(format!("%{}%", image)));
             }
+
+            if let Some(price_min) = f.price_min {
+                query = query.filter(dsl::price.ge(price_min));
+            }
+
+            if let Some(price_max) = f.price_max {
+                query = query.filter(dsl::price.le(price_max));
+            }
+
+            if let Some(discount_price_min) = f.discount_price_min {
+                query = query.filter(dsl::discount_price.ge(discount_price_min));
+            }
+
+            if let Some(discount_price_max) = f.discount_price_max {
+                query = query.filter(dsl::discount_price.le(discount_price_max));
+            }
+
+            if let Some(is_discounted) = f.is_discounted {
+                query = query.filter(dsl::is_discounted.eq(is_discounted));
+            }
+
+            if let Some(is_valid) = f.is_valid {
+                query = query.filter(dsl::is_valid.eq(is_valid));
+            }
+
+            if let Some(stock_quantity_min) = f.stock_quantity_min {
+                query = query.filter(dsl::stock_quantity.ge(stock_quantity_min));
+            }
+
+            if let Some(stock_quantity_max) = f.stock_quantity_max {
+                query = query.filter(dsl::stock_quantity.le(stock_quantity_max));
+            }
+
+            if let Some(is_in_stock) = f.is_in_stock {
+                query = query.filter(dsl::is_in_stock.eq(is_in_stock));
+            }
+
             if let Some(created_at_min) = f.created_at_min {
                 query = query.filter(dsl::created_at.ge(created_at_min));
             }
+
             if let Some(created_at_max) = f.created_at_max {
                 query = query.filter(dsl::created_at.le(created_at_max));
             }
+
             if let Some(updated_at_min) = f.updated_at_min {
                 query = query.filter(dsl::updated_at.ge(updated_at_min));
             }
+
             if let Some(updated_at_max) = f.updated_at_max {
                 query = query.filter(dsl::updated_at.le(updated_at_max));
+            }
+
+            if let Some(supplier_id) = f.supplier_id {
+                query = query.filter(dsl::supplier_id.eq(supplier_id));
+            }
+
+            if let Some(weight_min) = f.weight_min {
+                query = query.filter(dsl::weight.ge(weight_min));
+            }
+
+            if let Some(weight_max) = f.weight_max {
+                query = query.filter(dsl::weight.le(weight_max));
+            }
+
+            if let Some(dimensions) = &f.dimensions {
+                query = query.filter(dsl::dimensions.ilike(format!("%{}%", dimensions)));
+            }
+
+            if let Some(status) = &f.status {
+                query = query.filter(dsl::status.ilike(format!("%{}%", status)));
+            }
+
+            if let Some(public) = f.public {
+                query = query.filter(dsl::public.eq(public));
             }
         }
         let data = query.load::<Product>(conn)?;

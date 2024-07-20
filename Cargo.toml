@@ -28,6 +28,7 @@ crab_rocket_user = { path = "./modules/cb_user" }
 crab_rocket_employee = { path = "./modules/cb_employee" }
 crab_rocket_supplier = { path = "./modules/cb_supplier" }
 crab_rocket_category = { path = "./modules/cb_category" }
+crab_rocket_product = { path = "./modules/cb_product" }
 crab_rocket_info = { path = "./modules/cb_info" }
 crab_rocket_file = { path = "./modules/cb_file" }
 crab_rocket_schema = { path = "./modules/cb_schema" }
