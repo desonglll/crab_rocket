@@ -4,3 +4,5 @@ files
 tasks.sqlite
 upload
 # static
+.idea
+.zed

@@ -3,6 +3,7 @@ use crab_rocket_employee::routes::employee_route::*;
 use crab_rocket_file::routes::{bin_file_route, form_file_route};
 use crab_rocket_follow::routes::follow_route::*;
 use crab_rocket_info::routes::info_route;
+use crab_rocket_inventory::routes::inventory_route::*;
 use crab_rocket_permission::routes::permission_route::*;
 use crab_rocket_post::routes::post_route::*;
 use crab_rocket_product::routes::product_route::*;
@@ -107,6 +108,14 @@ pub fn module_routes() -> Vec<Route> {
         delete_product_by_id,
         update_product_by_id,
         options_product,
+        //inventory routes
+        get_inventorys,
+        filter_inventorys,
+        get_inventory_by_id,
+        insert_single_inventory,
+        delete_inventory_by_id,
+        update_inventory_by_id,
+        options_inventory,
         // schema_routes
         schema_routes::get_reload_count
     ]

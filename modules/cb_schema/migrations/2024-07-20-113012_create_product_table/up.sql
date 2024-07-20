@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS product_table(
     discount_price FLOAT DEFAULT 0.0,
     is_discounted BOOLEAN DEFAULT FALSE,
     is_valid BOOLEAN DEFAULT FALSE,
-    stock_quantity INTEGER DEFAULT 0,
+    inventory INTEGER DEFAULT 0,
     is_in_stock BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS product_table(
 );
 
 -- 插入示例数据到 products 表
-INSERT INTO product_table(user_id, name, description, sku, image, price, discount_price, is_discounted, is_valid, stock_quantity, is_in_stock, supplier_id, weight, dimensions, status, public) VALUES 
+INSERT INTO product_table(user_id, name, description, sku, image, price, discount_price, is_discounted, is_valid, inventory, is_in_stock, supplier_id, weight, dimensions, status, public) VALUES 
 (1, 'Product 1', 'Description for Product 1', 'SKU001', 'http://example.com/image1.jpg', 100.00, 80.00, TRUE, TRUE, 50, TRUE, 1, 1.5, '10x10x10', 'Available', TRUE),
 (2, 'Product 2', 'Description for Product 2', 'SKU002', 'http://example.com/image2.jpg', 200.00, 150.00, TRUE, TRUE, 30, TRUE, 2, 2.5, '20x20x20', 'Available', TRUE),
 (3, 'Product 3', 'Description for Product 3', 'SKU003', 'http://example.com/image3.jpg', 300.00, 250.00, TRUE, TRUE, 20, TRUE, 3, 3.5, '30x30x30', 'Available', TRUE),

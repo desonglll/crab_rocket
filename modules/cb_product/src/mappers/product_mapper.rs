@@ -108,7 +108,7 @@ impl MapperCRUD for ProductMapper {
                 dsl::discount_price.eq(obj.discount_price),
                 dsl::is_discounted.eq(obj.is_discounted),
                 dsl::is_valid.eq(obj.is_valid),
-                dsl::stock_quantity.eq(obj.stock_quantity),
+                dsl::inventory.eq(obj.inventory),
                 dsl::is_in_stock.eq(obj.is_in_stock),
                 dsl::updated_at.eq(get_e8_time()),
                 dsl::supplier_id.eq(obj.supplier_id),
@@ -207,12 +207,12 @@ impl MapperCRUD for ProductMapper {
                 query = query.filter(dsl::is_valid.eq(is_valid));
             }
 
-            if let Some(stock_quantity_min) = f.stock_quantity_min {
-                query = query.filter(dsl::stock_quantity.ge(stock_quantity_min));
+            if let Some(inventory_min) = f.inventory_min {
+                query = query.filter(dsl::inventory.ge(inventory_min));
             }
 
-            if let Some(stock_quantity_max) = f.stock_quantity_max {
-                query = query.filter(dsl::stock_quantity.le(stock_quantity_max));
+            if let Some(inventory_max) = f.inventory_max {
+                query = query.filter(dsl::inventory.le(inventory_max));
             }
 
             if let Some(is_in_stock) = f.is_in_stock {
