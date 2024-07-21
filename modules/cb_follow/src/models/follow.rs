@@ -9,10 +9,10 @@ use utoipa::ToSchema;
 #[diesel(table_name = crab_rocket_schema::schema::follow_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Follow {
-    following_user_id: i32,
-    followed_user_id: i32,
-    created_at: Option<chrono::NaiveDateTime>,
-    follow_id: i32,
+    pub following_user_id: i32,
+    pub followed_user_id: i32,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub follow_id: i32,
 }
 
 impl Follow {
@@ -29,38 +29,6 @@ impl Follow {
             follow_id,
         }
     }
-
-    pub fn following_user_id(&self) -> i32 {
-        self.following_user_id
-    }
-
-    pub fn followed_user_id(&self) -> i32 {
-        self.followed_user_id
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn follow_id(&self) -> i32 {
-        self.follow_id
-    }
-
-    pub fn set_following_user_id(&mut self, following_user_id: i32) {
-        self.following_user_id = following_user_id;
-    }
-
-    pub fn set_followed_user_id(&mut self, followed_user_id: i32) {
-        self.followed_user_id = followed_user_id;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_follow_id(&mut self, follow_id: i32) {
-        self.follow_id = follow_id;
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -69,9 +37,9 @@ impl Follow {
 #[diesel(table_name = crab_rocket_schema::schema::follow_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PostFollow {
-    following_user_id: i32,
-    followed_user_id: i32,
-    created_at: Option<chrono::NaiveDateTime>,
+    pub following_user_id: i32,
+    pub followed_user_id: i32,
+    pub created_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PostFollow {
@@ -89,33 +57,10 @@ impl PostFollow {
 
     pub fn demo() -> Self {
         Self {
-            followed_user_id: 3,
+            followed_user_id: 4,
             following_user_id: 1,
             created_at: Some(get_e8_time()),
         }
-    }
-    pub fn following_user_id(&self) -> i32 {
-        self.following_user_id
-    }
-
-    pub fn followed_user_id(&self) -> i32 {
-        self.followed_user_id
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn set_following_user_id(&mut self, following_user_id: i32) {
-        self.following_user_id = following_user_id;
-    }
-
-    pub fn set_followed_user_id(&mut self, followed_user_id: i32) {
-        self.followed_user_id = followed_user_id;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
     }
 }
 
@@ -125,9 +70,9 @@ impl PostFollow {
 #[diesel(table_name = crab_rocket_schema::schema::follow_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchFollow {
-    following_user_id: i32,
-    followed_user_id: i32,
-    created_at: Option<chrono::NaiveDateTime>,
+    pub following_user_id: i32,
+    pub followed_user_id: i32,
+    pub created_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PatchFollow {
@@ -141,29 +86,5 @@ impl PatchFollow {
             followed_user_id,
             created_at,
         }
-    }
-
-    pub fn following_user_id(&self) -> i32 {
-        self.following_user_id
-    }
-
-    pub fn followed_user_id(&self) -> i32 {
-        self.followed_user_id
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn set_following_user_id(&mut self, following_user_id: i32) {
-        self.following_user_id = following_user_id;
-    }
-
-    pub fn set_followed_user_id(&mut self, followed_user_id: i32) {
-        self.followed_user_id = followed_user_id;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
     }
 }
