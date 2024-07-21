@@ -182,27 +182,125 @@ impl MapperCRUD for SupplierMapper {
         Ok(body)
     }
 }
-
-mod test {
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::supplier::{PatchSupplier, PostSupplier};
+    use crate::models::supplier_filter::SupplierFilter;
+    use crab_rocket_schema::establish_pg_connection;
+    use obj_traits::request::request_param::RequestParam;
 
     #[test]
     fn test_fetch_all_supplier_table() {
-        use crab_rocket_schema::establish_pg_connection;
-        use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-
-        use super::SupplierMapper;
-        let param = RequestParam::default();
+        let param = RequestParam::<PaginationParam, SupplierFilter>::default();
         match establish_pg_connection() {
             Ok(mut conn) => match SupplierMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
+                    assert!(data.data().len() > 0); // Ensure data is fetched
                 }
                 Err(e) => {
                     println!("{:?}", e);
+                    panic!("Failed to fetch suppliers: {:?}", e);
                 }
             },
             Err(e) => {
                 println!("{:?}", e);
+                panic!("Failed to establish database connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_get_by_id() {
+        let test_supplier_id = 3; // Replace with an actual ID from your test database
+        match establish_pg_connection() {
+            Ok(mut conn) => match SupplierMapper::get_by_id(&mut conn, test_supplier_id) {
+                Ok(supplier) => {
+                    println!("{:#?}", supplier);
+                    assert_eq!(supplier.supplier_id(), test_supplier_id);
+                }
+                Err(e) => {
+                    println!("{:?}", e);
+                    panic!("Failed to get supplier by ID: {:?}", e);
+                }
+            },
+            Err(e) => {
+                println!("{:?}", e);
+                panic!("Failed to establish database connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_add_single() {
+        let new_supplier = PostSupplier::demo(); // Using demo data for testing
+        match establish_pg_connection() {
+            Ok(mut conn) => match SupplierMapper::add_single(&mut conn, &new_supplier) {
+                Ok(supplier) => {
+                    println!("{:#?}", supplier);
+                    assert_eq!(supplier.name(), new_supplier.name);
+                }
+                Err(e) => {
+                    println!("{:?}", e);
+                    panic!("Failed to add new supplier: {:?}", e);
+                }
+            },
+            Err(e) => {
+                println!("{:?}", e);
+                panic!("Failed to establish database connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_delete_by_id() {
+        let test_supplier_id = 1; // Replace with an actual ID from your test database
+        match establish_pg_connection() {
+            Ok(mut conn) => match SupplierMapper::delete_by_id(&mut conn, test_supplier_id) {
+                Ok(supplier) => {
+                    println!("{:#?}", supplier);
+                    assert_eq!(supplier.supplier_id(), test_supplier_id);
+                }
+                Err(e) => {
+                    println!("{:?}", e);
+                    panic!("Failed to delete supplier by ID: {:?}", e);
+                }
+            },
+            Err(e) => {
+                println!("{:?}", e);
+                panic!("Failed to establish database connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_update_by_id() {
+        let test_supplier_id = 2; // Replace with an actual ID from your test database
+        let updated_supplier = PatchSupplier {
+            name: "Updated Supplier".to_string(),
+            address: Some("Updated Address".to_string()),
+            phone_number: Some("Updated Phone".to_string()),
+            email: Some("updated@example.com".to_string()),
+            created_at: None,
+            updated_at: Some(get_e8_time()), // Ensure this matches your expected format
+        };
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match SupplierMapper::update_by_id(&mut conn, test_supplier_id, &updated_supplier) {
+                    Ok(supplier) => {
+                        println!("{:#?}", supplier);
+                        assert_eq!(supplier.name(), updated_supplier.name());
+                    }
+                    Err(e) => {
+                        println!("{:?}", e);
+                        panic!("Failed to update supplier by ID: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{:?}", e);
+                panic!("Failed to establish database connection: {:?}", e);
             }
         }
     }
