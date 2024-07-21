@@ -1,11 +1,11 @@
-import { Button, Card, Space, Table, message } from "antd";
+import { Button, Card, ConfigProvider, Space, Table, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import { Fade } from "@mui/material";
 import { User } from "../../models/models.ts";
-
+import "./UserTable.scss";
 export function UserTable() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
@@ -55,15 +55,22 @@ export function UserTable() {
       dataIndex: "username",
       key: "username",
       render: (_: string, user: User) => (
-        <Card
-          hoverable
-          onClick={() => {
-            navigate(`/user/detail/${user.user_id}`);
+        <ConfigProvider
+          theme={{
+            token: {
+              paddingLG: 10,
+            },
           }}
-          style={{ width: "100%" }}
         >
-          {user.username}
-        </Card>
+          <Card
+            hoverable
+            onClick={() => {
+              navigate(`/user/detail/${user.user_id}`);
+            }}
+          >
+            {user.username}
+          </Card>
+        </ConfigProvider>
       ),
     },
     {
