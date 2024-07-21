@@ -9,7 +9,7 @@ use obj_traits::{
 };
 
 use crate::models::{
-    employee::{Employee, PostEmployee, PatchEmployee},
+    employee::{Employee, PatchEmployee, PostEmployee},
     employee_filter::EmployeeFilter,
 };
 use crab_rocket_schema::schema::employee_table::dsl;
@@ -86,26 +86,26 @@ impl MapperCRUD for EmployeeMapper {
     ) -> Result<Employee, Error> {
         diesel::update(dsl::employee_table.filter(dsl::employee_id.eq(pid)))
             .set((
-                dsl::first_name.eq(obj.first_name()),
-                dsl::last_name.eq(obj.last_name()),
-                dsl::employee_name.eq(obj.employee_name()),
-                dsl::gender.eq(obj.gender()),
-                dsl::date_of_birth.eq(obj.date_of_birth()),
-                dsl::hire_date.eq(obj.hire_date()),
-                dsl::email.eq(obj.email()),
-                dsl::phone_number.eq(obj.phone_number()),
-                dsl::department_id.eq(obj.department_id()),
-                dsl::job_title.eq(obj.job_title()),
-                dsl::salary.eq(obj.salary()),
-                dsl::manager_id.eq(obj.manager_id()),
-                dsl::address.eq(obj.address()),
-                dsl::city.eq(obj.city()),
-                dsl::state.eq(obj.state()),
-                dsl::postal_code.eq(obj.postal_code()),
-                dsl::valid.eq(obj.valid()),
+                dsl::first_name.eq(&obj.first_name),
+                dsl::last_name.eq(&obj.last_name),
+                dsl::employee_name.eq(&obj.employee_name),
+                dsl::gender.eq(&obj.gender),
+                dsl::date_of_birth.eq(&obj.date_of_birth),
+                dsl::hire_date.eq(&obj.hire_date),
+                dsl::email.eq(&obj.email),
+                dsl::phone_number.eq(&obj.phone_number),
+                dsl::department_id.eq(&obj.department_id),
+                dsl::job_title.eq(&obj.job_title),
+                dsl::salary.eq(&obj.salary),
+                dsl::manager_id.eq(&obj.manager_id),
+                dsl::address.eq(&obj.address),
+                dsl::city.eq(&obj.city),
+                dsl::state.eq(&obj.state),
+                dsl::postal_code.eq(&obj.postal_code),
+                dsl::valid.eq(&obj.valid),
                 dsl::last_update.eq(get_e8_time()),
-                dsl::role_name.eq(obj.role_name()),
-                dsl::role_id.eq(obj.role_id()),
+                dsl::role_name.eq(&obj.role_name),
+                dsl::role_id.eq(obj.role_id),
             ))
             .get_result(conn)
     }
@@ -228,8 +228,9 @@ impl MapperCRUD for EmployeeMapper {
 }
 #[cfg(test)]
 mod test {
+    use super::*;
     use crate::models::{
-        employee::{PostEmployee, PatchEmployee},
+        employee::{PatchEmployee, PostEmployee},
         employee_filter::EmployeeFilter,
     };
     use crab_rocket_schema::establish_pg_connection;
@@ -241,28 +242,49 @@ mod test {
         },
     };
 
-    use super::EmployeeMapper;
-
     #[test]
     fn test_insert_employee() {
-        let new_employee = PostEmployee::default();
+        let new_employee = PostEmployee {
+            first_name: Some("John".to_string()),
+            last_name: Some("Doe".to_string()),
+            employee_name: "John Doe".to_string(),
+            gender: Some("Male".to_string()),
+            date_of_birth: Some(get_e8_time()),
+            hire_date: Some(get_e8_time()),
+            email: Some("john.doe@example.com".to_string()),
+            phone_number: Some("1234567890".to_string()),
+            department_id: Some(1),
+            job_title: Some("Developer".to_string()),
+            salary: Some(60000.0),
+            manager_id: Some(2),
+            address: Some("123 Main St".to_string()),
+            city: Some("Metropolis".to_string()),
+            state: Some("NY".to_string()),
+            postal_code: Some("12345".to_string()),
+            valid: Some(true),
+            role_name: Some("Senior Developer".to_string()),
+            role_id: Some(1),
+        };
+
         match establish_pg_connection() {
             Ok(mut conn) => match EmployeeMapper::add_single(&mut conn, &new_employee) {
-                Ok(inserted_employee) => println!("{inserted_employee:?}"),
-                Err(e) => println!("{e:?}"),
+                Ok(inserted_employee) => println!("{:?}", inserted_employee),
+                Err(e) => eprintln!("Error inserting employee: {:?}", e),
             },
-            Err(e) => println!("{e:?}"),
+            Err(e) => eprintln!("Error establishing connection: {:?}", e),
         }
     }
 
     #[test]
     fn test_delete_employee_by_id() {
+        let employee_id = 1; // Ensure this ID exists in your test database
+
         match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::delete_by_id(&mut conn, 1) {
-                Ok(deleted_employee) => println!("{deleted_employee:?}"),
-                Err(e) => println!("{e:?}"),
+            Ok(mut conn) => match EmployeeMapper::delete_by_id(&mut conn, employee_id) {
+                Ok(deleted_employee) => println!("{:?}", deleted_employee),
+                Err(e) => eprintln!("Error deleting employee: {:?}", e),
             },
-            Err(e) => println!("{e:?}"),
+            Err(e) => eprintln!("Error establishing connection: {:?}", e),
         }
     }
 
@@ -275,28 +297,70 @@ mod test {
         "#;
         let filter = EmployeeFilter::from_json(json_data).unwrap();
         let params = RequestParam::new(PaginationParam::demo(), Some(filter));
+
         match establish_pg_connection() {
             Ok(mut conn) => match EmployeeMapper::get_all(&mut conn, &params) {
-                Ok(u_posts) => {
-                    println!("{u_posts}")
-                }
-                Err(e) => println!("{e:?}"),
+                Ok(result) => println!("{:?}", result),
+                Err(e) => eprintln!("Error fetching employees: {:?}", e),
             },
-            Err(e) => println!("{e:?}"),
+            Err(e) => eprintln!("Error establishing connection: {:?}", e),
         }
     }
 
     #[test]
     fn test_update_employee_by_id() {
-        let updated_emp = PatchEmployee::demo();
+        let updated_emp = PatchEmployee {
+            first_name: Some("Jane".to_string()),
+            last_name: Some("Doe".to_string()),
+            employee_name: "Jane Doe".to_string(),
+            gender: Some("Female".to_string()),
+            date_of_birth: Some(get_e8_time()),
+            hire_date: Some(get_e8_time()),
+            email: Some("jane.doe@example.com".to_string()),
+            phone_number: Some("0987654321".to_string()),
+            department_id: Some(2),
+            job_title: Some("Lead Developer".to_string()),
+            salary: Some(80000.0),
+            manager_id: Some(3),
+            address: Some("456 Another St".to_string()),
+            city: Some("Gotham".to_string()),
+            state: Some("CA".to_string()),
+            postal_code: Some("67890".to_string()),
+            valid: Some(false),
+            role_name: Some("Lead Developer".to_string()),
+            role_id: Some(2),
+        };
+
+        let employee_id = 2; // Ensure this ID exists in your test database
+
         match establish_pg_connection() {
-            Ok(mut conn) => match EmployeeMapper::update_by_id(&mut conn, 2, &updated_emp) {
-                Ok(updated_emp) => {
-                    println!("{updated_emp:?}")
+            Ok(mut conn) => {
+                match EmployeeMapper::update_by_id(&mut conn, employee_id, &updated_emp) {
+                    Ok(updated_employee) => println!("{:?}", updated_employee),
+                    Err(e) => eprintln!("Error updating employee: {:?}", e),
                 }
-                Err(e) => println!("{e:?}"),
+            }
+            Err(e) => eprintln!("Error establishing connection: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_filter_employees() {
+        let json_data = r#"
+        {
+            "salary_min": 50000.0,
+            "salary_max": 70000.0
+        }
+        "#;
+        let filter = EmployeeFilter::from_json(json_data).unwrap();
+        let params = RequestParam::new(PaginationParam::demo(), Some(filter));
+
+        match establish_pg_connection() {
+            Ok(mut conn) => match EmployeeMapper::filter(&mut conn, &params) {
+                Ok(result) => println!("{:?}", result),
+                Err(e) => eprintln!("Error filtering employees: {:?}", e),
             },
-            Err(e) => println!("{e:?}"),
+            Err(e) => eprintln!("Error establishing connection: {:?}", e),
         }
     }
 }

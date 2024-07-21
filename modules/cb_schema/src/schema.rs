@@ -75,7 +75,7 @@ diesel::table! {
         department_id -> Nullable<Int4>,
         #[max_length = 255]
         job_title -> Nullable<Varchar>,
-        salary -> Nullable<Int4>,
+        salary -> Nullable<Float8>,
         manager_id -> Nullable<Int4>,
         #[max_length = 255]
         address -> Nullable<Varchar>,

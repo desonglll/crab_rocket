@@ -101,10 +101,10 @@ impl MapperCRUD for CategoryMapper {
     ) -> Result<Category, diesel::result::Error> {
         diesel::update(dsl::category_table.filter(dsl::category_id.eq(pid)))
             .set((
-                dsl::name.eq(obj.name()),
-                dsl::description.eq(obj.description()),
-                dsl::parent_id.eq(obj.parent_id()),
-                dsl::created_at.eq(obj.created_at()),
+                dsl::name.eq(&obj.name),
+                dsl::description.eq(&obj.description),
+                dsl::parent_id.eq(obj.parent_id),
+                dsl::created_at.eq(obj.created_at),
                 dsl::updated_at.eq(get_e8_time()),
             ))
             .get_result(conn)
@@ -179,26 +179,148 @@ impl MapperCRUD for CategoryMapper {
     }
 }
 
+#[cfg(test)]
 mod test {
+    use super::*;
+    use crab_rocket_schema::establish_pg_connection;
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
 
     #[test]
     fn test_fetch_all_category_table() {
-        use crab_rocket_schema::establish_pg_connection;
-        use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-
-        use super::CategoryMapper;
-        let param = RequestParam::default();
+        let param = RequestParam::default(); // 預設的請求參數
         match establish_pg_connection() {
             Ok(mut conn) => match CategoryMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
                 }
                 Err(e) => {
-                    println!("{:?}", e);
+                    eprintln!("Error fetching categories: {:?}", e);
                 }
             },
             Err(e) => {
-                println!("{:?}", e);
+                eprintln!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_fetch_category_by_id() {
+        let test_id = 1; // 測試用的 ID
+        match establish_pg_connection() {
+            Ok(mut conn) => match CategoryMapper::get_by_id(&mut conn, test_id) {
+                Ok(category) => {
+                    println!("{:#?}", category);
+                }
+                Err(e) => {
+                    eprintln!("Error fetching category by ID: {:?}", e);
+                }
+            },
+            Err(e) => {
+                eprintln!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_add_category() {
+        let new_category = PostCategory {
+            name: "Test Category".to_string(),
+            description: Some("A description for the test category".to_string()),
+            parent_id: None,
+            created_at: None,
+            updated_at: None,
+        };
+        match establish_pg_connection() {
+            Ok(mut conn) => match CategoryMapper::add_single(&mut conn, &new_category) {
+                Ok(category) => {
+                    println!("Added category: {:#?}", category);
+                }
+                Err(e) => {
+                    eprintln!("Error adding category: {:?}", e);
+                }
+            },
+            Err(e) => {
+                eprintln!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_update_category() {
+        let category_id = 1; // 測試用的 ID
+        let updated_category = PatchCategory {
+            name: "Updated Category".to_string(),
+            description: Some("Updated description".to_string()),
+            parent_id: None,
+            created_at: None,
+            updated_at: None,
+        };
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match CategoryMapper::update_by_id(&mut conn, category_id, &updated_category) {
+                    Ok(category) => {
+                        println!("Updated category: {:#?}", category);
+                    }
+                    Err(e) => {
+                        eprintln!("Error updating category: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_delete_category() {
+        let category_id = 1; // 測試用的 ID
+        match establish_pg_connection() {
+            Ok(mut conn) => match CategoryMapper::delete_by_id(&mut conn, category_id) {
+                Ok(category) => {
+                    println!("Deleted category: {:#?}", category);
+                }
+                Err(e) => {
+                    eprintln!("Error deleting category: {:?}", e);
+                }
+            },
+            Err(e) => {
+                eprintln!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_filter_categories() {
+        let filter_params = CategoryFilter {
+            category_id: None,
+            name: Some("Test".to_string()), // 根據名稱過濾
+            description: None,
+            parent_id: None,
+            created_at_min: None,
+            created_at_max: None,
+            updated_at_min: None,
+            updated_at_max: None,
+        };
+        let param = RequestParam {
+            pagination: PaginationParam {
+                limit: Some(10),
+                offset: Some(0),
+            },
+            filter: Some(filter_params),
+        };
+
+        match establish_pg_connection() {
+            Ok(mut conn) => match CategoryMapper::filter(&mut conn, &param) {
+                Ok(data) => {
+                    println!("{:#?}", data);
+                }
+                Err(e) => {
+                    eprintln!("Error filtering categories: {:?}", e);
+                }
+            },
+            Err(e) => {
+                eprintln!("Error establishing connection: {:?}", e);
             }
         }
     }
