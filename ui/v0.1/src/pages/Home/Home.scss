@@ -4,6 +4,7 @@
   // text-align: center;
   // padding-inline: 48px;
   background-color: #ffffff;
+  padding: 0;
 }
 
 // 内容样式
@@ -43,4 +44,14 @@
 }
 .ant-layout-sider {
   width: 100%;
+}
+
+.hide-on-mobile {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .hide-on-mobile {
+    display: inline-block !important;
+  }
 }

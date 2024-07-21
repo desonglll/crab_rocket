@@ -17,7 +17,19 @@ export function Greet() {
     <>
       <NavLink to="/employee/list">Go To Employee</NavLink>
       {options ? (
-        <ReactECharts option={options} style={{ height: "50vh" }} />
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            minHeight: "500px",
+            minWidth: "600px",
+          }}
+        >
+          <ReactECharts
+            option={options}
+            style={{ height: "100%", width: "100%" }}
+          />
+        </div>
       ) : (
         <p>Loading...</p>
       )}

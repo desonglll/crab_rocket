@@ -22,6 +22,14 @@ function App() {
           token: {
             paddingLG: 10,
           },
+          components: {
+            Menu: {
+              groupTitleLineHeight: "1.0",
+              itemHeight: 35,
+              activeBarHeight: 2,
+              // collapsedIconSize: 10,
+            },
+          },
         }}
         locale={zhCN}
       >
