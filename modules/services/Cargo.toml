@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+rocket = { version = "0.5.1", features = ["json", "uuid"] }
+crab_rocket_inventory = { path = "./cb_inventory" }
+crab_rocket_order = { path = "./cb_order" }
+crab_rocket_shipment = { path = "./cb_shipment" }

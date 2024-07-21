@@ -4,3 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+rocket = { version = "0.5.1", features = ["json", "uuid"] }
+crab_rocket_task = { path = "./cb_task" }
+crab_rocket_post = { path = "./cb_post" }
+crab_rocket_follow = { path = "./cb_follow" }
+crab_rocket_role = { path = "./cb_role" }
+crab_rocket_permission = { path = "./cb_permission" }
+crab_rocket_user = { path = "./cb_user" }
+crab_rocket_employee = { path = "./cb_employee" }
+crab_rocket_supplier = { path = "./cb_supplier" }
+crab_rocket_category = { path = "./cb_category" }
+crab_rocket_product = { path = "./cb_product" }
+crab_rocket_customer = { path = "./cb_customer" }
+crab_rocket_info = { path = "./cb_info" }
+crab_rocket_file = { path = "./cb_file" }

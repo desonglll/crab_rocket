@@ -1,11 +1,14 @@
 #[macro_use]
 extern crate rocket;
 
-use crab_rocket::{env_variables, routes::routes::module_routes};
+use crab_rocket::env_variables;
 use crab_rocket_utils;
 use dotenvy::dotenv;
+use entities::entities_routes;
 use rocket::{http::Method, Route};
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use schemas::schemas_routes;
+use services::services_routes;
 use std::env;
 
 #[launch]
@@ -50,12 +53,10 @@ fn rocket() -> _ {
 
     let mut routes = Vec::<Route>::new();
 
-    let module_routes = module_routes();
-
-    // let doc_routes = routes![docs::doc];
-
     // routes.extend(doc_routes.clone());
-    routes.extend(module_routes.clone());
+    routes.extend(entities_routes().clone());
+    routes.extend(services_routes().clone());
+    routes.extend(schemas_routes().clone());
 
     rocket::build().mount("/api", routes).attach(cors)
 }

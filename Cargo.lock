@@ -310,29 +310,15 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "colored",
- "crab_rocket_category",
- "crab_rocket_customer",
- "crab_rocket_employee",
- "crab_rocket_file",
- "crab_rocket_follow",
- "crab_rocket_info",
- "crab_rocket_inventory",
- "crab_rocket_order",
- "crab_rocket_permission",
- "crab_rocket_post",
- "crab_rocket_product",
- "crab_rocket_role",
- "crab_rocket_schema",
- "crab_rocket_shipment",
- "crab_rocket_supplier",
- "crab_rocket_task",
- "crab_rocket_user",
  "crab_rocket_utils",
  "diesel",
  "dotenvy",
+ "entities",
  "rocket",
  "rocket_cors",
+ "schemas",
  "serde_json",
+ "services",
  "utoipa",
 ]
 
@@ -782,6 +768,22 @@ dependencies = [
 [[package]]
 name = "entities"
 version = "0.1.0"
+dependencies = [
+ "crab_rocket_category",
+ "crab_rocket_customer",
+ "crab_rocket_employee",
+ "crab_rocket_file",
+ "crab_rocket_follow",
+ "crab_rocket_info",
+ "crab_rocket_permission",
+ "crab_rocket_post",
+ "crab_rocket_product",
+ "crab_rocket_role",
+ "crab_rocket_supplier",
+ "crab_rocket_task",
+ "crab_rocket_user",
+ "rocket",
+]
 
 [[package]]
 name = "equivalent"
@@ -1836,6 +1838,10 @@ checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
 [[package]]
 name = "schemas"
 version = "0.1.0"
+dependencies = [
+ "crab_rocket_schema",
+ "rocket",
+]
 
 [[package]]
 name = "scoped-tls"
@@ -1898,6 +1904,12 @@ dependencies = [
 [[package]]
 name = "services"
 version = "0.1.0"
+dependencies = [
+ "crab_rocket_inventory",
+ "crab_rocket_order",
+ "crab_rocket_shipment",
+ "rocket",
+]
 
 [[package]]
 name = "sharded-slab"
