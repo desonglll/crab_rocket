@@ -70,7 +70,7 @@ export function Home() {
             flex: "auto",
           }}
         >
-          <Layout style={{ minWidth: "20px" }}>
+          <Layout style={{ minWidth: "20px", width: "100%" }}>
             {isMobile ? (
               <Header
                 style={{ height: "3vh", backgroundColor: "#ffffff" }}
@@ -126,7 +126,7 @@ export function Home() {
                 className="content"
                 style={{
                   width: "100%",
-                  height: "100%",
+                  height: "auto",
                   overflow: "scroll",
                 }}
               >

@@ -6,11 +6,13 @@ import { UserNew } from "../components/User/UserNew";
 function UserRoutes() {
   return (
     <>
-      <Routes>
-        <Route path={"list"} element={<UserList />} />
-        <Route path={"new"} element={<UserNew />} />
-        <Route path={"detail/:user_id"} element={<UserDetail />} />
-      </Routes>
+      <div style={{ maxWidth: "100%", minHeight: "100%" }}>
+        <Routes>
+          <Route path={"list"} element={<UserList />} />
+          <Route path={"new"} element={<UserNew />} />
+          <Route path={"detail/:user_id"} element={<UserDetail />} />
+        </Routes>
+      </div>
     </>
   );
 }
