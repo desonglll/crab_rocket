@@ -22,7 +22,6 @@ pub struct Inventory {
 #[diesel(table_name = crab_rocket_schema::schema::inventory_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PostInventory {
-    pub inventory_id: i32,
     pub product_id: Option<i32>,
     pub location: Option<String>,
     pub quantity: Option<i32>,
@@ -35,7 +34,6 @@ pub struct PostInventory {
 #[diesel(table_name = crab_rocket_schema::schema::inventory_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchInventory {
-    pub inventory_id: i32,
     pub product_id: Option<i32>,
     pub location: Option<String>,
     pub quantity: Option<i32>,
