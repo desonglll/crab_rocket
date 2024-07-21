@@ -5,7 +5,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { Fade } from "@mui/material";
 import { User } from "../../models/models.ts";
-
+import "./UserTable.scss";
 export function UserTable() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
@@ -60,7 +60,6 @@ export function UserTable() {
           onClick={() => {
             navigate(`/user/detail/${user.user_id}`);
           }}
-          style={{ width: "100%" }}
         >
           {user.username}
         </Card>

@@ -3,7 +3,7 @@ import { Menu, MenuProps, MenuTheme } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import menuItems from "../../config/menuItems";
-
+import "./TopMenu.scss";
 const TopMenu: React.FC<{ themeMode: MenuTheme }> = ({
   themeMode = "light",
 }) => {
@@ -24,15 +24,16 @@ const TopMenu: React.FC<{ themeMode: MenuTheme }> = ({
     navigate(`${e.key}`);
   };
   return (
-    <div style={{ width: "100%" }}>
+    <>
       <Menu
         onClick={onClick}
         selectedKeys={[current]}
         mode="horizontal"
         items={menuItems}
         theme={themeMode}
+        style={{ flex: "auto", minWidth: "20px" }}
       />
-    </div>
+    </>
   );
 };
 

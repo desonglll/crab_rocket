@@ -6,7 +6,7 @@ import UserRoutes from "../../routes/UserRoutes.tsx";
 import TaskRoutes from "../../routes/TaskRoutes.tsx";
 import FileRoutes from "../../routes/FileRoutes.tsx";
 import RoleRoutes from "../../routes/RoleRoutes.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Divider, Flex, Layout, MenuTheme } from "antd";
 const { Header, Footer, Sider, Content } = Layout;
 import { Button } from "antd";
@@ -19,103 +19,146 @@ import TopMenu from "../../components/Common/TopMenu.tsx";
 import SideMenu from "../../components/Common/SideMenu.tsx";
 import "./Home.scss";
 export function Home() {
+  const [isMobile, setIsMobile] = useState(
+    window.matchMedia("(max-width: 767px)").matches
+  );
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState<MenuTheme>("light");
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      setIsMobile(isMobile);
+      setCollapsed(isMobile ? true : false);
+    };
+
+    // 初始調用以設置狀態
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <>
-      <Layout>
-        <Flex>
-          <Layout>
-            <Sider className="sider" collapsed={collapsed} theme={theme}>
-              <Button className="demo-logo-vertical"></Button>
-              <SideMenu themeMode={theme} />
-            </Sider>
-          </Layout>
-
+      <Flex vertical={false} style={{ height: "100%", width: "100%" }}>
+        <Flex style={{ height: "100%", width: "auto" }}>
           <Layout
             style={{
-              height: "100vh",
-              width: "100vw",
               overflow: "auto",
+              width: "100%",
             }}
           >
-            <Flex
-              vertical={true}
-              justify="space-between"
-              style={{ height: "100%" }}
-            >
-              <Flex vertical={true}>
-                <Header
-                  className="header"
-                  style={{
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <Button
-                    type="text"
-                    icon={
-                      collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
-                    }
-                    onClick={() => setCollapsed(!collapsed)}
-                    style={{
-                      fontSize: "16px",
-                      width: 64,
-                      height: 64,
-                    }}
-                  />
-                  <Button
-                    type="text"
-                    onClick={() =>
-                      setTheme(theme === "light" ? "dark" : "light")
-                    }
-                    icon={<SunOutlined />}
-                    style={{
-                      fontSize: "16px",
-                      width: 64,
-                      height: 64,
-                    }}
-                  />
-                  <TopMenu themeMode={theme} />
-                  <Button className="demo-avatar"></Button>
-                </Header>
-
-                <Layout className="layout">
-                  <Content className="content">
-                    <Routes>
-                      <Route path={""} element={<Greet />} />
-                      <Route path={"greet"} element={<Greet />} />
-                      <Route path={"post/*"} element={<PostRoutes />} />
-                      <Route path={"task/*"} element={<TaskRoutes />} />
-                      <Route path={"employee/*"} element={<EmployeeRoutes />} />
-                      <Route path={"file/*"} element={<FileRoutes />} />
-                      <Route path={"user/*"} element={<UserRoutes />} />
-                      <Route path={"role/*"} element={<RoleRoutes />} />
-                    </Routes>
-                  </Content>
-                </Layout>
-              </Flex>
-              <Divider />
-              <Footer
-                className="footer"
-                style={{
-                  position: "sticky",
-                  bottom: 0,
-                  zIndex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                }}
+            <Flex>
+              <Sider
+                className="sider"
+                collapsed={collapsed}
+                theme={theme}
+                width={"10vw"}
               >
-                2023-2024 © Copyright Alright Received
-              </Footer>
+                <Button className="demo-logo-vertical"></Button>
+                <SideMenu themeMode={theme} />
+              </Sider>
             </Flex>
           </Layout>
         </Flex>
-      </Layout>
+
+        <Flex
+          style={{
+            width: "auto",
+            height: "100%",
+            minWidth: "20px",
+            flex: "auto",
+          }}
+        >
+          <Layout style={{ minWidth: "20px", width: "100%" }}>
+            {isMobile ? (
+              <Header
+                style={{ height: "3vh", backgroundColor: "#ffffff" }}
+              ></Header>
+            ) : (
+              <Header
+                className="header"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <Button
+                  type="text"
+                  icon={
+                    collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+                  }
+                  onClick={() => setCollapsed(!collapsed)}
+                  style={{
+                    fontSize: "16px",
+                    width: 64,
+                    height: 30,
+                  }}
+                  className="hide-on-mobile"
+                />
+                <Button
+                  type="text"
+                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                  icon={<SunOutlined />}
+                  style={{
+                    fontSize: "16px",
+                    width: 64,
+                    height: 30,
+                  }}
+                  className="hide-on-mobile"
+                />
+
+                <TopMenu themeMode={theme} />
+
+                <Button className="demo-avatar"></Button>
+              </Header>
+            )}
+
+            <Layout
+              className="layout"
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <Content
+                className="content"
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  overflow: "scroll",
+                }}
+              >
+                <Routes>
+                  <Route path={""} element={<Greet />} />
+                  <Route path={"greet"} element={<Greet />} />
+                  <Route path={"post/*"} element={<PostRoutes />} />
+                  <Route path={"task/*"} element={<TaskRoutes />} />
+                  <Route path={"employee/*"} element={<EmployeeRoutes />} />
+                  <Route path={"file/*"} element={<FileRoutes />} />
+                  <Route path={"user/*"} element={<UserRoutes />} />
+                  <Route path={"role/*"} element={<RoleRoutes />} />
+                </Routes>
+              </Content>
+            </Layout>
+
+            <Divider />
+            <Footer
+              className="footer"
+              style={{
+                position: "sticky",
+                bottom: 0,
+                zIndex: 1,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              2023-2024 © Copyright Alright Received
+            </Footer>
+          </Layout>
+        </Flex>
+      </Flex>
     </>
   );
 }
