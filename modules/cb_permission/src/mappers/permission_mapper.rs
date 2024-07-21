@@ -1,5 +1,5 @@
 use crate::models::{
-    permission::{PostPermission, PatchPermission, Permission},
+    permission::{PatchPermission, Permission, PostPermission},
     permission_filter::PermissionFilter,
 };
 use crab_rocket_schema::schema::permission_table::dsl;
@@ -199,5 +199,99 @@ impl MapperCRUD for PermissionMapper {
         let data = query.load::<Permission>(conn)?;
         let body = Data::new(data, pagination);
         Ok(body)
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crab_rocket_schema::establish_pg_connection;
+
+    #[test]
+    fn test_get_all() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let param = RequestParam {
+            pagination: PaginationParam {
+                limit: Some(10),
+                offset: Some(0),
+            },
+            filter: None,
+        };
+        let result = PermissionMapper::get_all(&mut conn, &param);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        assert!(data.data().len() > 0); // Ensure there's data or at least an empty vector
+    }
+    #[test]
+    fn test_get_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_permission = PostPermission::demo();
+        let permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
+        let result = PermissionMapper::get_by_id(&mut conn, permission.permission_id);
+        assert!(result.is_ok());
+        let fetched_permission = result.unwrap();
+        assert_eq!(fetched_permission.permission_id, permission.permission_id);
+    }
+    #[test]
+    fn test_add_single() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_permission = PostPermission::demo();
+        let result = PermissionMapper::add_single(&mut conn, &new_permission);
+        assert!(result.is_ok());
+        let inserted_permission = result.unwrap();
+        assert_eq!(inserted_permission.permission_name, new_permission.permission_name);
+    }
+    #[test]
+    fn test_delete_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_permission = PostPermission::demo();
+        let inserted_permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
+        let result = PermissionMapper::delete_by_id(&mut conn, inserted_permission.permission_id);
+        assert!(result.is_ok());
+        let deleted_permission = result.unwrap();
+        assert_eq!(deleted_permission.permission_id, inserted_permission.permission_id);
+    }
+    #[test]
+    fn test_update_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_permission = PostPermission::demo();
+        let inserted_permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
+        // Create a PatchPermission manually
+        let updated_permission = PatchPermission {
+            permission_name: "updated_name".to_string(),
+            permission_description: inserted_permission.permission_description.clone(),
+            resource: inserted_permission.resource.clone(),
+            action: inserted_permission.action.clone(),
+            is_active: inserted_permission.is_active,
+            created_at: inserted_permission.created_at,
+            updated_at: inserted_permission.updated_at,
+            created_by: inserted_permission.created_by.clone(),
+            updated_by: inserted_permission.updated_by.clone(),
+            notes: inserted_permission.notes.clone(),
+        };
+
+        let result = PermissionMapper::update_by_id(
+            &mut conn,
+            inserted_permission.permission_id,
+            &updated_permission,
+        );
+        assert!(result.is_ok());
+        let updated_permission_result = result.unwrap();
+        assert_eq!(updated_permission_result.permission_name, updated_permission.permission_name);
+    }
+
+    #[test]
+    fn test_filter() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let param = RequestParam {
+            pagination: PaginationParam {
+                limit: Some(10),
+                offset: Some(0),
+            },
+            filter: None,
+        };
+        let result = PermissionMapper::filter(&mut conn, &param);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        assert!(data.data().len() >= 1); // Ensure at least one record matches the filter
     }
 }
