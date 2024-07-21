@@ -1,4 +1,4 @@
-use crate::models::post::{PostPost, PatchPost, Post};
+use crate::models::post::{PatchPost, Post, PostPost};
 use crate::models::post_filter::PostFilter;
 use crab_rocket_schema::schema::post_table::dsl;
 use crab_rocket_utils::time::get_e8_time;
@@ -92,11 +92,11 @@ impl MapperCRUD for PostMapper {
     ) -> Result<Post, diesel::result::Error> {
         diesel::update(dsl::post_table.filter(dsl::post_id.eq(pid)))
             .set((
-                dsl::title.eq(obj.title()),
-                dsl::body.eq(obj.body()),
-                dsl::user_id.eq(obj.user_id()),
-                dsl::status.eq(obj.status()),
-                dsl::created_at.eq(obj.created_at()),
+                dsl::title.eq(&obj.title),
+                dsl::body.eq(&obj.body),
+                dsl::user_id.eq(obj.user_id),
+                dsl::status.eq(&obj.status),
+                dsl::created_at.eq(obj.created_at),
                 dsl::updated_at.eq(get_e8_time()),
             ))
             .get_result(conn)
@@ -180,87 +180,92 @@ impl MapperCRUD for PostMapper {
 }
 #[cfg(test)]
 mod tests {
+    use crab_rocket_schema::establish_pg_connection;
     use obj_traits::request::pagination_request_param::PaginationParamTrait;
+
+    use super::*;
 
     #[test]
     fn test_insert_post() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                // 创建一个新的 NewPost 实例
-                let new_post = PostPost::demo();
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
 
-                // 调用 insert_post 函数
-                let _ = PostMapper::add_single(&mut conn, &new_post);
-                // 删除插入的数据，以便下一次测试
-                // diesel::delete(post_table::table.filter(post_table::title.eq("Test
-                // Title"))) .execute(&mut conn)
-                // .expect("Failed to delete test data");
-            }
-            Err(_) => (),
-        }
+        // 創建一個新的 PostPost 實例
+        let new_post = PostPost::demo();
+
+        // 插入新 Post
+        let inserted_post =
+            PostMapper::add_single(&mut conn, &new_post).expect("Failed to insert post");
+
+        // 確認插入的 Post 的 title 是否符合預期
+        assert_eq!(inserted_post.title, new_post.title);
     }
 
     #[test]
     fn test_fetch_all_post_table() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
         let param = RequestParam::new(PaginationParam::demo(), None);
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::get_all(&mut conn, &param) {
-                Ok(all_post_table) => {
-                    println!("{all_post_table}")
-                }
-                Err(_) => (),
-            },
-            Err(_) => (),
-        }
+
+        // 查詢所有 Post 記錄
+        let result = PostMapper::get_all(&mut conn, &param).expect("Failed to fetch all posts");
+        // 確認結果是否正確
+        assert!(result.data().len() > 0); // 確認返回了至少一條記錄
     }
 
     #[test]
     fn test_fetch_post_by_id() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::get_by_id(&mut conn, 1) {
-                Ok(post) => {
-                    println!("{post:?}")
-                }
-                Err(_) => (),
-            },
-            Err(_) => (),
-        }
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        // 插入測試 Post
+        let new_post = PostPost::demo();
+        let inserted_post =
+            PostMapper::add_single(&mut conn, &new_post).expect("Failed to insert post");
+
+        // 查詢 Post 根據 ID
+        let fetched_post =
+            PostMapper::get_by_id(&mut conn, inserted_post.post_id).expect("Failed to fetch post");
+
+        // 確認查詢結果是否與插入的 Post 匹配
+        assert_eq!(fetched_post.title, new_post.title);
     }
 
     #[test]
     fn test_update_post_by_id() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        // 插入測試 Post
         let new_post = PostPost::demo();
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::update_by_id(&mut conn, 4, &new_post.into()) {
-                Ok(updated_post) => {
-                    println!("{updated_post:?}")
-                }
-                Err(_) => (),
-            },
-            Err(_) => (),
-        }
+        let inserted_post =
+            PostMapper::add_single(&mut conn, &new_post).expect("Failed to insert post");
+
+        // 更新 Post
+        let updated_post_data =
+            PatchPost::new(Some("Updated Title".to_string()), None, None, None, None, None);
+        let updated_post =
+            PostMapper::update_by_id(&mut conn, inserted_post.post_id, &updated_post_data)
+                .expect("Failed to update post");
+
+        // 確認更新結果
+        assert_eq!(updated_post.title, updated_post_data.title);
     }
 
     #[test]
     fn test_delete_post_by_id() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        match establish_pg_connection() {
-            Ok(mut conn) => match PostMapper::delete_by_id(&mut conn, 1) {
-                Ok(deleted_post) => {
-                    println!("{deleted_post:?}")
-                }
-                Err(_) => (),
-            },
-            Err(_) => (),
-        }
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        // 插入測試 Post
+        let new_post = PostPost::demo();
+        let inserted_post =
+            PostMapper::add_single(&mut conn, &new_post).expect("Failed to insert post");
+
+        // 刪除 Post
+        let deleted_post = PostMapper::delete_by_id(&mut conn, inserted_post.post_id)
+            .expect("Failed to delete post");
+
+        // 確認刪除結果
+        assert_eq!(deleted_post.post_id, inserted_post.post_id);
+
+        // 確認刪除後記錄是否不存在
+        let fetched_post = PostMapper::get_by_id(&mut conn, inserted_post.post_id);
+        assert!(fetched_post.is_err());
     }
 }

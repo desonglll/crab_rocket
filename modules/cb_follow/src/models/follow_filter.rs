@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use rocket::serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Default)]
 #[serde(crate = "rocket::serde")]
 pub struct FollowFilter {
     pub following_user_id: Option<i32>,

@@ -9,14 +9,14 @@ use utoipa::ToSchema;
 #[diesel(table_name = crab_rocket_schema::schema::post_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Post {
-    post_id: i32,
-    title: Option<String>,
-    body: Option<String>,
-    user_id: Option<i32>,
-    status: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
-    username: Option<String>,
+    pub post_id: i32,
+    pub title: Option<String>,
+    pub body: Option<String>,
+    pub user_id: Option<i32>,
+    pub status: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
+    pub username: Option<String>,
 }
 
 impl Post {
@@ -41,70 +41,6 @@ impl Post {
             username,
         }
     }
-
-    pub fn post_id(&self) -> i32 {
-        self.post_id
-    }
-
-    pub fn title(&self) -> &Option<String> {
-        &self.title
-    }
-
-    pub fn body(&self) -> &Option<String> {
-        &self.body
-    }
-
-    pub fn user_id(&self) -> Option<i32> {
-        self.user_id
-    }
-
-    pub fn status(&self) -> &Option<String> {
-        &self.status
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.updated_at
-    }
-
-    pub fn username(&self) -> &Option<String> {
-        &self.username
-    }
-
-    pub fn set_post_id(&mut self, post_id: i32) {
-        self.post_id = post_id;
-    }
-
-    pub fn set_title(&mut self, title: Option<String>) {
-        self.title = title;
-    }
-
-    pub fn set_body(&mut self, body: Option<String>) {
-        self.body = body;
-    }
-
-    pub fn set_user_id(&mut self, user_id: Option<i32>) {
-        self.user_id = user_id;
-    }
-
-    pub fn set_status(&mut self, status: Option<String>) {
-        self.status = status;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
-        self.updated_at = updated_at;
-    }
-
-    pub fn set_username(&mut self, username: Option<String>) {
-        self.username = username;
-    }
 }
 
 ///示例数据
@@ -122,12 +58,12 @@ impl Post {
 #[diesel(table_name = crab_rocket_schema::schema::post_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PostPost {
-    title: Option<String>,
-    body: Option<String>,
-    user_id: Option<i32>,
-    status: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
+    pub title: Option<String>,
+    pub body: Option<String>,
+    pub user_id: Option<i32>,
+    pub status: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PostPost {
@@ -159,54 +95,6 @@ impl PostPost {
             updated_at: Some(get_e8_time()),
         }
     }
-
-    pub fn title(&self) -> &Option<String> {
-        &self.title
-    }
-
-    pub fn body(&self) -> &Option<String> {
-        &self.body
-    }
-
-    pub fn user_id(&self) -> Option<i32> {
-        self.user_id
-    }
-
-    pub fn status(&self) -> &Option<String> {
-        &self.status
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.updated_at
-    }
-
-    pub fn set_title(&mut self, title: Option<String>) {
-        self.title = title;
-    }
-
-    pub fn set_body(&mut self, body: Option<String>) {
-        self.body = body;
-    }
-
-    pub fn set_user_id(&mut self, user_id: Option<i32>) {
-        self.user_id = user_id;
-    }
-
-    pub fn set_status(&mut self, status: Option<String>) {
-        self.status = status;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
-        self.updated_at = updated_at;
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -215,12 +103,12 @@ impl PostPost {
 #[diesel(table_name = crab_rocket_schema::schema::post_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchPost {
-    title: Option<String>,
-    body: Option<String>,
-    user_id: Option<i32>,
-    status: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
+    pub title: Option<String>,
+    pub body: Option<String>,
+    pub user_id: Option<i32>,
+    pub status: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PatchPost {
@@ -240,54 +128,6 @@ impl PatchPost {
             created_at,
             updated_at,
         }
-    }
-
-    pub fn title(&self) -> &Option<String> {
-        &self.title
-    }
-
-    pub fn body(&self) -> &Option<String> {
-        &self.body
-    }
-
-    pub fn user_id(&self) -> Option<i32> {
-        self.user_id
-    }
-
-    pub fn status(&self) -> &Option<String> {
-        &self.status
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.updated_at
-    }
-
-    pub fn set_title(&mut self, title: Option<String>) {
-        self.title = title;
-    }
-
-    pub fn set_body(&mut self, body: Option<String>) {
-        self.body = body;
-    }
-
-    pub fn set_user_id(&mut self, user_id: Option<i32>) {
-        self.user_id = user_id;
-    }
-
-    pub fn set_status(&mut self, status: Option<String>) {
-        self.status = status;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
-        self.updated_at = updated_at;
     }
 }
 

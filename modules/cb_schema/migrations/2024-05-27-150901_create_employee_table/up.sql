@@ -11,7 +11,7 @@ CREATE TABLE "employee_table" (
   "phone_number" varchar(255) DEFAULT '',
   "department_id" int4 DEFAULT NULL,
   "job_title" varchar(255) DEFAULT '',
-  "salary" int4 DEFAULT 0,
+  "salary" FLOAT DEFAULT 0.0,
   "manager_id" int4 DEFAULT NULL,
   "address" varchar(255) DEFAULT '',
   "city" varchar(255) DEFAULT '',

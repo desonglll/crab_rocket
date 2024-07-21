@@ -10,63 +10,15 @@ use utoipa::ToSchema;
 #[diesel(table_name = crab_rocket_schema::schema::task_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Task {
-    task_id: i32,
-    title: String,
-    content: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
-    user_id: Option<i32>,
+    pub task_id: i32,
+    pub title: String,
+    pub content: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
+    pub user_id: Option<i32>,
 }
 
 impl Task {
-    pub fn task_id(&self) -> i32 {
-        self.task_id
-    }
-
-    pub fn title(&self) -> &str {
-        &self.title
-    }
-
-    pub fn content(&self) -> &Option<String> {
-        &self.content
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.updated_at
-    }
-
-    pub fn user_id(&self) -> Option<i32> {
-        self.user_id
-    }
-
-    pub fn set_task_id(&mut self, task_id: i32) {
-        self.task_id = task_id;
-    }
-
-    pub fn set_title(&mut self, title: String) {
-        self.title = title;
-    }
-
-    pub fn set_content(&mut self, content: Option<String>) {
-        self.content = content;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
-        self.updated_at = updated_at;
-    }
-
-    pub fn set_user_id(&mut self, user_id: Option<i32>) {
-        self.user_id = user_id;
-    }
-
     pub fn new(
         task_id: i32,
         title: String,
@@ -119,54 +71,14 @@ impl Display for TaskList {
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::task_table)]
 pub struct PostTask {
-    title: String,
-    content: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
-    user_id: Option<i32>,
+    pub title: String,
+    pub content: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
+    pub user_id: Option<i32>,
 }
 
 impl PostTask {
-    pub fn title(&self) -> &str {
-        &self.title
-    }
-
-    pub fn content(&self) -> &Option<String> {
-        &self.content
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.updated_at
-    }
-
-    pub fn user_id(&self) -> Option<i32> {
-        self.user_id
-    }
-
-    pub fn set_title(&mut self, title: String) {
-        self.title = title;
-    }
-
-    pub fn set_content(&mut self, content: Option<String>) {
-        self.content = content;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
-        self.updated_at = updated_at;
-    }
-
-    pub fn set_user_id(&mut self, user_id: Option<i32>) {
-        self.user_id = user_id;
-    }
-
     pub fn new(
         title: String,
         content: Option<String>,
@@ -188,36 +100,12 @@ impl PostTask {
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::task_table)]
 pub struct PatchTask {
-    title: String,
-    content: Option<String>,
-    user_id: Option<i32>,
+    pub title: String,
+    pub content: Option<String>,
+    pub user_id: Option<i32>,
 }
 
 impl PatchTask {
-    pub fn title(&self) -> &str {
-        &self.title
-    }
-
-    pub fn content(&self) -> &Option<String> {
-        &self.content
-    }
-
-    pub fn user_id(&self) -> Option<i32> {
-        self.user_id
-    }
-
-    pub fn set_title(&mut self, title: String) {
-        self.title = title;
-    }
-
-    pub fn set_content(&mut self, content: Option<String>) {
-        self.content = content;
-    }
-
-    pub fn set_user_id(&mut self, user_id: Option<i32>) {
-        self.user_id = user_id;
-    }
-
     pub fn new(title: String, content: Option<String>, user_id: Option<i32>) -> Self {
         Self {
             title,

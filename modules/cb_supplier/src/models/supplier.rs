@@ -103,12 +103,12 @@ impl Supplier {
 #[diesel(table_name = crab_rocket_schema::schema::supplier_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PostSupplier {
-    name: String,
-    address: Option<String>,
-    phone_number: Option<String>,
-    email: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
+    pub name: String,
+    pub address: Option<String>,
+    pub phone_number: Option<String>,
+    pub email: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PostSupplier {
@@ -146,12 +146,12 @@ impl PostSupplier {
 #[diesel(table_name = crab_rocket_schema::schema::supplier_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PatchSupplier {
-    name: String,
-    address: Option<String>,
-    phone_number: Option<String>,
-    email: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
+    pub name: String,
+    pub address: Option<String>,
+    pub phone_number: Option<String>,
+    pub email: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl PatchSupplier {

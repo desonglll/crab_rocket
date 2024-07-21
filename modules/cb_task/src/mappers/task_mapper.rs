@@ -1,4 +1,4 @@
-use crate::models::task::{PostTask, PatchTask, Task};
+use crate::models::task::{PatchTask, PostTask, Task};
 use crate::models::task_filter::TaskFilter;
 use crab_rocket_schema::schema::task_table::dsl; //配合下面的 `tasks.filter()`
 use crab_rocket_schema::schema::task_table::{self};
@@ -93,10 +93,10 @@ impl MapperCRUD for TaskMapper {
     ) -> Result<Task, diesel::result::Error> {
         diesel::update(dsl::task_table.filter(dsl::task_id.eq(pid)))
             .set((
-                task_table::title.eq(obj.title()),
-                task_table::content.eq(obj.content()),
+                task_table::title.eq(&obj.title),
+                task_table::content.eq(&obj.content),
                 task_table::updated_at.eq(Some(get_e8_time())), //Update time
-                task_table::user_id.eq(obj.user_id()),
+                task_table::user_id.eq(obj.user_id),
             ))
             .get_result(conn)
     }
@@ -177,90 +177,98 @@ impl MapperCRUD for TaskMapper {
         Ok(body)
     }
 }
-
 #[cfg(test)]
 mod tests {
-    use super::TaskMapper;
-    use crate::models::task::{PostTask, PatchTask};
+    use super::*;
+    use crate::models::task::{PatchTask, PostTask};
     use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::mapper::mapper_crud::MapperCRUD;
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
 
     #[test]
-    fn test_insert_task() {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                let task = PostTask::new(
-                    "title".to_string().into(),
-                    "new content".to_string().into(),
-                    Some(chrono::Local::now().naive_utc()),
-                    Some(chrono::Local::now().naive_utc()),
-                    Some(4),
-                );
-                let _ = super::TaskMapper::add_single(&mut conn, &task);
-            }
-            Err(_) => println!("establish_pg_connection error"),
-        }
+    fn test_add_single_task() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        let task = PostTask::new(
+            "Test Task Title".to_string(),
+            Some("Test Task Content".to_string()),
+            None,
+            None,
+            Some(1),
+        );
+
+        let result = TaskMapper::add_single(&mut conn, &task);
+        assert!(result.is_ok());
+        let inserted_task = result.unwrap();
+        assert_eq!(inserted_task.title, "Test Task Title");
     }
 
     #[test]
-    fn test_fetch_all_tasks() {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                let param = RequestParam::new(PaginationParam::demo(), None);
-                let all_tasks = TaskMapper::get_all(&mut conn, &param).unwrap();
-                let json_string = serde_json::to_string_pretty(&all_tasks).unwrap();
-                println!("{json_string:?}");
-            }
-            Err(_) => println!("establish_pg_connection error"),
-        }
+    fn test_get_all_tasks() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        let param = RequestParam::new(PaginationParam::demo(), None);
+
+        let result = TaskMapper::get_all(&mut conn, &param);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        assert!(data.data().len() > 0); // Assuming there are tasks in the database
     }
 
     #[test]
-    fn test_fetch_task_by_id() {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                let t_id = 3;
-                match super::TaskMapper::get_by_id(&mut conn, t_id) {
-                    Ok(task) => println!("{task:?}"),
-                    Err(_) => println!("err"),
-                }
-            }
-            Err(_) => println!("establish_pg_connection error"),
-        }
+    fn test_get_task_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        // Assuming a task with ID 1 exists in the database
+        let task_id = 1;
+        let result = TaskMapper::get_by_id(&mut conn, task_id);
+        assert!(result.is_ok());
+        let task = result.unwrap();
+        assert_eq!(task.task_id, task_id);
     }
 
     #[test]
     fn test_update_task_by_id() {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                let t_id = 1;
-                let patch_task: PatchTask = PatchTask::new(
-                    "title for put 1".to_string(),
-                    "new content for put".to_string().into(),
-                    Some(4),
-                );
-                match super::TaskMapper::update_by_id(&mut conn, t_id, &patch_task) {
-                    Ok(res) => println!("{res:?}"),
-                    Err(_) => println!("Err"),
-                }
-            }
-            Err(_) => println!("establish_pg_connection error"),
-        }
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        let patch_task = PatchTask::new(
+            "Updated Title".to_string(),
+            Some("Updated Content".to_string()),
+            Some(2),
+        );
+
+        // Assuming a task with ID 1 exists in the database
+        let task_id = 1;
+        let result = TaskMapper::update_by_id(&mut conn, task_id, &patch_task);
+        assert!(result.is_ok());
+        let updated_task = result.unwrap();
+        assert_eq!(updated_task.title, "Updated Title");
     }
 
     #[test]
     fn test_delete_task_by_id() {
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                let t_id = 2;
-                match super::TaskMapper::delete_by_id(&mut conn, t_id) {
-                    Ok(res) => println!("{res:?}"),
-                    Err(_) => println!("Err"),
-                }
-            }
-            Err(_) => println!("establish_pg_connection error"),
-        }
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        // Add a task to delete
+        let task = PostTask::new(
+            "Task to Delete".to_string(),
+            Some("Content to Delete".to_string()),
+            None,
+            None,
+            Some(1),
+        );
+        let inserted_task =
+            TaskMapper::add_single(&mut conn, &task).expect("Failed to insert task");
+        let task_id = inserted_task.task_id;
+
+        // Delete the task
+        let result = TaskMapper::delete_by_id(&mut conn, task_id);
+        assert!(result.is_ok());
+        let deleted_task = result.unwrap();
+        assert_eq!(deleted_task.task_id, task_id);
+
+        // Verify deletion
+        let result = TaskMapper::get_by_id(&mut conn, task_id);
+        assert!(result.is_err());
     }
 }

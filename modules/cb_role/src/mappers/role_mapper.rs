@@ -1,4 +1,4 @@
-use crate::models::role::{PostRole, PatchRole, Role};
+use crate::models::role::{PatchRole, PostRole, Role};
 use crate::models::role_filter::RoleFilter;
 use crab_rocket_schema::schema::role_table::dsl; //配合下面的 `posts.filter()`
 use crab_rocket_schema::schema::role_table::{self};
@@ -92,10 +92,10 @@ impl MapperCRUD for RoleMapper {
     fn update_by_id(conn: &mut PgConnection, pid: i32, obj: &PatchRole) -> Result<Role, Error> {
         diesel::update(dsl::role_table.filter(dsl::role_id.eq(pid)))
             .set((
-                role_table::role_name.eq(obj.role_name()),
-                role_table::description.eq(obj.description()),
-                role_table::permissions.eq(obj.permissions()),
-                role_table::created_at.eq(obj.created_at()),
+                role_table::role_name.eq(&obj.role_name),
+                role_table::description.eq(&obj.description),
+                role_table::permissions.eq(&obj.permissions),
+                role_table::created_at.eq(obj.created_at),
                 role_table::updated_at.eq(get_e8_time()),
             ))
             .get_result(conn)
@@ -177,40 +177,102 @@ impl MapperCRUD for RoleMapper {
         Ok(body)
     }
 }
-
 #[cfg(test)]
-mod test {
-    use obj_traits::request::pagination_request_param::PaginationParamTrait;
+mod tests {
+    use super::*;
+    use crate::models::role::{PatchRole, PostRole};
+    use crate::models::role_filter::RoleFilter;
+    use crab_rocket_schema::establish_pg_connection;
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use obj_traits::request::request_param::RequestParam;
 
     #[test]
-    fn test_insert_role() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
-        match establish_pg_connection() {
-            Ok(mut conn) => {
-                // 创建一个新的 NewPost 实例
-                let new_role = PostRole::demo();
-                let _ = RoleMapper::add_single(&mut conn, &new_role);
-            }
-            Err(_) => (),
-        }
+    fn test_add_single() {
+        let new_role = PostRole::demo();
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let result = RoleMapper::add_single(&mut conn, &new_role);
+        assert!(result.is_ok());
+        let inserted_role = result.unwrap();
+        assert_eq!(inserted_role.role_name, new_role.role_name);
     }
 
     #[test]
-    fn test_fetch_all_roles() {
-        use super::*;
-        use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
+    fn test_get_all() {
         let param = RequestParam::new(PaginationParam::demo(), None);
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let result = RoleMapper::get_all(&mut conn, &param);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        assert!(data.data().len() > 0);
+    }
 
-        match establish_pg_connection() {
-            Ok(mut conn) => match RoleMapper::get_all(&mut conn, &param) {
-                Ok(roles) => {
-                    println!("{roles}");
-                    ()
-                }
-                Err(_) => (),
-            },
-            Err(_) => (),
-        }
+    #[test]
+    fn test_get_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        let result = RoleMapper::get_by_id(&mut conn, 2);
+        assert!(result.is_ok());
+        let role = result.unwrap();
+        assert_eq!(role.role_id, 2);
+    }
+
+    #[test]
+    fn test_delete_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_role = PostRole::new("DeleteUser".to_owned(), Some(String::new()), None);
+        let inserted_role =
+            RoleMapper::add_single(&mut conn, &new_role).expect("Failed to insert role");
+
+        let delete_result = RoleMapper::delete_by_id(&mut conn, inserted_role.role_id);
+        assert!(delete_result.is_ok());
+        let deleted_role = delete_result.unwrap();
+        assert_eq!(deleted_role.role_id, inserted_role.role_id);
+
+        let get_result = RoleMapper::get_by_id(&mut conn, inserted_role.role_id);
+        assert!(get_result.is_err());
+    }
+
+    #[test]
+    fn test_update_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_role = PostRole::new("UpdatedUser".to_owned(), None, None);
+        let inserted_role =
+            RoleMapper::add_single(&mut conn, &new_role).expect("Failed to insert role");
+
+        let updated_role = PatchRole {
+            role_name: String::from("updated_role"),
+            description: Some(String::from("Updated description")),
+            permissions: Some(String::from("updated:permissions")),
+            created_at: inserted_role.created_at,
+            updated_at: Some(get_e8_time()),
+        };
+
+        let result = RoleMapper::update_by_id(&mut conn, inserted_role.role_id, &updated_role);
+        assert!(result.is_ok());
+        let updated_role_result = result.unwrap();
+        assert_eq!(updated_role_result.role_name, updated_role.role_name);
+    }
+
+    #[test]
+    fn test_filter() {
+        let param = RequestParam {
+            pagination: PaginationParam::default(),
+            filter: Some(RoleFilter {
+                role_name: Some("Admin".to_string()),
+                role_id: None,
+                description: None,
+                permissions: None,
+                created_at_min: None,
+                created_at_max: None,
+                updated_at_min: None,
+                updated_at_max: None,
+            }),
+        };
+
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let result = RoleMapper::filter(&mut conn, &param);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        assert!(data.data().len() > 0);
     }
 }

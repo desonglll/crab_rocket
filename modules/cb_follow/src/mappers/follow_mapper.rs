@@ -8,7 +8,7 @@ use obj_traits::{
 };
 
 use crate::models::{
-    follow::{Follow, PostFollow, PatchFollow},
+    follow::{Follow, PatchFollow, PostFollow},
     follow_filter::FollowFilter,
 };
 use crab_rocket_schema::schema::follow_table::dsl;
@@ -79,7 +79,7 @@ impl MapperCRUD for FollowMapper {
         obj: &PostFollow,
     ) -> Result<Follow, diesel::result::Error> {
         // check if exist before ccreate.
-        if !check_exist_follow(conn, obj.following_user_id(), obj.followed_user_id()) {
+        if !check_exist_follow(conn, obj.following_user_id, obj.followed_user_id) {
             match diesel::insert_into(dsl::follow_table)
                 .values(obj)
                 .returning(Follow::as_returning())
@@ -107,8 +107,8 @@ impl MapperCRUD for FollowMapper {
     ) -> Result<Follow, diesel::result::Error> {
         diesel::update(dsl::follow_table.filter(dsl::follow_id.eq(pid)))
             .set((
-                dsl::followed_user_id.eq(obj.followed_user_id()),
-                dsl::following_user_id.eq(obj.following_user_id()),
+                dsl::followed_user_id.eq(obj.followed_user_id),
+                dsl::following_user_id.eq(obj.following_user_id),
             ))
             .get_result(conn)
     }
@@ -188,12 +188,12 @@ impl FollowMapperTrait for FollowMapper {
         conn: &mut PgConnection,
         obj: &PostFollow,
     ) -> Result<Follow, diesel::result::Error> {
-        if check_exist_follow(conn, obj.following_user_id(), obj.followed_user_id()) {
+        if check_exist_follow(conn, obj.following_user_id, obj.followed_user_id) {
             diesel::delete(
                 dsl::follow_table.filter(
                     dsl::following_user_id
-                        .eq(obj.following_user_id())
-                        .and(dsl::followed_user_id.eq(obj.followed_user_id())),
+                        .eq(obj.following_user_id)
+                        .and(dsl::followed_user_id.eq(obj.followed_user_id)),
                 ),
             )
             .get_result(conn)
@@ -327,67 +327,222 @@ pub fn check_exist_follow(
 
 #[cfg(test)]
 mod test {
-    use obj_traits::mapper::mapper_crud::MapperCRUD;
-
-    use crate::{
-        mappers::{follow_mapper::FollowMapper, follow_mapper_trait::FollowMapperTrait},
-        models::follow::PostFollow,
-    };
+    use super::*;
+    use crate::models::follow::{PatchFollow, PostFollow};
+    use crab_rocket_schema::establish_pg_connection;
 
     #[test]
     fn test_create_new_follow() {
-        use crate::models::follow::PostFollow;
-        use crab_rocket_schema::establish_pg_connection;
         let follow = PostFollow::new(1, 3, None);
         match establish_pg_connection() {
-            Ok(mut conn) => match FollowMapper::add_single(&mut conn, &follow) {
-                Ok(inserted_follow) => println!("{inserted_follow:?}"),
-                Err(e) => {
-                    println!("{e:?}");
-                    ()
+            Ok(mut conn) => {
+                let result = FollowMapper::add_single(&mut conn, &follow);
+                match result {
+                    Ok(inserted_follow) => {
+                        println!("Created follow: {:?}", inserted_follow);
+                        assert_eq!(inserted_follow.following_user_id, follow.following_user_id);
+                        assert_eq!(inserted_follow.followed_user_id, follow.followed_user_id);
+                    }
+                    Err(e) => {
+                        println!("Error creating follow: {:?}", e);
+                        assert!(false);
+                    }
                 }
-            },
-            Err(_) => (),
+            }
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
         }
     }
 
     #[test]
     fn test_check_exist_follow() {
-        use super::check_exist_follow;
-        use crab_rocket_schema::establish_pg_connection;
         let following_id = 1;
-        let followed_id = 3;
+        let followed_id = 5;
         match establish_pg_connection() {
             Ok(mut conn) => {
                 let result = check_exist_follow(&mut conn, following_id, followed_id);
-                println!("following: {following_id} -> followed: {followed_id}: {result}");
+                println!("Follow exists: {}", result);
+                assert!(result);
             }
-            Err(_) => (),
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
         }
     }
 
     #[test]
     fn test_delete_follow() {
-        use crab_rocket_schema::establish_pg_connection;
+        let follow_id = 1;
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let deleted_follow = FollowMapper::delete_by_id(&mut conn, 1);
-                println!("{deleted_follow:?}");
+                let result = FollowMapper::delete_by_id(&mut conn, follow_id);
+                match result {
+                    Ok(deleted_follow) => {
+                        println!("Deleted follow: {:?}", deleted_follow);
+                        assert_eq!(deleted_follow.follow_id, follow_id);
+                    }
+                    Err(e) => {
+                        println!("Error deleting follow: {:?}", e);
+                        assert!(false);
+                    }
+                }
             }
-            Err(_) => (),
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
         }
     }
 
     #[test]
     fn test_delete_follow_specifically() {
-        use crab_rocket_schema::establish_pg_connection;
         let follow = PostFollow::demo();
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let deleted_follow = FollowMapper::delete_follow_specifically(&mut conn, &follow);
-                println!("{deleted_follow:?}");
+                let result = FollowMapper::delete_follow_specifically(&mut conn, &follow);
+                match result {
+                    Ok(deleted_follow) => {
+                        println!("Deleted specific follow: {:?}", deleted_follow);
+                        assert_eq!(deleted_follow.following_user_id, follow.following_user_id);
+                        assert_eq!(deleted_follow.followed_user_id, follow.followed_user_id);
+                    }
+                    Err(e) => {
+                        println!("Error deleting specific follow: {:?}", e);
+                        assert!(false);
+                    }
+                }
             }
-            Err(_) => (),
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn test_update_follow() {
+        let follow_id = 2;
+        let updated_follow = PatchFollow::new(2, 4, None);
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let result = FollowMapper::update_by_id(&mut conn, follow_id, &updated_follow);
+                match result {
+                    Ok(updated_follow) => {
+                        println!("Updated follow: {:?}", updated_follow);
+                        assert_eq!(
+                            updated_follow.following_user_id,
+                            updated_follow.following_user_id
+                        );
+                        assert_eq!(
+                            updated_follow.followed_user_id,
+                            updated_follow.followed_user_id
+                        );
+                    }
+                    Err(e) => {
+                        println!("Error updating follow: {:?}", e);
+                        assert!(false);
+                    }
+                }
+            }
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn test_get_all_follows() {
+        let param = RequestParam {
+            pagination: PaginationParam {
+                offset: Some(0),
+                limit: Some(10),
+            },
+            filter: None,
+        };
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let result = FollowMapper::get_all(&mut conn, &param);
+                match result {
+                    Ok(data) => {
+                        println!("Fetched all follows: {:?}", data);
+                        assert!(data.data().len() > 0);
+                    }
+                    Err(e) => {
+                        println!("Error fetching all follows: {:?}", e);
+                        assert!(false);
+                    }
+                }
+            }
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn test_get_followings_by_user_id() {
+        let user_id = 1;
+        let param = RequestParam {
+            pagination: PaginationParam {
+                offset: Some(0),
+                limit: Some(10),
+            },
+            filter: None,
+        };
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let result = FollowMapper::get_followings_by_user_id(&mut conn, user_id, &param);
+                match result {
+                    Ok(data) => {
+                        println!("Fetched followings by user ID: {:?}", data);
+                        assert!(data.data().len() > 0);
+                    }
+                    Err(e) => {
+                        println!("Error fetching followings by user ID: {:?}", e);
+                        assert!(false);
+                    }
+                }
+            }
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn test_get_followeds_by_user_id() {
+        let user_id = 1;
+        let param = RequestParam {
+            pagination: PaginationParam {
+                offset: Some(0),
+                limit: Some(10),
+            },
+            filter: None,
+        };
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let result = FollowMapper::get_followeds_by_user_id(&mut conn, user_id, &param);
+                match result {
+                    Ok(data) => {
+                        println!("Fetched followeds by user ID: {:?}", data);
+                        assert!(data.data().len() > 0);
+                    }
+                    Err(e) => {
+                        println!("Error fetching followeds by user ID: {:?}", e);
+                        assert!(false);
+                    }
+                }
+            }
+            Err(e) => {
+                println!("Connection error: {:?}", e);
+                assert!(false);
+            }
         }
     }
 }

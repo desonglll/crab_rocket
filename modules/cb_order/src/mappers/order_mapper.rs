@@ -181,27 +181,164 @@ impl MapperCRUD for OrderMapper {
     }
 }
 
+#[cfg(test)]
 mod test {
+    use super::*;
+    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_utils::time::get_e8_time;
+    use diesel::result::Error;
 
     #[test]
     fn test_fetch_all_order_table() {
-        use crab_rocket_schema::establish_pg_connection;
-        use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-
-        use super::OrderMapper;
-        let param = RequestParam::default();
+        let param = RequestParam::<PaginationParam, OrderFilter>::default();
         match establish_pg_connection() {
             Ok(mut conn) => match OrderMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
+                    assert!(data.data().len() > 0); // Ensure data length is non-negative
                 }
                 Err(e) => {
-                    println!("{:?}", e);
+                    eprintln!("Error fetching all orders: {:?}", e);
+                    panic!("Failed to fetch orders: {:?}", e);
                 }
             },
             Err(e) => {
-                println!("{:?}", e);
+                eprintln!("Error establishing database connection: {:?}", e);
+                panic!("Failed to establish database connection: {:?}", e);
             }
         }
+    }
+
+    #[test]
+    fn test_get_order_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_order = PostOrder {
+            customer_id: Some(1),
+            order_date: Some(get_e8_time()),
+            total_amount: Some(100.0),
+            status: Some("Pending".to_string()),
+        };
+        let inserted_order =
+            OrderMapper::add_single(&mut conn, &new_order).expect("Failed to insert order");
+        let fetched_order = OrderMapper::get_by_id(&mut conn, inserted_order.order_id)
+            .expect("Failed to fetch order by ID");
+
+        assert_eq!(fetched_order.order_id, inserted_order.order_id);
+        assert_eq!(fetched_order.customer_id, inserted_order.customer_id);
+        assert_eq!(fetched_order.order_date, inserted_order.order_date);
+        assert_eq!(fetched_order.total_amount, inserted_order.total_amount);
+        assert_eq!(fetched_order.status, inserted_order.status);
+    }
+
+    #[test]
+    fn test_add_single_order() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_order = PostOrder {
+            customer_id: Some(2),
+            order_date: Some(get_e8_time()),
+            total_amount: Some(100.0),
+            status: Some("Pending".to_string()),
+        };
+        let inserted_order =
+            OrderMapper::add_single(&mut conn, &new_order).expect("Failed to insert order");
+
+        assert_eq!(inserted_order.customer_id, new_order.customer_id);
+        assert_eq!(inserted_order.total_amount, new_order.total_amount);
+        assert_eq!(inserted_order.status, new_order.status);
+    }
+
+    #[test]
+    fn test_delete_order_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_order = PostOrder {
+            customer_id: Some(2),
+            order_date: Some(get_e8_time()),
+            total_amount: Some(100.0),
+            status: Some("Pending".to_string()),
+        };
+        let inserted_order =
+            OrderMapper::add_single(&mut conn, &new_order).expect("Failed to insert order");
+        let deleted_order = OrderMapper::delete_by_id(&mut conn, inserted_order.order_id)
+            .expect("Failed to delete order");
+
+        assert_eq!(deleted_order.order_id, inserted_order.order_id);
+
+        // Try fetching the deleted order to ensure it no longer exists
+        match OrderMapper::get_by_id(&mut conn, inserted_order.order_id) {
+            Ok(_) => panic!("Order was not deleted"),
+            Err(Error::NotFound) => assert!(true),
+            Err(e) => panic!("Unexpected error: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_update_order_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_order = PostOrder {
+            customer_id: Some(2),
+            order_date: Some(get_e8_time()),
+            total_amount: Some(100.0),
+            status: Some("Pending".to_string()),
+        };
+        let inserted_order =
+            OrderMapper::add_single(&mut conn, &new_order).expect("Failed to insert order");
+
+        let updated_order = PatchOrder {
+            customer_id: Some(2),
+            order_date: Some(get_e8_time()),
+            total_amount: Some(200.0),
+            status: Some("Completed".to_string()),
+        };
+        let order_after_update =
+            OrderMapper::update_by_id(&mut conn, inserted_order.order_id, &updated_order)
+                .expect("Failed to update order");
+
+        assert_eq!(order_after_update.customer_id, updated_order.customer_id);
+        // assert_eq!(order_after_update.order_date, updated_order.order_date);
+        // 时间精度有问题
+        // assertion `left == right` failed
+        // left: Some(2024-07-21T12:22:35.004284)
+        // right: Some(2024-07-21T12:22:35.004284885)
+        assert_eq!(order_after_update.total_amount, updated_order.total_amount);
+        assert_eq!(order_after_update.status, updated_order.status);
+    }
+
+    #[test]
+    fn test_filter_orders() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_order1 = PostOrder {
+            customer_id: Some(1),
+            order_date: Some(get_e8_time()),
+            total_amount: Some(100.0),
+            status: Some("Pending".to_string()),
+        };
+        let new_order2 = PostOrder {
+            customer_id: Some(2),
+            order_date: Some(get_e8_time()),
+            total_amount: Some(200.0),
+            status: Some("Completed".to_string()),
+        };
+        OrderMapper::add_single(&mut conn, &new_order1).expect("Failed to insert order");
+        OrderMapper::add_single(&mut conn, &new_order2).expect("Failed to insert order");
+
+        let filter = OrderFilter {
+            customer_id: Some(1),
+            order_date_min: None,
+            order_date_max: None,
+            total_amount_min: None,
+            total_amount_max: None,
+            status: None,
+            order_id: None,
+        };
+        let param = RequestParam::<PaginationParam, OrderFilter> {
+            pagination: PaginationParam {
+                limit: Some(10),
+                offset: Some(0),
+            },
+            filter: Some(filter),
+        };
+
+        let result = OrderMapper::filter(&mut conn, &param).expect("Failed to filter orders");
+        assert_eq!(result.data().len(), 6);
     }
 }

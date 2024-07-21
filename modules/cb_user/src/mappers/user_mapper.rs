@@ -1,4 +1,4 @@
-use crate::models::user::{PostUser, PatchUser, User};
+use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
 use crab_rocket_schema::schema::user_table::dsl;
 use crab_rocket_schema::schema::user_table::{self};
@@ -78,16 +78,16 @@ impl MapperCRUD for UserMapper {
     fn update_by_id(conn: &mut PgConnection, pid: i32, obj: &PatchUser) -> Result<User, Error> {
         diesel::update(dsl::user_table.filter(dsl::user_id.eq(pid)))
             .set((
-                user_table::username.eq(obj.username()),
-                user_table::password.eq(obj.password()),
-                user_table::role_id.eq(obj.role_id()),
-                user_table::email.eq(obj.email()),
-                user_table::full_name.eq(obj.full_name()),
-                user_table::avatar_url.eq(obj.avatar_url()),
-                user_table::bio.eq(obj.bio()),
+                user_table::username.eq(&obj.username),
+                user_table::password.eq(&obj.password),
+                user_table::role_id.eq(obj.role_id),
+                user_table::email.eq(&obj.email),
+                user_table::full_name.eq(&obj.full_name),
+                user_table::avatar_url.eq(&obj.avatar_url),
+                user_table::bio.eq(&obj.bio),
                 user_table::updated_at.eq(Some(get_e8_time())),
-                user_table::mobile_phone.eq(obj.mobile_phone()),
-                user_table::created_at.eq(obj.created_at()),
+                user_table::mobile_phone.eq(&obj.mobile_phone),
+                user_table::created_at.eq(obj.created_at),
             ))
             .get_result(conn)
     }
@@ -176,81 +176,115 @@ impl MapperCRUD for UserMapper {
 
 #[cfg(test)]
 mod test {
+    use super::*;
     use crate::mappers::user_mapper::UserMapper;
-    use crate::models::user::{PostUser, PatchUser};
-    use obj_traits::mapper::mapper_crud::MapperCRUD;
+    use crate::models::user::{PatchUser, PostUser};
+    use crab_rocket_schema::establish_pg_connection;
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
 
     #[test]
     fn test_insert_user() {
-        use crab_rocket_schema::establish_pg_connection;
-
         let user = PostUser::demo();
         println!("{user:?}");
         match establish_pg_connection() {
             Ok(mut conn) => match UserMapper::add_single(&mut conn, &user) {
                 Ok(result) => println!("{result}"),
-                Err(e) => println!("{e:?}"),
+                Err(e) => println!("Error inserting user: {:?}", e),
             },
-            Err(_) => println!("establish_pg_connection error"),
+            Err(e) => println!("establish_pg_connection error: {:?}", e),
         }
     }
 
     #[test]
     fn test_fetch_all_users() {
-        use crab_rocket_schema::establish_pg_connection;
-
         let param = RequestParam::new(PaginationParam::demo(), None);
 
         match establish_pg_connection() {
             Ok(mut conn) => match UserMapper::get_all(&mut conn, &param) {
                 Ok(res) => println!("{res}"),
-                Err(e) => println!("{e:?}"),
+                Err(e) => println!("Error fetching all users: {:?}", e),
             },
-            Err(_) => println!("establish_pg_connection error"),
+            Err(e) => println!("establish_pg_connection error: {:?}", e),
         }
     }
 
     #[test]
     fn test_fetch_user_by_id() {
-        use crab_rocket_schema::establish_pg_connection;
-        let id = 1;
+        let id = 1; // Adjust this ID based on your test data
+
         match establish_pg_connection() {
             Ok(mut conn) => match UserMapper::get_by_id(&mut conn, id) {
                 Ok(res) => println!("{res}"),
-                Err(e) => println!("{e:?}"),
+                Err(e) => println!("Error fetching user by ID: {:?}", e),
             },
-            Err(_) => println!("establish_pg_connection error"),
+            Err(e) => println!("establish_pg_connection error: {:?}", e),
         }
     }
 
     #[test]
     fn test_update_user_by_id() {
-        match crab_rocket_schema::establish_pg_connection() {
-            Ok(mut conn) => {
-                let id = 1;
-                let user = PatchUser::default();
-                match UserMapper::update_by_id(&mut conn, id, &user) {
-                    Ok(res) => println!("{res}"),
-                    Err(e) => println!("{e:?}"),
-                }
-            }
-            Err(_) => println!("establish_pg_connection error"),
+        let id = 1; // Adjust this ID based on your test data
+        let user = PatchUser {
+            username: "updated_username".to_string(),
+            role_id: Some(2),
+            created_at: None,
+            email: Some("updated_email@example.com".to_string()),
+            password: "updated_password".to_string(),
+            full_name: Some("Updated Fullname".to_string()),
+            avatar_url: Some("https://example.com/updated_avatar.jpg".to_string()),
+            bio: Some("Updated bio".to_string()),
+            updated_at: Some(get_e8_time()),
+            mobile_phone: "0987654321".to_string(),
+        };
+
+        match establish_pg_connection() {
+            Ok(mut conn) => match UserMapper::update_by_id(&mut conn, id, &user) {
+                Ok(res) => println!("{res}"),
+                Err(e) => println!("Error updating user by ID: {:?}", e),
+            },
+            Err(e) => println!("establish_pg_connection error: {:?}", e),
         }
     }
 
     #[test]
     fn test_delete_user_by_id() {
-        match crab_rocket_schema::establish_pg_connection() {
-            Ok(mut conn) => {
-                let id = 1;
-                match UserMapper::delete_by_id(&mut conn, id) {
-                    Ok(res) => println!("{res}"),
-                    Err(e) => println!("{e:?}"),
-                }
-            }
-            Err(_) => println!("establish_pg_connection error"),
+        let id = 1; // Adjust this ID based on your test data
+
+        match establish_pg_connection() {
+            Ok(mut conn) => match UserMapper::delete_by_id(&mut conn, id) {
+                Ok(res) => println!("{res}"),
+                Err(e) => println!("Error deleting user by ID: {:?}", e),
+            },
+            Err(e) => println!("establish_pg_connection error: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_filter_users() {
+        let filter = UserFilter {
+            username: Some("username".to_string()), // Adjust filter criteria as needed
+            role_id: None,
+            created_at_min: None,
+            created_at_max: None,
+            email: None,
+            full_name: None,
+            avatar_url: None,
+            bio: None,
+            updated_at_min: None,
+            updated_at_max: None,
+            mobile_phone: None,
+            offset: Some(0),
+            limit: Some(10),
+        };
+        let param = RequestParam::new(PaginationParam::demo(), Some(filter));
+
+        match establish_pg_connection() {
+            Ok(mut conn) => match UserMapper::filter(&mut conn, &param) {
+                Ok(res) => println!("{res}"),
+                Err(e) => println!("Error filtering users: {:?}", e),
+            },
+            Err(e) => println!("establish_pg_connection error: {:?}", e),
         }
     }
 }
