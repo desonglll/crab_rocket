@@ -172,27 +172,172 @@ impl MapperCRUD for CustomerMapper {
         Ok(body)
     }
 }
-
+#[cfg(test)]
 mod test {
-
+    use super::*;
+    use crate::models::{
+        customer::{PatchCustomer, PostCustomer},
+        customer_filter::CustomerFilter,
+    };
+    use crab_rocket_schema::establish_pg_connection;
     #[test]
-    fn test_fetch_all_customer_table() {
-        use crab_rocket_schema::establish_pg_connection;
-        use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+    fn test_get_all() {
+        let param = RequestParam {
+            pagination: PaginationParam {
+                limit: Some(10),
+                offset: Some(0),
+            },
+            filter: None,
+        };
 
-        use super::CustomerMapper;
-        let param = RequestParam::default();
         match establish_pg_connection() {
             Ok(mut conn) => match CustomerMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
+                    assert!(!data.data().is_empty(), "Customer table should not be empty");
                     println!("{:#?}", data);
                 }
                 Err(e) => {
-                    println!("{:?}", e);
+                    panic!("Error fetching all customers: {:?}", e);
                 }
             },
             Err(e) => {
-                println!("{:?}", e);
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_get_by_id() {
+        let test_id = 1; // 请确保你的数据库中有这个ID的数据
+        match establish_pg_connection() {
+            Ok(mut conn) => match CustomerMapper::get_by_id(&mut conn, test_id) {
+                Ok(customer) => {
+                    assert_eq!(
+                        customer.customer_id, test_id,
+                        "Fetched customer ID should match the requested ID"
+                    );
+                }
+                Err(diesel::result::Error::NotFound) => {
+                    panic!("Customer with ID {} not found", test_id);
+                }
+                Err(e) => {
+                    panic!("Error fetching customer by ID: {:?}", e);
+                }
+            },
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_add_single() {
+        let new_customer = PostCustomer {
+            name: "John Doe".to_string(),
+            email: "john.doe@example.com".to_string(),
+            phone: Some("1234567890".to_string()),
+            address: Some("123 Test St".to_string()),
+        };
+
+        match establish_pg_connection() {
+            Ok(mut conn) => match CustomerMapper::add_single(&mut conn, &new_customer) {
+                Ok(customer) => {
+                    assert_eq!(customer.name, "John Doe", "Name should match the added customer");
+                }
+                Err(e) => {
+                    panic!("Error adding customer: {:?}", e);
+                }
+            },
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_delete_by_id() {
+        let test_id = 3; // 请确保你的数据库中有这个ID的数据
+        match establish_pg_connection() {
+            Ok(mut conn) => match CustomerMapper::delete_by_id(&mut conn, test_id) {
+                Ok(customer) => {
+                    assert_eq!(
+                        customer.customer_id, test_id,
+                        "Deleted customer ID should match the requested ID"
+                    );
+                }
+                Err(diesel::result::Error::NotFound) => {
+                    panic!("Customer with ID {} not found for deletion", test_id);
+                }
+                Err(e) => {
+                    panic!("Error deleting customer: {:?}", e);
+                }
+            },
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_update_by_id() {
+        let test_id = 1; // 请确保你的数据库中有这个ID的数据
+        let updated_customer = PatchCustomer {
+            name: "Jane Doe".to_string(),
+            email: "jane.doe@example.com".to_string(),
+            phone: Some("0987654321".to_string()),
+            address: Some("456 Test Ave".to_string()),
+        };
+
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                match CustomerMapper::update_by_id(&mut conn, test_id, &updated_customer) {
+                    Ok(customer) => {
+                        assert_eq!(customer.name, "Jane Doe", "Name should be updated");
+                    }
+                    Err(diesel::result::Error::NotFound) => {
+                        panic!("Customer with ID {} not found for update", test_id);
+                    }
+                    Err(e) => {
+                        panic!("Error updating customer: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_filter() {
+        let param = RequestParam {
+            pagination: PaginationParam {
+                limit: Some(10),
+                offset: Some(0),
+            },
+            filter: Some(CustomerFilter {
+                customer_id: None,
+                name: Some("John".to_string()),
+                email: None,
+                phone: None,
+                address: None,
+            }),
+        };
+
+        match establish_pg_connection() {
+            Ok(mut conn) => match CustomerMapper::filter(&mut conn, &param) {
+                Ok(data) => {
+                    assert!(
+                        data.data().iter().all(|c| c.name.contains("John")),
+                        "Filtered result should contain customers with 'John' in the name"
+                    );
+                }
+                Err(e) => {
+                    panic!("Error filtering customers: {:?}", e);
+                }
+            },
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
             }
         }
     }
