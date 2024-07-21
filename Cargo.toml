@@ -18,24 +18,24 @@ dotenvy = "0.15"
 serde_json = "1.0.117"
 colored = "2.1.0"
 utoipa = { version = "4", features = ["rocket_extras"] }
-crab_rocket_utils = { path = "./modules/cb_utils" }
-crab_rocket_task = { path = "./modules/cb_task" }
-crab_rocket_post = { path = "./modules/cb_post" }
-crab_rocket_follow = { path = "./modules/cb_follow" }
-crab_rocket_role = { path = "./modules/cb_role" }
-crab_rocket_permission = { path = "./modules/cb_permission" }
-crab_rocket_user = { path = "./modules/cb_user" }
-crab_rocket_employee = { path = "./modules/cb_employee" }
-crab_rocket_supplier = { path = "./modules/cb_supplier" }
-crab_rocket_category = { path = "./modules/cb_category" }
-crab_rocket_product = { path = "./modules/cb_product" }
-crab_rocket_inventory = { path = "./modules/cb_inventory" }
-crab_rocket_shipment = { path = "./modules/cb_shipment" }
-crab_rocket_order = { path = "./modules/cb_order" }
-crab_rocket_customer = { path = "./modules/cb_customer" }
-crab_rocket_info = { path = "./modules/cb_info" }
-crab_rocket_file = { path = "./modules/cb_file" }
-crab_rocket_schema = { path = "./modules/cb_schema" }
+crab_rocket_utils = { path = "modules/utils/cb_utils" }
+crab_rocket_task = { path = "modules/entities/cb_task" }
+crab_rocket_post = { path = "modules/entities/cb_post" }
+crab_rocket_follow = { path = "modules/entities/cb_follow" }
+crab_rocket_role = { path = "modules/entities/cb_role" }
+crab_rocket_permission = { path = "modules/entities/cb_permission" }
+crab_rocket_user = { path = "modules/entities/cb_user" }
+crab_rocket_employee = { path = "modules/entities/cb_employee" }
+crab_rocket_supplier = { path = "modules/entities/cb_supplier" }
+crab_rocket_category = { path = "modules/entities/cb_category" }
+crab_rocket_product = { path = "modules/entities/cb_product" }
+crab_rocket_inventory = { path = "./modules/services/cb_inventory" }
+crab_rocket_shipment = { path = "modules/services/cb_shipment" }
+crab_rocket_order = { path = "modules/services/cb_order" }
+crab_rocket_customer = { path = "modules/entities/cb_customer" }
+crab_rocket_info = { path = "modules/entities/cb_info" }
+crab_rocket_file = { path = "modules/entities/cb_file" }
+crab_rocket_schema = { path = "modules/schemas/cb_schema" }
 
 
 [profile.dev]
