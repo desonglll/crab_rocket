@@ -1,27 +1,26 @@
 - [🦀 Crab Rocket](#-crab-rocket)
-- [🧩 Project Dependencies](#-project-dependencies)
-- [⚙️ Requirement](#️-requirement)
-- [Development](#development)
-- [Using cross](#using-cross)
-  - [Install](#install)
-  - [Add dependencies](#add-dependencies)
-  - [Usage](#usage)
-- [🔧 Compile Released Version](#-compile-released-version)
-- [Install](#install-1)
-- [🚀 Running Executive Binary File](#-running-executive-binary-file)
-  - [First Running](#first-running)
-  - [Second Running](#second-running)
-  - [Reset Database](#reset-database)
-- [Run with Dockerfile](#run-with-dockerfile)
-- [`mise`](#mise)
-- [🚦 Work Flow](#-work-flow)
-  - [impl level](#impl-level)
-- [Develop Warning](#develop-warning)
-- [📖 Change Log](#-change-log)
-- [Docker toast](#docker-toast)
-- [Docker Compose to run Postgres](#docker-compose-to-run-postgres)
+  - [🧩 Project Dependencies](#-project-dependencies)
+  - [⚙️ Requirements](#️-requirements)
+  - [🥰 Development](#-development)
+    - [Database Migration](#database-migration)
+  - [🔧 Compile Release Version](#-compile-release-version)
+    - [Installation](#installation)
+    - [🚀 Running the Binary](#-running-the-binary)
+    - [Reset Database](#reset-database)
+    - [Run](#run)
+  - [📖 Change Log](#-change-log)
+  - [(Optional) Run with Docker](#optional-run-with-docker)
+  - [(Optional) `mise`](#optional-mise)
+    - [Implementation Notes](#implementation-notes)
+  - [(Optional) Docker Toast](#optional-docker-toast)
+  - [(Optional) Docker Compose for PostgreSQL](#optional-docker-compose-for-postgresql)
+  - [(Optional) Using `posting`](#optional-using-posting)
+  - [(Optional) Using `cross`](#optional-using-cross)
+    - [Installation](#installation-1)
+    - [Add Dependencies](#add-dependencies)
+    - [Usage](#usage)
 
-## 🦀 Crab Rocket
+# 🦀 Crab Rocket
 
 A web backend server written in Rust and based on Rocket.
 
@@ -31,96 +30,60 @@ A web backend server written in Rust and based on Rocket.
 
 - Rust
 - Rocket
-- diesel
+- Diesel
 - dotenvy
 - serde_json
 - chrono
 
-## ⚙️ Requirement
+## ⚙️ Requirements
 
 - Rust 2021 environment
-- Postgres
+- PostgreSQL
 
-## Development
+## 🥰 Development
+
+### Database Migration
 
 ```shell
-# install diesel cli
+# Install Diesel CLI
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/diesel-rs/diesel/releases/download/v2.2.1/diesel_cli-installer.sh | sh
+
+cd ./modules/cb_schema
+
+# Setup Diesel
 diesel setup
+
+# Redo and run migrations
 diesel migration redo
 diesel migration run
+
+# Run the server
 cargo run
 ```
 
-## Using cross
-### Install
+!!! Everytime run `cargo test` should run `diesel database reset` first.
 
-```shell
-cargo install cross --git https://github.com/cross-rs/cross
-```
-查看支持的所有目标平台
-你可以使用以下命令来查看Rust编译器支持的所有目标平台：
-
-```sh
-rustc --print target-list
-```
-
-### Add dependencies
-
-安装特定目标平台的工具链
-在使用cross之前，你可能需要安装特定目标平台的工具链。你可以使用以下命令来安装它们：
-
-```shell
-rustup target add aarch64-apple-darwin
-```
-### Usage
-```shell
-# (ONCE PER BOOT, on Linux)
-# Start the Docker daemon, if it's not already running using systemd
-# on WSL2 and other systems using SysVinit, use `sudo service docker start`.
-$ sudo systemctl start docker
-
-# MAGIC! This Just Works
-$ cross build --target aarch64-unknown-linux-gnu
-
-# EVEN MORE MAGICAL! This also Just Works
-$ cross test --target mips64-unknown-linux-gnuabi64
-
-# Obviously, this also Just Works
-$ cross rustc --target powerpc-unknown-linux-gnu --release -- -C lto
-```
-
-## 🔧 Compile Released Version
+## 🔧 Compile Release Version
 
 ```shell
 cargo build --release
 ```
 
-## Install
+### Installation
 
 ```shell
 cargo install --path .
 ```
 
-## 🚀 Running Executive Binary File
+### 🚀 Running the Binary
 
-Setting environment variable.
-
-`export DATABASE_URL=postgres://@localhost/hello_rocket`
-
-### First Running
+Set the environment variable:
 
 ```shell
-diesel setup
-diesel migration redo
-diesel migration run
+export DATABASE_URL=postgres://@localhost/hello_rocket
 ```
 
-### Second Running
-
-```shell
-./hello_rocket
-```
+Alternatively, update the `.env` file in the project root.
 
 ### Reset Database
 
@@ -128,51 +91,45 @@ diesel migration run
 diesel database reset
 ```
 
-## Run with Dockerfile
+### Run
+
+```shell
+crab_rocket
+```
+## 📖 Change Log
+
+[Change Log](./CHANGELOG.md)
+
+## (Optional) Run with Docker
 
 ```shell
 docker build -t crab_rocket .
 docker run --name crab_rocket_demo --rm -p 8000:8000 crab_rocket
 ```
 
-## `mise`
+## (Optional) `mise`
+
 ```shell
 mise run r
 ```
 
-configured at `.mise.config.toml`
+Configured in `.mise.config.toml`
 
-## 🚦 Work Flow
+### Implementation Notes
 
-- Change Models
-- Run diesel migration
-- Modify Mappers
-- Modify Services
-- Modify Routes
-- Mount routes in Main
+- Ensure the sequence of fields in structs matches the database schema exactly.
+- Mismatches may lead to errors in `Queryable`.
 
-### impl level
 
-Handle all error in impl level, and print out the error detail in backend.
+## (Optional) Docker Toast
 
-## Develop Warning
+```shell
+cargo install toast
+docker build -t crab_rocket .
+toast
+```
 
-- The sequence of the fields in struct is absolutely the same with database.
-- Or Queryable will wrong.
-
-## 📖 Change Log
-
-[Change Log](./CHANGELOG.md)
-
-## Docker toast
-
-`cargo install toast`
-
-`docker build -t crab_rocket .`
-
-`toast`
-
-## Docker Compose to run Postgres
+## (Optional) Docker Compose for PostgreSQL
 
 ```yml
 version: "3.1"
@@ -187,11 +144,45 @@ services:
       POSTGRES_PASSWORD: changemeinpred!
 ```
 
-## Using Posting
+## (Optional) Using `posting`
+
 ```shell
 pip install posting
 ```
 
 ```shell
 posting --collection ./posting
+```
+
+## (Optional) Using `cross`
+
+### Installation
+
+```shell
+cargo install cross --git https://github.com/cross-rs/cross
+```
+
+### Add Dependencies
+
+Install toolchains for specific target platforms:
+
+```shell
+rustup target add aarch64-apple-darwin
+```
+
+### Usage
+
+```shell
+# (ONCE PER BOOT, on Linux)
+# Start Docker daemon (Systemd for WSL2 and SysVinit for other systems)
+sudo systemctl start docker
+
+# Build for aarch64
+cross build --target aarch64-unknown-linux-gnu
+
+# Test for mips64
+cross test --target mips64-unknown-linux-gnuabi64
+
+# Build with LTO for powerpc
+cross rustc --target powerpc-unknown-linux-gnu --release -- -C lto
 ```
