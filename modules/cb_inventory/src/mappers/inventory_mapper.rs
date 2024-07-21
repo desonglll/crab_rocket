@@ -181,27 +181,181 @@ impl MapperCRUD for InventoryMapper {
         Ok(body)
     }
 }
-
+#[cfg(test)]
 mod test {
+    use super::*;
+    use crate::models::{
+        inventory::{PatchInventory, PostInventory},
+        inventory_filter::InventoryFilter,
+    };
+    use crab_rocket_schema::establish_pg_connection;
+    use obj_traits::{
+        mapper::mapper_crud::MapperCRUD,
+        request::{pagination_request_param::PaginationParamTrait, request_param::RequestParam},
+    };
 
     #[test]
     fn test_fetch_all_inventory_table() {
-        use crab_rocket_schema::establish_pg_connection;
-        use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-
-        use super::InventoryMapper;
         let param = RequestParam::default();
         match establish_pg_connection() {
             Ok(mut conn) => match InventoryMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
-                    println!("{:#?}", data);
+                    assert!(!data.data().is_empty(), "Inventory table should not be empty");
                 }
                 Err(e) => {
-                    println!("{:?}", e);
+                    panic!("Error fetching all inventory: {:?}", e);
                 }
             },
             Err(e) => {
-                println!("{:?}", e);
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_get_by_id() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let pid = 1; // 假设ID为1的记录存在
+                match InventoryMapper::get_by_id(&mut conn, pid) {
+                    Ok(data) => {
+                        assert_eq!(
+                            data.inventory_id, pid,
+                            "Fetched inventory ID should match requested ID"
+                        );
+                    }
+                    Err(diesel::result::Error::NotFound) => {
+                        panic!("Inventory with ID {} not found", pid);
+                    }
+                    Err(e) => {
+                        panic!("Error fetching inventory by ID: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_add_single() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let new_inventory = PostInventory {
+                    product_id: Some(1),
+                    location: Some("Test Location".to_string()),
+                    quantity: Some(100),
+                    last_updated: None,
+                };
+                match InventoryMapper::add_single(&mut conn, &new_inventory) {
+                    Ok(data) => {
+                        assert_eq!(
+                            data.location,
+                            Some("Test Location".to_string()),
+                            "Location should match the added inventory"
+                        );
+                    }
+                    Err(e) => {
+                        panic!("Error adding inventory: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_update_by_id() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let pid = 2; // 假设ID为1的记录存在
+                let updated_inventory = PatchInventory {
+                    product_id: Some(2),
+                    location: Some("Updated Location".to_string()),
+                    quantity: Some(200),
+                    last_updated: None,
+                };
+                match InventoryMapper::update_by_id(&mut conn, pid, &updated_inventory) {
+                    Ok(data) => {
+                        assert_eq!(
+                            data.location,
+                            Some("Updated Location".to_string()),
+                            "Location should be updated"
+                        );
+                    }
+                    Err(diesel::result::Error::NotFound) => {
+                        panic!("Inventory with ID {} not found for update", pid);
+                    }
+                    Err(e) => {
+                        panic!("Error updating inventory: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_delete_by_id() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let pid = 3; // 假设ID为1的记录存在
+                match InventoryMapper::delete_by_id(&mut conn, pid) {
+                    Ok(data) => {
+                        assert_eq!(
+                            data.inventory_id, pid,
+                            "Deleted inventory ID should match requested ID"
+                        );
+                    }
+                    Err(diesel::result::Error::NotFound) => {
+                        panic!("Inventory with ID {} not found for deletion", pid);
+                    }
+                    Err(e) => {
+                        panic!("Error deleting inventory: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_filter() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let param = RequestParam {
+                    pagination: PaginationParam::demo(),
+                    filter: Some(InventoryFilter {
+                        inventory_id: Some(1),
+                        product_id: None,
+                        location: None,
+                        quantity_min: None,
+                        quantity_max: None,
+                        last_updated_min: None,
+                        last_updated_max: None,
+                    }),
+                };
+                match InventoryMapper::filter(&mut conn, &param) {
+                    Ok(data) => {
+                        assert!(
+                            data.data().iter().all(|item| item.inventory_id == 1),
+                            "Filtered result should have inventory_id 1"
+                        );
+                    }
+                    Err(e) => {
+                        panic!("Error filtering inventory: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
             }
         }
     }
