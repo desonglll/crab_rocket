@@ -176,27 +176,132 @@ impl MapperCRUD for ShipmentMapper {
     }
 }
 
+#[cfg(test)]
 mod test {
+    use super::*;
+    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_utils::time::get_e8_time;
+
+    // Helper function to create a new shipment for testing
+    fn create_test_shipment(conn: &mut PgConnection) -> Result<Shipment, diesel::result::Error> {
+        let new_shipment = PostShipment {
+            order_id: Some(1),
+            shipment_date: Some(get_e8_time()),
+            delivery_address: Some("123 Test St".to_string()),
+            status: Some("Pending".to_string()),
+        };
+        ShipmentMapper::add_single(conn, &new_shipment)
+    }
 
     #[test]
-    fn test_fetch_all_shipment_table() {
-        use crab_rocket_schema::establish_pg_connection;
-        use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-
-        use super::ShipmentMapper;
-        let param = RequestParam::default();
-        match establish_pg_connection() {
-            Ok(mut conn) => match ShipmentMapper::get_all(&mut conn, &param) {
-                Ok(data) => {
-                    println!("{:#?}", data);
-                }
-                Err(e) => {
-                    println!("{:?}", e);
-                }
+    fn test_get_all_shipments() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let param = RequestParam {
+            pagination: PaginationParam {
+                offset: Some(0),
+                limit: Some(10),
             },
-            Err(e) => {
-                println!("{:?}", e);
+            filter: None,
+        };
+        match ShipmentMapper::get_all(&mut conn, &param) {
+            Ok(data) => println!("{:#?}", data),
+            Err(e) => panic!("Error fetching all shipments: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_get_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
+
+        match ShipmentMapper::get_by_id(&mut conn, shipment.shipment_id) {
+            Ok(data) => assert_eq!(data.shipment_id, shipment.shipment_id),
+            Err(e) => panic!("Error fetching shipment by ID: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_add_single_shipment() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+
+        let new_shipment = PostShipment {
+            order_id: Some(1),
+            shipment_date: Some(get_e8_time()),
+            delivery_address: Some("123 Test St".to_string()),
+            status: Some("Pending".to_string()),
+        };
+        match ShipmentMapper::add_single(&mut conn, &new_shipment) {
+            Ok(data) => {
+                assert_eq!(data.order_id, new_shipment.order_id);
+                assert_eq!(data.delivery_address, new_shipment.delivery_address);
             }
+            Err(e) => panic!("Error adding shipment: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_delete_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
+
+        match ShipmentMapper::delete_by_id(&mut conn, shipment.shipment_id) {
+            Ok(deleted_shipment) => {
+                assert_eq!(deleted_shipment.shipment_id, shipment.shipment_id);
+                // Verify that it has been deleted
+                assert!(ShipmentMapper::get_by_id(&mut conn, shipment.shipment_id).is_err());
+            }
+            Err(e) => panic!("Error deleting shipment: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_update_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
+
+        let updated_info = PatchShipment {
+            order_id: Some(2),
+            shipment_date: Some(get_e8_time()),
+            delivery_address: Some("456 Updated St".to_string()),
+            status: Some("Shipped".to_string()),
+        };
+
+        match ShipmentMapper::update_by_id(&mut conn, shipment.shipment_id, &updated_info) {
+            Ok(updated_shipment) => {
+                assert_eq!(updated_shipment.order_id, updated_info.order_id);
+                assert_eq!(updated_shipment.delivery_address, updated_info.delivery_address);
+                assert_eq!(updated_shipment.status, updated_info.status);
+            }
+            Err(e) => panic!("Error updating shipment: {:?}", e),
+        }
+    }
+
+    #[test]
+    fn test_filter_shipments() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let _ = create_test_shipment(&mut conn).expect("Failed to create test shipment");
+
+        let filter = ShipmentFilter {
+            shipment_id: None,
+            order_id: None,
+            shipment_date_min: None,
+            shipment_date_max: None,
+            delivery_address: None,
+            status: None,
+        };
+        let param = RequestParam {
+            pagination: PaginationParam {
+                offset: Some(0),
+                limit: Some(10),
+            },
+            filter: Some(filter),
+        };
+
+        match ShipmentMapper::filter(&mut conn, &param) {
+            Ok(data) => {
+                assert!(!data.data().is_empty());
+            }
+            Err(e) => panic!("Error filtering shipments: {:?}", e),
         }
     }
 }
