@@ -1,5 +1,3 @@
-pub mod routes;
-
 use diesel::prelude::*;
 use std::env;
 

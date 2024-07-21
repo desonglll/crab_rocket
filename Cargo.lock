@@ -310,29 +310,15 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "colored",
- "crab_rocket_category",
- "crab_rocket_customer",
- "crab_rocket_employee",
- "crab_rocket_file",
- "crab_rocket_follow",
- "crab_rocket_info",
- "crab_rocket_inventory",
- "crab_rocket_order",
- "crab_rocket_permission",
- "crab_rocket_post",
- "crab_rocket_product",
- "crab_rocket_role",
- "crab_rocket_schema",
- "crab_rocket_shipment",
- "crab_rocket_supplier",
- "crab_rocket_task",
- "crab_rocket_user",
  "crab_rocket_utils",
  "diesel",
  "dotenvy",
+ "entities",
  "rocket",
  "rocket_cors",
+ "schemas",
  "serde_json",
+ "services",
  "utoipa",
 ]
 
@@ -777,6 +763,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b45de904aa0b010bce2ab45264d0631681847fa7b6f2eaa7dab7619943bc4f59"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "entities"
+version = "0.1.0"
+dependencies = [
+ "crab_rocket_category",
+ "crab_rocket_customer",
+ "crab_rocket_employee",
+ "crab_rocket_file",
+ "crab_rocket_follow",
+ "crab_rocket_info",
+ "crab_rocket_permission",
+ "crab_rocket_post",
+ "crab_rocket_product",
+ "crab_rocket_role",
+ "crab_rocket_supplier",
+ "crab_rocket_task",
+ "crab_rocket_user",
+ "rocket",
 ]
 
 [[package]]
@@ -1830,6 +1836,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
 
 [[package]]
+name = "schemas"
+version = "0.1.0"
+dependencies = [
+ "crab_rocket_schema",
+ "rocket",
+]
+
+[[package]]
 name = "scoped-tls"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1885,6 +1899,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79e674e01f999af37c49f70a6ede167a8a60b2503e56c5599532a65baa5969a0"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "services"
+version = "0.1.0"
+dependencies = [
+ "crab_rocket_inventory",
+ "crab_rocket_order",
+ "crab_rocket_shipment",
+ "rocket",
 ]
 
 [[package]]
@@ -2326,6 +2350,10 @@ dependencies = [
  "idna",
  "percent-encoding",
 ]
+
+[[package]]
+name = "utils"
+version = "0.1.0"
 
 [[package]]
 name = "utoipa"
