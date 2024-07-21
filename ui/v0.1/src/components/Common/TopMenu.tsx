@@ -24,7 +24,7 @@ const TopMenu: React.FC<{ themeMode: MenuTheme }> = ({
     navigate(`${e.key}`);
   };
   return (
-    <div style={{ width: "100%" }}>
+    <>
       <Menu
         onClick={onClick}
         selectedKeys={[current]}
@@ -32,7 +32,7 @@ const TopMenu: React.FC<{ themeMode: MenuTheme }> = ({
         items={menuItems}
         theme={themeMode}
       />
-    </div>
+    </>
   );
 };
 
