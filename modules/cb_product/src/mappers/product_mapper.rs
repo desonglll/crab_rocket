@@ -265,129 +265,215 @@ impl MapperCRUD for ProductMapper {
     }
 }
 
+#[cfg(test)]
 mod test {
+    use super::*;
+    use crab_rocket_schema::establish_pg_connection;
+    use obj_traits::request::pagination_request_param::PaginationParamTrait;
 
     #[test]
     fn test_fetch_all_product_table() {
-        use crab_rocket_schema::establish_pg_connection;
-        use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-
-        use super::ProductMapper;
         let param = RequestParam::default();
         match establish_pg_connection() {
             Ok(mut conn) => match ProductMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
-                    println!("{:#?}", data);
+                    assert!(!data.data().is_empty(), "Product table should not be empty");
                 }
                 Err(e) => {
-                    println!("{:?}", e);
+                    panic!("Error fetching all products: {:?}", e);
                 }
             },
             Err(e) => {
-                println!("{:?}", e);
+                panic!("Error establishing connection: {:?}", e);
             }
         }
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::mapper::mapper_crud::MapperCRUD;
-    use obj_traits::request::pagination_request_param::PaginationParam;
-    use obj_traits::request::request_param::RequestParam;
-
-    #[test]
-    fn test_get_all() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let param = RequestParam {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: None,
-        };
-        let result = ProductMapper::get_all(&mut conn, &param);
-        assert!(result.is_ok(), "Get all products failed: {:?}", result.err());
-        let data = result.unwrap();
-        println!("{:#?}", data);
     }
 
     #[test]
     fn test_get_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let product_id = 1; // 假设此ID存在
-        let result = ProductMapper::get_by_id(&mut conn, product_id);
-        assert!(result.is_ok(), "Get product by ID failed: {:?}", result.err());
-        let product = result.unwrap();
-        println!("{:#?}", product);
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let pid = 2; // 假设ID为1的记录存在
+                match ProductMapper::get_by_id(&mut conn, pid) {
+                    Ok(data) => {
+                        assert_eq!(
+                            data.product_id, pid,
+                            "Fetched product ID should match requested ID"
+                        );
+                    }
+                    Err(diesel::result::Error::NotFound) => {
+                        panic!("Product with ID {} not found", pid);
+                    }
+                    Err(e) => {
+                        panic!("Error fetching product by ID: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
     }
 
     #[test]
     fn test_add_single() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let new_product = PostProduct {
-            name: String::from("Test Product"),
-            description: Some(String::from("This is a test product")),
-            sku: String::from("TESTSKU123"),
-            image: Some(String::from("http://example.com/image.jpg")),
-            price: Some(99.99),
-            discount_price: Some(79.99),
-            is_discounted: Some(true),
-            is_valid: Some(true),
-            inventory: Some(100),
-            is_in_stock: Some(true),
-            created_at: Some(chrono::Utc::now().naive_utc()),
-            updated_at: Some(chrono::Utc::now().naive_utc()),
-            supplier_id: Some(1),
-            weight: Some(1.5),
-            dimensions: Some(String::from("10x10x10")),
-            status: Some(String::from("active")),
-            public: Some(true),
-        };
-        let result = ProductMapper::add_single(&mut conn, &new_product);
-        assert!(result.is_ok(), "Add single product failed: {:?}", result.err());
-        let product = result.unwrap();
-        println!("{:#?}", product);
-    }
-
-    #[test]
-    fn test_delete_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let product_id = 1; // 假设此ID存在且可删除
-        let result = ProductMapper::delete_by_id(&mut conn, product_id);
-        assert!(result.is_ok(), "Delete product by ID failed: {:?}", result.err());
-        let product = result.unwrap();
-        println!("{:#?}", product);
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let new_product = PostProduct {
+                    name: "Test Product".to_string(),
+                    description: Some("This is a test product".to_string()),
+                    sku: "TEST123".to_string(),
+                    image: Some("test_image.jpg".to_string()),
+                    price: Some(100.0),
+                    discount_price: Some(90.0),
+                    is_discounted: Some(true),
+                    is_valid: Some(true),
+                    inventory: Some(10),
+                    is_in_stock: Some(true),
+                    created_at: Some(get_e8_time()),
+                    updated_at: Some(get_e8_time()),
+                    supplier_id: Some(1),
+                    weight: Some(1.5),
+                    dimensions: Some("10x10x10".to_string()),
+                    status: Some("available".to_string()),
+                    public: Some(true),
+                };
+                match ProductMapper::add_single(&mut conn, &new_product) {
+                    Ok(data) => {
+                        assert_eq!(
+                            data.name, "Test Product",
+                            "Name should match the added product"
+                        );
+                    }
+                    Err(e) => {
+                        panic!("Error adding product: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
     }
 
     #[test]
     fn test_update_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let product_id = 2; // 假设此ID存在
-        let updated_product = PatchProduct {
-            user_id: Some(1),
-            name: String::from("Updated Product Name"),
-            description: Some(String::from("Updated description")),
-            sku: String::from("UPDATEDSKU123"),
-            image: Some(String::from("http://example.com/updated_image.jpg")),
-            price: Some(119.99),
-            discount_price: Some(89.99),
-            is_discounted: Some(true),
-            is_valid: Some(true),
-            inventory: Some(50),
-            is_in_stock: Some(true),
-            created_at: Some(get_e8_time()),
-            updated_at: Some(get_e8_time()),
-            supplier_id: Some(1),
-            weight: Some(2.0),
-            dimensions: Some(String::from("15x15x15")),
-            status: Some(String::from("active")),
-            public: Some(true),
-        };
-        let result = ProductMapper::update_by_id(&mut conn, product_id, &updated_product);
-        assert!(result.is_ok(), "Update product by ID failed: {:?}", result.err());
-        let product = result.unwrap();
-        println!("{:#?}", product);
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let pid = 2; // 假设ID为1的记录存在
+                let updated_product = PatchProduct {
+                    user_id: Some(2),
+                    name: "Updated Product".to_string(),
+                    description: Some("This is an updated product description".to_string()),
+                    sku: "UPDATED123".to_string(),
+                    image: Some("updated_image.jpg".to_string()),
+                    price: Some(150.0),
+                    discount_price: Some(140.0),
+                    is_discounted: Some(true),
+                    is_valid: Some(true),
+                    inventory: Some(20),
+                    is_in_stock: Some(true),
+                    updated_at: Some(get_e8_time()),
+                    created_at: Some(get_e8_time()),
+                    supplier_id: Some(2),
+                    weight: Some(2.0),
+                    dimensions: Some("20x20x20".to_string()),
+                    status: Some("updated".to_string()),
+                    public: Some(false),
+                };
+                match ProductMapper::update_by_id(&mut conn, pid, &updated_product) {
+                    Ok(data) => {
+                        assert_eq!(data.name, "Updated Product", "Name should be updated");
+                    }
+                    Err(diesel::result::Error::NotFound) => {
+                        panic!("Product with ID {} not found for update", pid);
+                    }
+                    Err(e) => {
+                        panic!("Error updating product: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_delete_by_id() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let pid = 1; // 假设ID为1的记录存在
+                match ProductMapper::delete_by_id(&mut conn, pid) {
+                    Ok(data) => {
+                        assert_eq!(
+                            data.product_id, pid,
+                            "Deleted product ID should match requested ID"
+                        );
+                    }
+                    Err(diesel::result::Error::NotFound) => {
+                        panic!("Product with ID {} not found for deletion", pid);
+                    }
+                    Err(e) => {
+                        panic!("Error deleting product: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_filter() {
+        match establish_pg_connection() {
+            Ok(mut conn) => {
+                let param = RequestParam {
+                    pagination: PaginationParam::demo(),
+                    filter: Some(ProductFilter {
+                        product_id: Some(1),
+                        user_id: None,
+                        name: None,
+                        description: None,
+                        sku: None,
+                        image: None,
+                        price_min: None,
+                        price_max: None,
+                        discount_price_min: None,
+                        discount_price_max: None,
+                        is_discounted: None,
+                        is_valid: None,
+                        inventory_min: None,
+                        inventory_max: None,
+                        is_in_stock: None,
+                        created_at_min: None,
+                        created_at_max: None,
+                        updated_at_min: None,
+                        updated_at_max: None,
+                        supplier_id: None,
+                        weight_min: None,
+                        weight_max: None,
+                        dimensions: None,
+                        status: None,
+                        public: None,
+                    }),
+                };
+                match ProductMapper::filter(&mut conn, &param) {
+                    Ok(data) => {
+                        assert!(
+                            data.data().iter().all(|item| item.product_id == 1),
+                            "Filtered result should have product_id 1"
+                        );
+                    }
+                    Err(e) => {
+                        panic!("Error filtering products: {:?}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Error establishing connection: {:?}", e);
+            }
+        }
     }
 }
