@@ -289,3 +289,105 @@ mod test {
         }
     }
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crab_rocket_schema::establish_pg_connection;
+    use obj_traits::mapper::mapper_crud::MapperCRUD;
+    use obj_traits::request::pagination_request_param::PaginationParam;
+    use obj_traits::request::request_param::RequestParam;
+
+    #[test]
+    fn test_get_all() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let param = RequestParam {
+            pagination: PaginationParam {
+                limit: Some(10),
+                offset: Some(0),
+            },
+            filter: None,
+        };
+        let result = ProductMapper::get_all(&mut conn, &param);
+        assert!(result.is_ok(), "Get all products failed: {:?}", result.err());
+        let data = result.unwrap();
+        println!("{:#?}", data);
+    }
+
+    #[test]
+    fn test_get_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let product_id = 1; // 假设此ID存在
+        let result = ProductMapper::get_by_id(&mut conn, product_id);
+        assert!(result.is_ok(), "Get product by ID failed: {:?}", result.err());
+        let product = result.unwrap();
+        println!("{:#?}", product);
+    }
+
+    #[test]
+    fn test_add_single() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let new_product = PostProduct {
+            name: String::from("Test Product"),
+            description: Some(String::from("This is a test product")),
+            sku: String::from("TESTSKU123"),
+            image: Some(String::from("http://example.com/image.jpg")),
+            price: Some(99.99),
+            discount_price: Some(79.99),
+            is_discounted: Some(true),
+            is_valid: Some(true),
+            inventory: Some(100),
+            is_in_stock: Some(true),
+            created_at: Some(chrono::Utc::now().naive_utc()),
+            updated_at: Some(chrono::Utc::now().naive_utc()),
+            supplier_id: Some(1),
+            weight: Some(1.5),
+            dimensions: Some(String::from("10x10x10")),
+            status: Some(String::from("active")),
+            public: Some(true),
+        };
+        let result = ProductMapper::add_single(&mut conn, &new_product);
+        assert!(result.is_ok(), "Add single product failed: {:?}", result.err());
+        let product = result.unwrap();
+        println!("{:#?}", product);
+    }
+
+    #[test]
+    fn test_delete_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let product_id = 1; // 假设此ID存在且可删除
+        let result = ProductMapper::delete_by_id(&mut conn, product_id);
+        assert!(result.is_ok(), "Delete product by ID failed: {:?}", result.err());
+        let product = result.unwrap();
+        println!("{:#?}", product);
+    }
+
+    #[test]
+    fn test_update_by_id() {
+        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let product_id = 2; // 假设此ID存在
+        let updated_product = PatchProduct {
+            user_id: Some(1),
+            name: String::from("Updated Product Name"),
+            description: Some(String::from("Updated description")),
+            sku: String::from("UPDATEDSKU123"),
+            image: Some(String::from("http://example.com/updated_image.jpg")),
+            price: Some(119.99),
+            discount_price: Some(89.99),
+            is_discounted: Some(true),
+            is_valid: Some(true),
+            inventory: Some(50),
+            is_in_stock: Some(true),
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
+            supplier_id: Some(1),
+            weight: Some(2.0),
+            dimensions: Some(String::from("15x15x15")),
+            status: Some(String::from("active")),
+            public: Some(true),
+        };
+        let result = ProductMapper::update_by_id(&mut conn, product_id, &updated_product);
+        assert!(result.is_ok(), "Update product by ID failed: {:?}", result.err());
+        let product = result.unwrap();
+        println!("{:#?}", product);
+    }
+}
