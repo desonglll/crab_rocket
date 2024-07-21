@@ -1,4 +1,4 @@
-import { Button, Card, ConfigProvider, Space, Table, message } from "antd";
+import { Button, Card, Space, Table, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -55,22 +55,14 @@ export function UserTable() {
       dataIndex: "username",
       key: "username",
       render: (_: string, user: User) => (
-        <ConfigProvider
-          theme={{
-            token: {
-              paddingLG: 10,
-            },
+        <Card
+          hoverable
+          onClick={() => {
+            navigate(`/user/detail/${user.user_id}`);
           }}
         >
-          <Card
-            hoverable
-            onClick={() => {
-              navigate(`/user/detail/${user.user_id}`);
-            }}
-          >
-            {user.username}
-          </Card>
-        </ConfigProvider>
+          {user.username}
+        </Card>
       ),
     },
     {
