@@ -107,6 +107,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "auth"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "crab_rocket_schema",
+ "crab_rocket_user",
+ "crab_rocket_utils",
+ "diesel",
+ "rocket",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
