@@ -182,15 +182,17 @@ impl MapperCRUD for PostMapper {
 }
 #[cfg(test)]
 mod tests {
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use rocket::State;
 
     use super::*;
 
     #[test]
     fn test_insert_post() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         // 創建一個新的 PostPost 實例
         let new_post = PostPost::demo();
 
@@ -204,7 +206,9 @@ mod tests {
 
     #[test]
     fn test_fetch_all_post_table() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let param = RequestParam::new(Some(PaginationParam::demo()), None);
 
         // 查詢所有 Post 記錄
@@ -215,8 +219,9 @@ mod tests {
 
     #[test]
     fn test_fetch_post_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         // 插入測試 Post
         let new_post = PostPost::demo();
         let inserted_post =
@@ -232,8 +237,9 @@ mod tests {
 
     #[test]
     fn test_update_post_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         // 插入測試 Post
         let new_post = PostPost::demo();
         let inserted_post =
@@ -252,8 +258,9 @@ mod tests {
 
     #[test]
     fn test_delete_post_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         // 插入測試 Post
         let new_post = PostPost::demo();
         let inserted_post =

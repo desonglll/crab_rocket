@@ -2,6 +2,7 @@
 extern crate rocket;
 
 use crab_rocket::env_variables;
+use crab_rocket_schema::establish_pool;
 use crab_rocket_utils;
 use dotenvy::dotenv;
 use entities::entities_routes;
@@ -18,6 +19,7 @@ fn rocket() -> _ {
     // Load env
     env_variables::load_env();
     dotenv().ok();
+    let pool = establish_pool();
 
     crab_rocket_utils::run_preload();
 
@@ -58,5 +60,5 @@ fn rocket() -> _ {
     routes.extend(services_routes().clone());
     routes.extend(schemas_routes().clone());
 
-    rocket::build().mount("/api", routes).attach(cors)
+    rocket::build().mount("/api", routes).attach(cors).manage(pool)
 }

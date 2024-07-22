@@ -183,13 +183,16 @@ impl MapperCRUD for TaskMapper {
 mod tests {
     use super::*;
     use crate::models::task::{PatchTask, PostTask};
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
+    use rocket::State;
 
     #[test]
     fn test_add_single_task() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
 
         let task = PostTask::new(
             "Test Task Title".to_string(),
@@ -207,7 +210,9 @@ mod tests {
 
     #[test]
     fn test_get_all_tasks() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
 
         let param = RequestParam::new(Some(PaginationParam::demo()), None);
 
@@ -219,7 +224,9 @@ mod tests {
 
     #[test]
     fn test_get_task_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
 
         // Assuming a task with ID 1 exists in the database
         let task_id = 1;
@@ -231,17 +238,20 @@ mod tests {
 
     #[test]
     fn test_update_task_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
 
         let patch_task = PatchTask::new(
             "Updated Title".to_string(),
             Some("Updated Content".to_string()),
-            Some(2),
+            Some(1),
         );
 
         // Assuming a task with ID 1 exists in the database
         let task_id = 1;
         let result = TaskMapper::update_by_id(&mut conn, task_id, &patch_task);
+        println!("{:#?}", result);
         assert!(result.is_ok());
         let updated_task = result.unwrap();
         assert_eq!(updated_task.title, "Updated Title");
@@ -249,7 +259,9 @@ mod tests {
 
     #[test]
     fn test_delete_task_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
 
         // Add a task to delete
         let task = PostTask::new(

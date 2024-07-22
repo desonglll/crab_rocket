@@ -267,13 +267,16 @@ impl MapperCRUD for ProductMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_product_table() {
         let param = RequestParam::default();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match ProductMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     assert!(!data.data().is_empty(), "Product table should not be empty");
@@ -290,7 +293,9 @@ mod test {
 
     #[test]
     fn test_get_by_id() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let pid = 2; // 假设ID为1的记录存在
                 match ProductMapper::get_by_id(&mut conn, pid) {
@@ -316,7 +321,9 @@ mod test {
 
     #[test]
     fn test_add_single() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let new_product = PostProduct {
                     name: "Test Product".to_string(),
@@ -357,7 +364,9 @@ mod test {
 
     #[test]
     fn test_update_by_id() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let pid = 2; // 假设ID为1的记录存在
                 let updated_product = PatchProduct {
@@ -400,7 +409,9 @@ mod test {
 
     #[test]
     fn test_delete_by_id() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let pid = 1; // 假设ID为1的记录存在
                 match ProductMapper::delete_by_id(&mut conn, pid) {
@@ -426,7 +437,9 @@ mod test {
 
     #[test]
     fn test_filter() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let param = RequestParam {
                     auth: None,

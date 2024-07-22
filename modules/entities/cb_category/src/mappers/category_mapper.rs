@@ -181,13 +181,16 @@ impl MapperCRUD for CategoryMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_category_table() {
         let param = RequestParam::default(); // 預設的請求參數
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
@@ -205,7 +208,9 @@ mod test {
     #[test]
     fn test_fetch_category_by_id() {
         let test_id = 1; // 測試用的 ID
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::get_by_id(&mut conn, test_id) {
                 Ok(category) => {
                     println!("{:#?}", category);
@@ -229,7 +234,9 @@ mod test {
             created_at: None,
             updated_at: None,
         };
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::add_single(&mut conn, &new_category) {
                 Ok(category) => {
                     println!("Added category: {:#?}", category);
@@ -254,7 +261,9 @@ mod test {
             created_at: None,
             updated_at: None,
         };
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match CategoryMapper::update_by_id(&mut conn, category_id, &updated_category) {
                     Ok(category) => {
@@ -274,7 +283,9 @@ mod test {
     #[test]
     fn test_delete_category() {
         let category_id = 1; // 測試用的 ID
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::delete_by_id(&mut conn, category_id) {
                 Ok(category) => {
                     println!("Deleted category: {:#?}", category);
@@ -303,7 +314,9 @@ mod test {
         };
         let param = RequestParam::new(None, Some(filter_params));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::filter(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);

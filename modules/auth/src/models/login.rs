@@ -1,7 +1,8 @@
-use crab_rocket_schema::establish_pg_connection;
 use crab_rocket_schema::schema::user_table;
+use crab_rocket_schema::{establish_pg_connection, DbPool};
 use crab_rocket_user::models::user::User;
 use diesel::prelude::*;
+use rocket::State;
 
 use super::session::Session;
 
@@ -12,10 +13,10 @@ pub struct Login {
 }
 
 impl Login {
-    pub fn login(&self) -> Result<Session, Box<dyn std::error::Error>> {
-        if self.is_user_exists() && self.is_valid() {
+    pub fn login(&self, pool: &State<DbPool>) -> Result<Session, Box<dyn std::error::Error>> {
+        if self.is_user_exists(pool) && self.is_valid(pool) {
             let session = Session::new(self.user_id);
-            let result_session = Session::add_session(session);
+            let result_session = Session::add_session(pool, session);
             match result_session {
                 Ok(ok_result) => Ok(ok_result),
                 Err(e) => Err(e),
@@ -24,8 +25,8 @@ impl Login {
             Ok(Session::new(-1))
         }
     }
-    pub fn is_user_exists(&self) -> bool {
-        match establish_pg_connection() {
+    pub fn is_user_exists(&self, pool: &State<DbPool>) -> bool {
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = user_table::dsl::user_table
                     .filter(user_table::dsl::user_id.eq(self.user_id))
@@ -46,8 +47,8 @@ impl Login {
         }
     }
 
-    pub fn is_valid(&self) -> bool {
-        match establish_pg_connection() {
+    pub fn is_valid(&self, pool: &State<DbPool>) -> bool {
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = user_table::dsl::user_table
                     .filter(user_table::dsl::user_id.eq(self.user_id))
@@ -72,6 +73,8 @@ impl Login {
 
 #[cfg(test)]
 mod tests {
+    use crab_rocket_schema::establish_pool;
+
     use super::*;
 
     #[test]
@@ -87,13 +90,15 @@ mod tests {
         //     .execute(&mut connection)
         //     .expect("Failed to insert test user");
 
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
         let login = Login {
             user_id: 1,
             username: "john_doe".to_string(),
             password: "password1".to_string(),
         };
 
-        let result = login.login().expect("Login failed");
+        let result = login.login(pool).expect("Login failed");
         println!("{:#?}", result);
         assert!(!result.session_id.is_nil());
     }
@@ -110,43 +115,50 @@ mod tests {
         //     ))
         //     .execute(&mut connection)
         //     .expect("Failed to insert test user");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
         let login = Login {
             user_id: 1,
             username: "john_doe".to_string(),
             password: "wrong_password".to_string(),
         };
 
-        let result = login.login().expect("Login failed");
+        let result = login.login(pool).expect("Login failed");
         assert_eq!(result.user_id, -1, "Expected session with invalid user");
     }
     #[test]
     fn test_user_exists() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
         let login = Login {
             user_id: 1,
             username: "john_doe".to_string(),
             password: "password1".to_string(),
         };
 
-        let result = login.is_user_exists();
+        let result = login.is_user_exists(pool);
         assert_eq!(result, true, "Expected user to exist");
     }
 
     #[test]
     fn test_user_does_not_exist() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
         let login = Login {
             user_id: 99,
             username: "user3".to_string(),
             password: "password3".to_string(),
         };
 
-        let result = login.is_user_exists();
+        let result = login.is_user_exists(pool);
         assert_eq!(result, false, "Expected user not to exist");
     }
     #[test]
     fn test_valid_user() {
         // ('john_doe', 1, 'john.doe@example.com', 'password1', 'John Doe', 'https://example.com/avatar1.jpg', 'Hello, I am John Doe', '123-456-7890'),
         // ('jane_smith', 2, 'jane.smith@example.com', 'password2', 'Jane Smith', 'https://example.com/avatar2.jpg', 'Hi, I am Jane Smith', '987-654-3210'),
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
         let login = Login {
             user_id: 1,
             username: "john_doe".to_string(),
@@ -154,7 +166,7 @@ mod tests {
         };
 
         // 将 mock 函数替换到 Login 实例中
-        let result = login.is_valid();
+        let result = login.is_valid(pool);
         assert_eq!(result, true, "Expected user to be valid");
     }
 
@@ -162,6 +174,8 @@ mod tests {
     fn test_invalid_user() {
         // ('john_doe', 1, 'john.doe@example.com', 'password1', 'John Doe', 'https://example.com/avatar1.jpg', 'Hello, I am John Doe', '123-456-7890'),
         // ('jane_smith', 2, 'jane.smith@example.com', 'password2', 'Jane Smith', 'https://example.com/avatar2.jpg', 'Hi, I am Jane Smith', '987-654-3210'),
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
         let login = Login {
             user_id: 2,
             username: "jane_smith".to_string(),
@@ -169,7 +183,7 @@ mod tests {
         };
 
         // 将 mock 函数替换到 Login 实例中
-        let result = login.is_valid();
+        let result = login.is_valid(pool);
         assert_eq!(result, false, "Expected user to be invalid");
     }
 }

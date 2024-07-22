@@ -60,10 +60,13 @@ pub fn fetch_all_files(conn: &mut PgConnection) -> Result<Vec<File>, diesel::res
 #[cfg(test)]
 mod test {
     use crate::mappers::file_mapper::fetch_all_files;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State;
     #[test]
     fn test_fetch_all_files() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let all_files = fetch_all_files(&mut conn);
                 println!("{all_files:?}");

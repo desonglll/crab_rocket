@@ -232,8 +232,9 @@ mod test {
         employee::{PatchEmployee, PostEmployee},
         employee_filter::EmployeeFilter,
     };
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+    use rocket::State;
 
     #[test]
     fn test_insert_employee() {
@@ -259,7 +260,9 @@ mod test {
             role_id: Some(1),
         };
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::add_single(&mut conn, &new_employee) {
                 Ok(inserted_employee) => println!("{:?}", inserted_employee),
                 Err(e) => eprintln!("Error inserting employee: {:?}", e),
@@ -272,7 +275,9 @@ mod test {
     fn test_delete_employee_by_id() {
         let employee_id = 1; // Ensure this ID exists in your test database
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::delete_by_id(&mut conn, employee_id) {
                 Ok(deleted_employee) => println!("{:?}", deleted_employee),
                 Err(e) => eprintln!("Error deleting employee: {:?}", e),
@@ -291,7 +296,9 @@ mod test {
         let filter = EmployeeFilter::from_json(json_data).unwrap();
         let params = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::get_all(&mut conn, &params) {
                 Ok(result) => println!("{:?}", result),
                 Err(e) => eprintln!("Error fetching employees: {:?}", e),
@@ -326,7 +333,9 @@ mod test {
 
         let employee_id = 2; // Ensure this ID exists in your test database
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match EmployeeMapper::update_by_id(&mut conn, employee_id, &updated_emp) {
                     Ok(updated_employee) => println!("{:?}", updated_employee),
@@ -348,7 +357,9 @@ mod test {
         let filter = EmployeeFilter::from_json(json_data).unwrap();
         let params = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::filter(&mut conn, &params) {
                 Ok(result) => println!("{:?}", result),
                 Err(e) => eprintln!("Error filtering employees: {:?}", e),

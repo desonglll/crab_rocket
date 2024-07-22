@@ -178,8 +178,9 @@ impl MapperCRUD for ShipmentMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use crab_rocket_utils::time::get_e8_time;
+    use rocket::State;
 
     // Helper function to create a new shipment for testing
     fn create_test_shipment(conn: &mut PgConnection) -> Result<Shipment, diesel::result::Error> {
@@ -194,7 +195,9 @@ mod test {
 
     #[test]
     fn test_get_all_shipments() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let param = RequestParam::demo();
         match ShipmentMapper::get_all(&mut conn, &param) {
             Ok(data) => println!("{:#?}", data),
@@ -204,7 +207,9 @@ mod test {
 
     #[test]
     fn test_get_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
 
         match ShipmentMapper::get_by_id(&mut conn, shipment.shipment_id) {
@@ -215,8 +220,9 @@ mod test {
 
     #[test]
     fn test_add_single_shipment() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_shipment = PostShipment {
             order_id: Some(1),
             shipment_date: Some(get_e8_time()),
@@ -234,7 +240,9 @@ mod test {
 
     #[test]
     fn test_delete_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
 
         match ShipmentMapper::delete_by_id(&mut conn, shipment.shipment_id) {
@@ -249,7 +257,9 @@ mod test {
 
     #[test]
     fn test_update_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
 
         let updated_info = PatchShipment {
@@ -271,8 +281,9 @@ mod test {
 
     #[test]
     fn test_filter_shipments() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let filter = ShipmentFilter {
             shipment_id: None,
             order_id: None,

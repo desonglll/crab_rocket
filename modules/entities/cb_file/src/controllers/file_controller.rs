@@ -1,8 +1,10 @@
 use std::path::Path;
 
+use crab_rocket_schema::DbPool;
 use rocket::{
     fs::TempFile,
     http::{ContentType, MediaType},
+    State,
 };
 use uuid::Uuid;
 
@@ -14,21 +16,30 @@ use crate::{
     },
     services::file_service::GetFile,
 };
-pub async fn insert_file_controller(files: Vec<TempFile<'_>>) -> (i32, String, Vec<String>) {
-    match File::insert_file(files).await {
+pub async fn insert_file_controller(
+    pool: &State<DbPool>,
+    files: Vec<TempFile<'_>>,
+) -> (i32, String, Vec<String>) {
+    match File::insert_file(pool, files).await {
         Ok(result) => (200, String::from("INSERT FILES OK"), result),
         Err(e) => (204, e.to_string(), Vec::new()),
     }
 }
-pub async fn insert_avatar_file_controller(file: TempFile<'_>) -> (i32, String, String) {
-    match File::insert_avatar_file(file).await {
+pub async fn insert_avatar_file_controller(
+    pool: &State<DbPool>,
+    file: TempFile<'_>,
+) -> (i32, String, String) {
+    match File::insert_avatar_file(pool, file).await {
         Ok(result) => (200, String::from("INSERT FILES OK"), result),
         Err(e) => (204, e.to_string(), String::new()),
     }
 }
 
-pub async fn retrieve_file_controller(uuid: Uuid) -> Option<FileRetrieveResponse> {
-    match File::retrieve_file_url_by_uuid(uuid) {
+pub async fn retrieve_file_controller(
+    pool: &State<DbPool>,
+    uuid: Uuid,
+) -> Option<FileRetrieveResponse> {
+    match File::retrieve_file_url_by_uuid(pool, uuid) {
         Ok(path) => {
             println!("File Path: {}", path);
             let named_file = rocket::fs::NamedFile::open(&path).await.ok()?;
@@ -54,9 +65,10 @@ pub async fn retrieve_file_controller(uuid: Uuid) -> Option<FileRetrieveResponse
     }
 }
 pub async fn download_file_controller(
+    pool: &State<DbPool>,
     uuid: Uuid,
 ) -> Option<models::file_response::FileDownloadResponse> {
-    match File::retrieve_file_url_by_uuid(uuid) {
+    match File::retrieve_file_url_by_uuid(pool, uuid) {
         Ok(path) => {
             println!("File Path: {}", path);
             let file = rocket::fs::NamedFile::open(path.clone()).await.ok();
@@ -85,8 +97,8 @@ pub async fn download_file_controller(
 
 // }
 
-pub fn get_all_files_controller() -> (i32, String, Vec<File>) {
-    match File::get_all_files() {
+pub fn get_all_files_controller(pool: &State<DbPool>) -> (i32, String, Vec<File>) {
+    match File::get_all_files(pool) {
         Ok(all_files) => (200, String::from("GET ALL FILES OK"), all_files),
         Err(e) => (204, e.to_string(), Vec::new()),
     }

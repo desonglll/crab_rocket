@@ -26,7 +26,16 @@ pub struct PostCustomer {
     pub phone: Option<String>,
     pub address: Option<String>,
 }
-
+impl PostCustomer {
+    pub fn demo() -> Self {
+        Self {
+            name: "Customer".to_owned(),
+            email: "aaa@example.com".to_owned(),
+            phone: None,
+            address: None,
+        }
+    }
+}
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]

@@ -186,13 +186,16 @@ mod tests {
     use super::*;
     use crate::models::supplier::{PatchSupplier, PostSupplier};
     use crate::models::supplier_filter::SupplierFilter;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::request::request_param::RequestParam;
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_supplier_table() {
         let param = RequestParam::<SupplierFilter>::default();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
@@ -213,7 +216,9 @@ mod tests {
     #[test]
     fn test_get_by_id() {
         let test_supplier_id = 3; // Replace with an actual ID from your test database
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::get_by_id(&mut conn, test_supplier_id) {
                 Ok(supplier) => {
                     println!("{:#?}", supplier);
@@ -234,7 +239,9 @@ mod tests {
     #[test]
     fn test_add_single() {
         let new_supplier = PostSupplier::demo(); // Using demo data for testing
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::add_single(&mut conn, &new_supplier) {
                 Ok(supplier) => {
                     println!("{:#?}", supplier);
@@ -255,7 +262,9 @@ mod tests {
     #[test]
     fn test_delete_by_id() {
         let test_supplier_id = 1; // Replace with an actual ID from your test database
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::delete_by_id(&mut conn, test_supplier_id) {
                 Ok(supplier) => {
                     println!("{:#?}", supplier);
@@ -284,7 +293,9 @@ mod tests {
             created_at: None,
             updated_at: Some(get_e8_time()), // Ensure this matches your expected format
         };
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match SupplierMapper::update_by_id(&mut conn, test_supplier_id, &updated_supplier) {
                     Ok(supplier) => {

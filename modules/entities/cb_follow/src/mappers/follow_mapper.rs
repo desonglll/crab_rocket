@@ -330,12 +330,15 @@ pub fn check_exist_follow(
 mod test {
     use super::*;
     use crate::models::follow::{PatchFollow, PostFollow};
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State;
 
     #[test]
     fn test_create_new_follow() {
         let follow = PostFollow::new(1, 3, None);
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::add_single(&mut conn, &follow);
                 match result {
@@ -361,7 +364,9 @@ mod test {
     fn test_check_exist_follow() {
         let following_id = 1;
         let followed_id = 5;
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = check_exist_follow(&mut conn, following_id, followed_id);
                 println!("Follow exists: {}", result);
@@ -377,7 +382,9 @@ mod test {
     #[test]
     fn test_delete_follow() {
         let follow_id = 1;
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::delete_by_id(&mut conn, follow_id);
                 match result {
@@ -401,7 +408,9 @@ mod test {
     #[test]
     fn test_delete_follow_specifically() {
         let follow = PostFollow::demo();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::delete_follow_specifically(&mut conn, &follow);
                 match result {
@@ -427,7 +436,9 @@ mod test {
     fn test_update_follow() {
         let follow_id = 2;
         let updated_follow = PatchFollow::new(2, 4, None);
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::update_by_id(&mut conn, follow_id, &updated_follow);
                 match result {
@@ -458,7 +469,9 @@ mod test {
     #[test]
     fn test_get_all_follows() {
         let param = RequestParam::demo();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::get_all(&mut conn, &param);
                 match result {
@@ -483,7 +496,9 @@ mod test {
     fn test_get_followings_by_user_id() {
         let user_id = 1;
         let param = RequestParam::demo();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::get_followings_by_user_id(&mut conn, user_id, &param);
                 match result {
@@ -508,7 +523,9 @@ mod test {
     fn test_get_followeds_by_user_id() {
         let user_id = 1;
         let param = RequestParam::demo();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::get_followeds_by_user_id(&mut conn, user_id, &param);
                 match result {

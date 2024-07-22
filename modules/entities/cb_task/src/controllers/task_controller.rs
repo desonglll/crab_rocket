@@ -1,6 +1,7 @@
 use crate::models::task::{PatchTask, PostTask, Task};
 use crate::models::task_filter::TaskFilter;
 use crate::services::task_service::TaskService;
+use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::{
     controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
     controller_get_by_id, controller_update_by_id, ControllerCRUD,
@@ -8,6 +9,7 @@ use obj_traits::controller::controller_crud::{
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
+use rocket::State;
 use std::error::Error;
 
 pub struct TaskController {}
@@ -18,29 +20,44 @@ impl ControllerCRUD for TaskController {
     type PatchItem = PatchTask;
     type Param = RequestParam<TaskFilter>;
     fn get_all(
+        pool: &State<DbPool>,
         param: &RequestParam<TaskFilter>,
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn Error>> {
-        controller_get_all::<Self::Item, TaskService, TaskFilter>(param)
+        controller_get_all::<Self::Item, TaskService, TaskFilter>(pool, param)
     }
 
-    fn get_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_get_by_id::<Self::Item, TaskService>(pid)
+    fn get_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_get_by_id::<Self::Item, TaskService>(pool, pid)
     }
 
-    fn add_single(obj: &mut PostTask) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_add_single::<Self::Item, TaskService, PostTask>(obj)
+    fn add_single(
+        pool: &State<DbPool>,
+        obj: &mut PostTask,
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, TaskService, PostTask>(pool, obj)
     }
 
-    fn delete_by_id(pid: i32) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_delete_by_id::<Self::Item, TaskService>(pid)
+    fn delete_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_delete_by_id::<Self::Item, TaskService>(pool, pid)
     }
 
-    fn update_by_id(pid: i32, obj: &PatchTask) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
-        controller_update_by_id::<Self::Item, TaskService, PatchTask>(pid, obj)
+    fn update_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+        obj: &PatchTask,
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_update_by_id::<Self::Item, TaskService, PatchTask>(pool, pid, obj)
     }
     fn filter(
+        pool: &State<DbPool>,
         param: &RequestParam<TaskFilter>,
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
-        controller_filter::<Self::Item, TaskService, TaskFilter>(param)
+        controller_filter::<Self::Item, TaskService, TaskFilter>(pool, param)
     }
 }

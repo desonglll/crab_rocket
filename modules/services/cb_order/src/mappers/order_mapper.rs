@@ -183,14 +183,17 @@ impl MapperCRUD for OrderMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use crab_rocket_utils::time::get_e8_time;
     use diesel::result::Error;
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_order_table() {
         let param = RequestParam::<OrderFilter>::default();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match OrderMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
@@ -210,7 +213,9 @@ mod test {
 
     #[test]
     fn test_get_order_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(1),
             order_date: Some(get_e8_time()),
@@ -231,7 +236,9 @@ mod test {
 
     #[test]
     fn test_add_single_order() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(2),
             order_date: Some(get_e8_time()),
@@ -248,7 +255,9 @@ mod test {
 
     #[test]
     fn test_delete_order_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(2),
             order_date: Some(get_e8_time()),
@@ -272,7 +281,9 @@ mod test {
 
     #[test]
     fn test_update_order_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(2),
             order_date: Some(get_e8_time()),
@@ -304,7 +315,9 @@ mod test {
 
     #[test]
     fn test_filter_orders() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order1 = PostOrder {
             customer_id: Some(1),
             order_date: Some(get_e8_time()),

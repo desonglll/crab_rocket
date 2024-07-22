@@ -203,11 +203,14 @@ impl MapperCRUD for PermissionMapper {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State;
 
     #[test]
     fn test_get_all() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let param = RequestParam::demo();
         let result = PermissionMapper::get_all(&mut conn, &param);
         assert!(result.is_ok());
@@ -216,7 +219,9 @@ mod tests {
     }
     #[test]
     fn test_get_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
         let permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
         let result = PermissionMapper::get_by_id(&mut conn, permission.permission_id);
@@ -226,7 +231,9 @@ mod tests {
     }
     #[test]
     fn test_add_single() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
         let result = PermissionMapper::add_single(&mut conn, &new_permission);
         assert!(result.is_ok());
@@ -235,7 +242,9 @@ mod tests {
     }
     #[test]
     fn test_delete_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
         let inserted_permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
         let result = PermissionMapper::delete_by_id(&mut conn, inserted_permission.permission_id);
@@ -245,7 +254,9 @@ mod tests {
     }
     #[test]
     fn test_update_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
         let inserted_permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
         // Create a PatchPermission manually
@@ -274,7 +285,9 @@ mod tests {
 
     #[test]
     fn test_filter() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let param = RequestParam::demo();
         let result = PermissionMapper::filter(&mut conn, &param);
         assert!(result.is_ok());

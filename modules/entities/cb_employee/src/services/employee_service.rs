@@ -1,12 +1,14 @@
 use crate::mappers::employee_mapper::EmployeeMapper;
 use crate::models::employee::{Employee, PatchEmployee, PostEmployee};
 use crate::models::employee_filter::EmployeeFilter;
+use crab_rocket_schema::DbPool;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
     service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
     service_update_by_id, ServiceCRUD,
 };
+use rocket::State;
 use std::error::Error;
 
 pub struct EmployeeService {}
@@ -17,44 +19,54 @@ impl ServiceCRUD for EmployeeService {
     type PatchItem = PatchEmployee;
     type Param = RequestParam<EmployeeFilter>;
     fn get_all(
+        pool: &State<DbPool>,
         param: &RequestParam<EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, Box<dyn Error>> {
-        service_get_all::<Employee, EmployeeMapper, EmployeeFilter>(param)
+        service_get_all::<Employee, EmployeeMapper, EmployeeFilter>(pool, param)
     }
-    fn get_by_id(pid: i32) -> Result<Employee, Box<dyn Error>> {
-        service_get_by_id::<Employee, EmployeeMapper>(pid)
-    }
-
-    fn add_single(obj: &PostEmployee) -> Result<Employee, Box<dyn Error>> {
-        service_add_single::<Employee, EmployeeMapper, PostEmployee>(obj)
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Employee, Box<dyn Error>> {
+        service_get_by_id::<Employee, EmployeeMapper>(pool, pid)
     }
 
-    fn delete_by_id(pid: i32) -> Result<Employee, Box<dyn Error>> {
-        service_delete_by_id::<Employee, EmployeeMapper>(pid)
+    fn add_single(pool: &State<DbPool>, obj: &PostEmployee) -> Result<Employee, Box<dyn Error>> {
+        service_add_single::<Employee, EmployeeMapper, PostEmployee>(pool, obj)
     }
 
-    fn update_by_id(pid: i32, obj: &PatchEmployee) -> Result<Employee, Box<dyn Error>> {
-        service_update_by_id::<Employee, EmployeeMapper, PatchEmployee>(pid, obj)
+    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Employee, Box<dyn Error>> {
+        service_delete_by_id::<Employee, EmployeeMapper>(pool, pid)
+    }
+
+    fn update_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+        obj: &PatchEmployee,
+    ) -> Result<Employee, Box<dyn Error>> {
+        service_update_by_id::<Employee, EmployeeMapper, PatchEmployee>(pool, pid, obj)
     }
     fn filter(
+        pool: &State<DbPool>,
         param: &RequestParam<EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, Box<dyn std::error::Error>> {
-        service_filter::<Employee, EmployeeMapper, EmployeeFilter>(param)
+        service_filter::<Employee, EmployeeMapper, EmployeeFilter>(pool, param)
     }
 }
 
 #[cfg(test)]
 mod test {
     use crate::services::employee_service::EmployeeService;
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
+    use rocket::State;
 
     #[test]
     fn test_insert_single_employee() {
         use crate::models::employee::PostEmployee;
         let employee = PostEmployee::demo();
-        match EmployeeService::add_single(&employee) {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match EmployeeService::add_single(pool, &employee) {
             Ok(result) => println!("{result:?}"),
             Err(e) => println!("{e:?}"),
         }
@@ -63,7 +75,9 @@ mod test {
     #[test]
     fn test_get_all_employees() {
         let param = RequestParam::new(Some(PaginationParam::demo()), None);
-        match EmployeeService::get_all(&param) {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match EmployeeService::get_all(pool, &param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),
         }
@@ -71,7 +85,9 @@ mod test {
 
     #[test]
     fn test_get_employee_by_id() {
-        match EmployeeService::get_by_id(1) {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match EmployeeService::get_by_id(pool, 1) {
             Ok(res) => println!("{res:?}"),
             Err(e) => println!("{e:?}"),
         }
@@ -79,7 +95,9 @@ mod test {
 
     #[test]
     fn test_delete_employee_by_id() {
-        match EmployeeService::delete_by_id(2) {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match EmployeeService::delete_by_id(pool, 2) {
             Ok(res) => println!("{res:?}"),
             Err(e) => println!("{e:?}"),
         }

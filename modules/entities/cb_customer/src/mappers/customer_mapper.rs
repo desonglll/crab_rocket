@@ -178,7 +178,8 @@ mod test {
         customer::{PatchCustomer, PostCustomer},
         customer_filter::CustomerFilter,
     };
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State;
     #[test]
     fn test_get_all() {
         let filter = CustomerFilter {
@@ -190,7 +191,9 @@ mod test {
         };
         let param = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     assert!(!data.data().is_empty(), "Customer table should not be empty");
@@ -209,7 +212,9 @@ mod test {
     #[test]
     fn test_get_by_id() {
         let test_id = 1; // 请确保你的数据库中有这个ID的数据
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::get_by_id(&mut conn, test_id) {
                 Ok(customer) => {
                     assert_eq!(
@@ -239,7 +244,9 @@ mod test {
             address: Some("123 Test St".to_string()),
         };
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::add_single(&mut conn, &new_customer) {
                 Ok(customer) => {
                     assert_eq!(customer.name, "John Doe", "Name should match the added customer");
@@ -257,7 +264,9 @@ mod test {
     #[test]
     fn test_delete_by_id() {
         let test_id = 3; // 请确保你的数据库中有这个ID的数据
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::delete_by_id(&mut conn, test_id) {
                 Ok(customer) => {
                     assert_eq!(
@@ -288,7 +297,9 @@ mod test {
             address: Some("456 Test Ave".to_string()),
         };
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match CustomerMapper::update_by_id(&mut conn, test_id, &updated_customer) {
                     Ok(customer) => {
@@ -319,7 +330,9 @@ mod test {
         };
         let param = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::filter(&mut conn, &param) {
                 Ok(data) => {
                     assert!(

@@ -33,7 +33,6 @@ pub fn entities_routes() -> Vec<Route> {
         insert_single_task,
         delete_task_by_id,
         update_task_by_id,
-        options_task_filter,
         //user routes
         get_users,
         filter_users,
@@ -49,7 +48,6 @@ pub fn entities_routes() -> Vec<Route> {
         insert_single_post,
         delete_post_by_id,
         update_post_by_id,
-        options_post_filter,
         // follow routes
         get_follows,
         filter_follows,

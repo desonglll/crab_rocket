@@ -181,14 +181,17 @@ mod test {
     use super::*;
     use crate::mappers::user_mapper::UserMapper;
     use crate::models::user::{PatchUser, PostUser};
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::request::request_param::RequestParam;
+    use rocket::State;
 
     #[test]
     fn test_insert_user() {
         let user = PostUser::demo();
         println!("{user:?}");
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match UserMapper::add_single(&mut conn, &user) {
                 Ok(result) => println!("{result}"),
                 Err(e) => println!("Error inserting user: {:?}", e),
@@ -201,7 +204,9 @@ mod test {
     fn test_fetch_all_users() {
         let param = RequestParam::new(None, None);
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match UserMapper::get_all(&mut conn, &param) {
                 Ok(res) => println!("{res}"),
                 Err(e) => println!("Error fetching all users: {:?}", e),
@@ -214,7 +219,9 @@ mod test {
     fn test_fetch_user_by_id() {
         let id = 1; // Adjust this ID based on your test data
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match UserMapper::get_by_id(&mut conn, id) {
                 Ok(res) => println!("{res}"),
                 Err(e) => println!("Error fetching user by ID: {:?}", e),
@@ -239,7 +246,9 @@ mod test {
             mobile_phone: "0987654321".to_string(),
         };
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match UserMapper::update_by_id(&mut conn, id, &user) {
                 Ok(res) => println!("{res}"),
                 Err(e) => println!("Error updating user by ID: {:?}", e),
@@ -252,7 +261,9 @@ mod test {
     fn test_delete_user_by_id() {
         let id = 1; // Adjust this ID based on your test data
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match UserMapper::delete_by_id(&mut conn, id) {
                 Ok(res) => println!("{res}"),
                 Err(e) => println!("Error deleting user by ID: {:?}", e),
@@ -280,7 +291,9 @@ mod test {
         };
         let param = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match UserMapper::filter(&mut conn, &param) {
                 Ok(res) => println!("{res}"),
                 Err(e) => println!("Error filtering users: {:?}", e),
