@@ -5,7 +5,6 @@ use obj_traits::controller::controller_crud::{
     controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
     controller_get_by_id, controller_update_by_id, ControllerCRUD,
 };
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
@@ -17,9 +16,9 @@ impl ControllerCRUD for EmployeeController {
     type Item = Employee;
     type PostItem = PostEmployee;
     type PatchItem = PatchEmployee;
-    type Param = RequestParam<PaginationParam, EmployeeFilter>;
+    type Param = RequestParam<EmployeeFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<ApiResponse<Data<Vec<Employee>>>, Box<dyn Error>> {
         controller_get_all::<Employee, EmployeeService, EmployeeFilter>(param)
     }
@@ -43,7 +42,7 @@ impl ControllerCRUD for EmployeeController {
         controller_update_by_id::<Employee, EmployeeService, PatchEmployee>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<ApiResponse<Data<Vec<Employee>>>, Box<dyn std::error::Error>> {
         controller_filter::<Employee, EmployeeService, EmployeeFilter>(param)
     }

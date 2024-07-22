@@ -1,7 +1,6 @@
 use crate::mappers::supplier_mapper::SupplierMapper;
 use crate::models::supplier::{PatchSupplier, PostSupplier, Supplier};
 use crate::models::supplier_filter::SupplierFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,9 +15,9 @@ impl ServiceCRUD for SupplierService {
     type Item = Supplier;
     type PostItem = PostSupplier;
     type PatchItem = PatchSupplier;
-    type Param = RequestParam<PaginationParam, SupplierFilter>;
+    type Param = RequestParam<SupplierFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, SupplierFilter>,
+        param: &RequestParam<SupplierFilter>,
     ) -> Result<Data<Vec<Supplier>>, Box<dyn Error>> {
         service_get_all::<Supplier, SupplierMapper, SupplierFilter>(param)
     }
@@ -38,7 +37,7 @@ impl ServiceCRUD for SupplierService {
         service_update_by_id::<Supplier, SupplierMapper, PatchSupplier>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, SupplierFilter>,
+        param: &RequestParam<SupplierFilter>,
     ) -> Result<Data<Vec<Supplier>>, Box<dyn std::error::Error>> {
         service_filter::<Supplier, SupplierMapper, SupplierFilter>(param)
     }
@@ -47,7 +46,6 @@ impl ServiceCRUD for SupplierService {
 #[cfg(test)]
 mod test {
     use crate::services::supplier_service::SupplierService;
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
 
@@ -63,7 +61,7 @@ mod test {
 
     #[test]
     fn test_get_all_suppliers() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(None, None);
         match SupplierService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

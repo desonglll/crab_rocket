@@ -1,6 +1,5 @@
 use std::error::Error;
 
-use crate::request::pagination_request_param::PaginationParam;
 use crate::request::request_param::RequestParam;
 use crate::response::api_response::ApiResponse;
 use crate::response::data::Data;
@@ -35,10 +34,10 @@ pub trait ControllerCRUD {
 }
 
 pub fn controller_get_all<Obj, ObjService, ObjFilter>(
-    param: &RequestParam<PaginationParam, ObjFilter>,
+    param: &RequestParam<ObjFilter>,
 ) -> Result<ApiResponse<Data<Vec<Obj>>>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item=Obj, Param=RequestParam<PaginationParam, ObjFilter>>,
+    ObjService: ServiceCRUD<Item = Obj, Param = RequestParam<ObjFilter>>,
 {
     match ObjService::get_all(param) {
         Ok(all_employees) => {
@@ -54,7 +53,7 @@ where
 
 pub fn controller_get_by_id<Obj, ObjService>(pid: i32) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item=Obj>,
+    ObjService: ServiceCRUD<Item = Obj>,
     Obj: std::default::Default,
 {
     match ObjService::get_by_id(pid) {
@@ -72,7 +71,7 @@ pub fn controller_add_single<Obj, ObjService, NewObj>(
     obj: &mut NewObj,
 ) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item=Obj, PostItem=NewObj>,
+    ObjService: ServiceCRUD<Item = Obj, PostItem = NewObj>,
     Obj: std::default::Default,
 {
     match ObjService::add_single(obj) {
@@ -90,7 +89,7 @@ pub fn controller_delete_by_id<Obj, ObjService>(
     pid: i32,
 ) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item=Obj>,
+    ObjService: ServiceCRUD<Item = Obj>,
     Obj: std::default::Default,
 {
     match ObjService::delete_by_id(pid) {
@@ -109,7 +108,7 @@ pub fn controller_update_by_id<Obj, ObjService, PatchObj>(
     obj: &PatchObj,
 ) -> Result<ApiResponse<Obj>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item=Obj, PatchItem=PatchObj>,
+    ObjService: ServiceCRUD<Item = Obj, PatchItem = PatchObj>,
     Obj: std::default::Default,
 {
     match ObjService::update_by_id(pid, obj) {
@@ -124,10 +123,10 @@ where
     }
 }
 pub fn controller_filter<Obj, ObjService, ObjFilter>(
-    param: &RequestParam<PaginationParam, ObjFilter>,
+    param: &RequestParam<ObjFilter>,
 ) -> Result<ApiResponse<Data<Vec<Obj>>>, Box<dyn Error>>
 where
-    ObjService: ServiceCRUD<Item=Obj, Param=RequestParam<PaginationParam, ObjFilter>>,
+    ObjService: ServiceCRUD<Item = Obj, Param = RequestParam<ObjFilter>>,
 {
     match ObjService::filter(param) {
         Ok(all_employees) => {

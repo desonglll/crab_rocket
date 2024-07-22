@@ -1,9 +1,6 @@
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,7 +17,7 @@ impl MapperCRUD for ShipmentMapper {
     type Item = Shipment;
     type PostItem = PostShipment;
     type PatchItem = PatchShipment;
-    type Param = RequestParam<PaginationParam, ShipmentFilter>;
+    type Param = RequestParam<ShipmentFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -40,8 +37,9 @@ impl MapperCRUD for ShipmentMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::shipment_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -109,7 +107,7 @@ impl MapperCRUD for ShipmentMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, ShipmentFilter>,
+        param: &RequestParam<ShipmentFilter>,
     ) -> Result<Data<Vec<Shipment>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -126,8 +124,9 @@ impl MapperCRUD for ShipmentMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::shipment_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -196,13 +195,7 @@ mod test {
     #[test]
     fn test_get_all_shipments() {
         let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let param = RequestParam {
-            pagination: PaginationParam {
-                offset: Some(0),
-                limit: Some(10),
-            },
-            filter: None,
-        };
+        let param = RequestParam::demo();
         match ShipmentMapper::get_all(&mut conn, &param) {
             Ok(data) => println!("{:#?}", data),
             Err(e) => panic!("Error fetching all shipments: {:?}", e),
@@ -279,7 +272,6 @@ mod test {
     #[test]
     fn test_filter_shipments() {
         let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let _ = create_test_shipment(&mut conn).expect("Failed to create test shipment");
 
         let filter = ShipmentFilter {
             shipment_id: None,
@@ -289,13 +281,7 @@ mod test {
             delivery_address: None,
             status: None,
         };
-        let param = RequestParam {
-            pagination: PaginationParam {
-                offset: Some(0),
-                limit: Some(10),
-            },
-            filter: Some(filter),
-        };
+        let param = RequestParam::new(None, Some(filter));
 
         match ShipmentMapper::filter(&mut conn, &param) {
             Ok(data) => {

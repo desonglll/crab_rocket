@@ -15,7 +15,7 @@ pub fn get_orders(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde
     if offset.is_none() {
         offset = Some(0);
     };
-    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
+    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = OrderController::get_all(&params).unwrap();
@@ -23,10 +23,8 @@ pub fn get_orders(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde
     Json(serde_json::from_value(json_value).unwrap())
 }
 #[post("/order/filter", data = "<param>")]
-pub fn filter_orders(
-    param: Option<Json<RequestParam<PaginationParam, OrderFilter>>>,
-) -> Json<serde_json::Value> {
-    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+pub fn filter_orders(param: Option<Json<RequestParam<OrderFilter>>>) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::new(Some(PaginationParam::default()), None)));
     let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = OrderController::filter(&param).unwrap();

@@ -1,7 +1,6 @@
 use crate::mappers::order_mapper::OrderMapper;
 use crate::models::order::{Order, PatchOrder, PostOrder};
 use crate::models::order_filter::OrderFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,10 +15,8 @@ impl ServiceCRUD for OrderService {
     type Item = Order;
     type PostItem = PostOrder;
     type PatchItem = PatchOrder;
-    type Param = RequestParam<PaginationParam, OrderFilter>;
-    fn get_all(
-        param: &RequestParam<PaginationParam, OrderFilter>,
-    ) -> Result<Data<Vec<Order>>, Box<dyn Error>> {
+    type Param = RequestParam<OrderFilter>;
+    fn get_all(param: &RequestParam<OrderFilter>) -> Result<Data<Vec<Order>>, Box<dyn Error>> {
         service_get_all::<Order, OrderMapper, OrderFilter>(param)
     }
     fn get_by_id(pid: i32) -> Result<Order, Box<dyn Error>> {
@@ -38,7 +35,7 @@ impl ServiceCRUD for OrderService {
         service_update_by_id::<Order, OrderMapper, PatchOrder>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, OrderFilter>,
+        param: &RequestParam<OrderFilter>,
     ) -> Result<Data<Vec<Order>>, Box<dyn std::error::Error>> {
         service_filter::<Order, OrderMapper, OrderFilter>(param)
     }
@@ -47,7 +44,6 @@ impl ServiceCRUD for OrderService {
 #[cfg(test)]
 mod test {
     use crate::services::order_service::OrderService;
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
 
@@ -63,7 +59,7 @@ mod test {
 
     #[test]
     fn test_get_all_orders() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(None, None);
         match OrderService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

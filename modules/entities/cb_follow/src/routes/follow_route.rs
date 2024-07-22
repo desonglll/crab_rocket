@@ -13,31 +13,24 @@ use crate::{
         follow_controller::FollowController, follow_controller_trait::FollowControllerTrait,
     },
     models::{
-        follow::{PostFollow, PatchFollow},
+        follow::{PatchFollow, PostFollow},
         follow_filter::FollowFilter,
     },
 };
 
 #[get("/follow?<limit>&<offset>")]
-pub fn get_follows(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
+pub fn get_follows(limit: Option<i32>, offset: Option<i32>) -> Json<serde_json::Value> {
     crab_rocket_schema::update_reload::update_reload_count();
-    if limit.is_none() {
-        limit = Some(10);
-    };
-    if offset.is_none() {
-        offset = Some(0);
-    };
-    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
+
+    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
     let resp = FollowController::get_all(&params).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[post("/follow/filter", data = "<param>")]
-pub fn filter_follows(
-    param: Option<Json<RequestParam<PaginationParam, FollowFilter>>>,
-) -> Json<serde_json::Value> {
-    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+pub fn filter_follows(param: Option<Json<RequestParam<FollowFilter>>>) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
     let param = param.into_inner();
     println!("{param:?}");
     let resp = FollowController::filter(&param).unwrap();

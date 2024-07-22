@@ -5,7 +5,6 @@ use obj_traits::controller::controller_crud::{
     controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
     controller_get_by_id, controller_update_by_id, ControllerCRUD,
 };
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
@@ -17,9 +16,9 @@ impl ControllerCRUD for ProductController {
     type Item = Product;
     type PostItem = PostProduct;
     type PatchItem = PatchProduct;
-    type Param = RequestParam<PaginationParam, ProductFilter>;
+    type Param = RequestParam<ProductFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, ProductFilter>,
+        param: &RequestParam<ProductFilter>,
     ) -> Result<ApiResponse<Data<Vec<Product>>>, Box<dyn Error>> {
         controller_get_all::<Product, ProductService, ProductFilter>(param)
     }
@@ -40,7 +39,7 @@ impl ControllerCRUD for ProductController {
         controller_update_by_id::<Product, ProductService, PatchProduct>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, ProductFilter>,
+        param: &RequestParam<ProductFilter>,
     ) -> Result<ApiResponse<Data<Vec<Product>>>, Box<dyn std::error::Error>> {
         controller_filter::<Product, ProductService, ProductFilter>(param)
     }

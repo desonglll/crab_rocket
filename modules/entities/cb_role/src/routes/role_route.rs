@@ -1,5 +1,5 @@
 use crate::controllers::role_controller::RoleController;
-use crate::models::role::{PostRole, PatchRole};
+use crate::models::role::{PatchRole, PostRole};
 use crate::models::role_filter::RoleFilter;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
@@ -17,14 +17,8 @@ use rocket::{delete, get, options, patch, post};
 /// 例如PUT/items/1的意思是替換/items/1，如果已經存在就替換，沒有就新增。
 /// PUT必須包含items/1的所有屬性資料
 #[get("/role?<limit>&<offset>")]
-pub fn get_roles(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
-    if limit.is_none() {
-        limit = Some(10);
-    };
-    if offset.is_none() {
-        offset = Some(0);
-    };
-    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
+pub fn get_roles(limit: Option<i32>, offset: Option<i32>) -> Json<serde_json::Value> {
+    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = RoleController::get_all(&params).unwrap();
@@ -33,10 +27,8 @@ pub fn get_roles(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
 }
 
 #[post("/role/filter", data = "<param>")]
-pub fn filter_roles(
-    param: Option<Json<RequestParam<PaginationParam, RoleFilter>>>,
-) -> Json<serde_json::Value> {
-    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+pub fn filter_roles(param: Option<Json<RequestParam<RoleFilter>>>) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
     let param = param.into_inner();
     println!("{param:?}");
     let resp = RoleController::filter(&param).unwrap();

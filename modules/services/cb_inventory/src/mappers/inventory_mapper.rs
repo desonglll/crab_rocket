@@ -1,10 +1,7 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -21,7 +18,7 @@ impl MapperCRUD for InventoryMapper {
     type Item = Inventory;
     type PostItem = PostInventory;
     type PatchItem = PatchInventory;
-    type Param = RequestParam<PaginationParam, InventoryFilter>;
+    type Param = RequestParam<InventoryFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -41,8 +38,9 @@ impl MapperCRUD for InventoryMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::inventory_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -110,7 +108,7 @@ impl MapperCRUD for InventoryMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, InventoryFilter>,
+        param: &RequestParam<InventoryFilter>,
     ) -> Result<Data<Vec<Inventory>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -127,8 +125,9 @@ impl MapperCRUD for InventoryMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::inventory_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -189,10 +188,7 @@ mod test {
         inventory_filter::InventoryFilter,
     };
     use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::{
-        mapper::mapper_crud::MapperCRUD,
-        request::{pagination_request_param::PaginationParamTrait, request_param::RequestParam},
-    };
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
 
     #[test]
     fn test_fetch_all_inventory_table() {
@@ -330,18 +326,16 @@ mod test {
     fn test_filter() {
         match establish_pg_connection() {
             Ok(mut conn) => {
-                let param = RequestParam {
-                    pagination: PaginationParam::demo(),
-                    filter: Some(InventoryFilter {
-                        inventory_id: Some(1),
-                        product_id: None,
-                        location: None,
-                        quantity_min: None,
-                        quantity_max: None,
-                        last_updated_min: None,
-                        last_updated_max: None,
-                    }),
+                let filter = InventoryFilter {
+                    inventory_id: Some(1),
+                    product_id: None,
+                    location: None,
+                    quantity_min: None,
+                    quantity_max: None,
+                    last_updated_min: None,
+                    last_updated_max: None,
                 };
+                let param = RequestParam::new(None, Some(filter));
                 match InventoryMapper::filter(&mut conn, &param) {
                     Ok(data) => {
                         assert!(

@@ -3,9 +3,7 @@ use std::error::Error;
 use crab_rocket_schema::establish_pg_connection;
 
 use crate::{
-    mapper::mapper_crud::MapperCRUD,
-    request::{pagination_request_param::PaginationParam, request_param::RequestParam},
-    response::data::Data,
+    mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam, response::data::Data,
 };
 
 /// ## Construct
@@ -30,10 +28,10 @@ pub trait ServiceCRUD {
     fn filter(param: &Self::Param) -> Result<Data<Vec<Self::Item>>, Box<dyn std::error::Error>>;
 }
 pub fn service_get_all<Obj, ObjMapper, ObjFilter>(
-    param: &RequestParam<PaginationParam, ObjFilter>,
+    param: &RequestParam<ObjFilter>,
 ) -> Result<Data<Vec<Obj>>, Box<dyn Error>>
 where
-    ObjMapper: MapperCRUD<Item=Obj, Param=RequestParam<PaginationParam, ObjFilter>>,
+    ObjMapper: MapperCRUD<Item = Obj, Param = RequestParam<ObjFilter>>,
 {
     match establish_pg_connection() {
         Ok(mut conn) => match ObjMapper::get_all(&mut conn, param) {
@@ -52,7 +50,7 @@ where
 
 pub fn service_get_by_id<Obj, ObjMapper>(pid: i32) -> Result<Obj, Box<dyn Error>>
 where
-    ObjMapper: MapperCRUD<Item=Obj>,
+    ObjMapper: MapperCRUD<Item = Obj>,
 {
     match establish_pg_connection() {
         Ok(mut conn) => match ObjMapper::get_by_id(&mut conn, pid) {
@@ -71,7 +69,7 @@ where
 
 pub fn service_add_single<Obj, ObjMapper, NewObj>(obj: &NewObj) -> Result<Obj, Box<dyn Error>>
 where
-    ObjMapper: MapperCRUD<Item=Obj, PostItem=NewObj>,
+    ObjMapper: MapperCRUD<Item = Obj, PostItem = NewObj>,
 {
     match establish_pg_connection() {
         Ok(mut conn) => match ObjMapper::add_single(&mut conn, obj) {
@@ -90,7 +88,7 @@ where
 
 pub fn service_delete_by_id<Obj, ObjMapper>(pid: i32) -> Result<Obj, Box<dyn Error>>
 where
-    ObjMapper: MapperCRUD<Item=Obj>,
+    ObjMapper: MapperCRUD<Item = Obj>,
 {
     match establish_pg_connection() {
         Ok(mut conn) => match ObjMapper::delete_by_id(&mut conn, pid) {
@@ -111,7 +109,7 @@ pub fn service_update_by_id<Obj, ObjMapper, PatchObj>(
     obj: &PatchObj,
 ) -> Result<Obj, Box<dyn Error>>
 where
-    ObjMapper: MapperCRUD<Item=Obj, PatchItem=PatchObj>,
+    ObjMapper: MapperCRUD<Item = Obj, PatchItem = PatchObj>,
 {
     match establish_pg_connection() {
         Ok(mut conn) => match ObjMapper::update_by_id(&mut conn, pid, obj) {
@@ -128,10 +126,10 @@ where
     }
 }
 pub fn service_filter<Obj, ObjMapper, ObjFilter>(
-    param: &RequestParam<PaginationParam, ObjFilter>,
+    param: &RequestParam<ObjFilter>,
 ) -> Result<Data<Vec<Obj>>, Box<dyn Error>>
 where
-    ObjMapper: MapperCRUD<Item=Obj, Param=RequestParam<PaginationParam, ObjFilter>>,
+    ObjMapper: MapperCRUD<Item = Obj, Param = RequestParam<ObjFilter>>,
 {
     match establish_pg_connection() {
         Ok(mut conn) => match ObjMapper::get_all(&mut conn, param) {

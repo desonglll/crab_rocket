@@ -17,3 +17,4 @@ rocket_cors = "0.6.0"
 crab_rocket_utils = { path = "../../utils/cb_utils" }
 crab_rocket_schema = { path = "../../schemas/cb_schema" }
 obj_traits = { path = "../../utils/obj_traits" }
+auth = { path = "../../auth" }

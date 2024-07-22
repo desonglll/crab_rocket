@@ -6,7 +6,7 @@ use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use diesel::result::Error;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
+use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 
@@ -16,10 +16,10 @@ impl MapperCRUD for UserMapper {
     type Item = User;
     type PostItem = PostUser;
     type PatchItem = PatchUser;
-    type Param = RequestParam<PaginationParam, UserFilter>;
+    type Param = RequestParam<UserFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, UserFilter>,
+        param: &RequestParam<UserFilter>,
     ) -> Result<Data<Vec<User>>, Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -36,8 +36,9 @@ impl MapperCRUD for UserMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::user_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -93,7 +94,7 @@ impl MapperCRUD for UserMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, UserFilter>,
+        param: &RequestParam<UserFilter>,
     ) -> Result<Data<Vec<User>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -112,8 +113,9 @@ impl MapperCRUD for UserMapper {
         let filter = &param.filter;
         println!("{filter:?}");
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::user_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -180,7 +182,6 @@ mod test {
     use crate::mappers::user_mapper::UserMapper;
     use crate::models::user::{PatchUser, PostUser};
     use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
 
     #[test]
@@ -198,7 +199,7 @@ mod test {
 
     #[test]
     fn test_fetch_all_users() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(None, None);
 
         match establish_pg_connection() {
             Ok(mut conn) => match UserMapper::get_all(&mut conn, &param) {
@@ -277,7 +278,7 @@ mod test {
             offset: Some(0),
             limit: Some(10),
         };
-        let param = RequestParam::new(PaginationParam::demo(), Some(filter));
+        let param = RequestParam::new(None, Some(filter));
 
         match establish_pg_connection() {
             Ok(mut conn) => match UserMapper::filter(&mut conn, &param) {

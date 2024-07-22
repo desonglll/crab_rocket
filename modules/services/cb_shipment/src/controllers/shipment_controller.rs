@@ -5,7 +5,6 @@ use obj_traits::controller::controller_crud::{
     controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
     controller_get_by_id, controller_update_by_id, ControllerCRUD,
 };
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
@@ -17,9 +16,9 @@ impl ControllerCRUD for ShipmentController {
     type Item = Shipment;
     type PostItem = PostShipment;
     type PatchItem = PatchShipment;
-    type Param = RequestParam<PaginationParam, ShipmentFilter>;
+    type Param = RequestParam<ShipmentFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, ShipmentFilter>,
+        param: &RequestParam<ShipmentFilter>,
     ) -> Result<ApiResponse<Data<Vec<Shipment>>>, Box<dyn Error>> {
         controller_get_all::<Shipment, ShipmentService, ShipmentFilter>(param)
     }
@@ -43,7 +42,7 @@ impl ControllerCRUD for ShipmentController {
         controller_update_by_id::<Shipment, ShipmentService, PatchShipment>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, ShipmentFilter>,
+        param: &RequestParam<ShipmentFilter>,
     ) -> Result<ApiResponse<Data<Vec<Shipment>>>, Box<dyn std::error::Error>> {
         controller_filter::<Shipment, ShipmentService, ShipmentFilter>(param)
     }

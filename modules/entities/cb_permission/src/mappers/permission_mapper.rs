@@ -6,10 +6,7 @@ use crab_rocket_schema::schema::permission_table::dsl;
 use diesel::{prelude::*, result::Error};
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -19,10 +16,10 @@ impl MapperCRUD for PermissionMapper {
     type Item = Permission;
     type PostItem = PostPermission;
     type PatchItem = PatchPermission;
-    type Param = RequestParam<PaginationParam, PermissionFilter>;
+    type Param = RequestParam<PermissionFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, PermissionFilter>,
+        param: &RequestParam<PermissionFilter>,
     ) -> Result<Data<Vec<Permission>>, Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -39,8 +36,9 @@ impl MapperCRUD for PermissionMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::permission_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -112,7 +110,7 @@ impl MapperCRUD for PermissionMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, PermissionFilter>,
+        param: &RequestParam<PermissionFilter>,
     ) -> Result<Data<Vec<Permission>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -129,8 +127,9 @@ impl MapperCRUD for PermissionMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::permission_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -209,13 +208,7 @@ mod tests {
     #[test]
     fn test_get_all() {
         let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let param = RequestParam {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: None,
-        };
+        let param = RequestParam::demo();
         let result = PermissionMapper::get_all(&mut conn, &param);
         assert!(result.is_ok());
         let data = result.unwrap();
@@ -282,13 +275,7 @@ mod tests {
     #[test]
     fn test_filter() {
         let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let param = RequestParam {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: None,
-        };
+        let param = RequestParam::demo();
         let result = PermissionMapper::filter(&mut conn, &param);
         assert!(result.is_ok());
         let data = result.unwrap();

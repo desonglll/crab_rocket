@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use obj_traits::{
-    request::{pagination_request_param::PaginationParam, request_param::RequestParam},
+    request::request_param::RequestParam,
     response::data::Data,
     service::service_crud::{
         service_add_single, service_delete_by_id, service_filter, service_get_all,
@@ -12,7 +12,7 @@ use obj_traits::{
 use crate::{
     mappers::post_mapper::PostMapper,
     models::{
-        post::{PostPost, PatchPost, Post},
+        post::{PatchPost, Post, PostPost},
         post_filter::PostFilter,
     },
 };
@@ -22,10 +22,8 @@ impl ServiceCRUD for PostService {
     type Item = Post;
     type PostItem = PostPost;
     type PatchItem = PatchPost;
-    type Param = RequestParam<PaginationParam, PostFilter>;
-    fn get_all(
-        param: &RequestParam<PaginationParam, PostFilter>,
-    ) -> Result<Data<Vec<Post>>, Box<dyn Error>> {
+    type Param = RequestParam<PostFilter>;
+    fn get_all(param: &RequestParam<PostFilter>) -> Result<Data<Vec<Post>>, Box<dyn Error>> {
         service_get_all::<Post, PostMapper, PostFilter>(param)
     }
     fn get_by_id(pid: i32) -> Result<Post, Box<dyn Error>> {
@@ -44,7 +42,7 @@ impl ServiceCRUD for PostService {
         service_update_by_id::<Post, PostMapper, PatchPost>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, PostFilter>,
+        param: &RequestParam<PostFilter>,
     ) -> Result<Data<Vec<Post>>, Box<dyn std::error::Error>> {
         service_filter::<Post, PostMapper, PostFilter>(param)
     }
@@ -71,7 +69,7 @@ mod test {
     }
     #[test]
     fn test_get_all_posts() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
         match PostService::get_all(&param) {
             Ok(all_posts) => {
                 println!("{all_posts}");

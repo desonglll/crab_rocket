@@ -1,7 +1,6 @@
 use crate::mappers::permission_mapper::PermissionMapper;
-use crate::models::permission::{PostPermission, PatchPermission, Permission};
+use crate::models::permission::{PatchPermission, Permission, PostPermission};
 use crate::models::permission_filter::PermissionFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,9 +15,9 @@ impl ServiceCRUD for PermissionService {
     type Item = Permission;
     type PostItem = PostPermission;
     type PatchItem = PatchPermission;
-    type Param = RequestParam<PaginationParam, PermissionFilter>;
+    type Param = RequestParam<PermissionFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, PermissionFilter>,
+        param: &RequestParam<PermissionFilter>,
     ) -> Result<Data<Vec<Permission>>, Box<dyn Error>> {
         service_get_all::<Permission, PermissionMapper, PermissionFilter>(param)
     }
@@ -38,7 +37,7 @@ impl ServiceCRUD for PermissionService {
         service_update_by_id::<Permission, PermissionMapper, PatchPermission>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, PermissionFilter>,
+        param: &RequestParam<PermissionFilter>,
     ) -> Result<Data<Vec<Permission>>, Box<dyn std::error::Error>> {
         service_filter::<Permission, PermissionMapper, PermissionFilter>(param)
     }

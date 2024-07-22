@@ -1,7 +1,6 @@
 use crate::mappers::customer_mapper::CustomerMapper;
 use crate::models::customer::{Customer, PatchCustomer, PostCustomer};
 use crate::models::customer_filter::CustomerFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,9 +15,9 @@ impl ServiceCRUD for CustomerService {
     type Item = Customer;
     type PostItem = PostCustomer;
     type PatchItem = PatchCustomer;
-    type Param = RequestParam<PaginationParam, CustomerFilter>;
+    type Param = RequestParam<CustomerFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, CustomerFilter>,
+        param: &RequestParam<CustomerFilter>,
     ) -> Result<Data<Vec<Customer>>, Box<dyn Error>> {
         service_get_all::<Customer, CustomerMapper, CustomerFilter>(param)
     }
@@ -38,7 +37,7 @@ impl ServiceCRUD for CustomerService {
         service_update_by_id::<Customer, CustomerMapper, PatchCustomer>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, CustomerFilter>,
+        param: &RequestParam<CustomerFilter>,
     ) -> Result<Data<Vec<Customer>>, Box<dyn std::error::Error>> {
         service_filter::<Customer, CustomerMapper, CustomerFilter>(param)
     }
@@ -63,7 +62,7 @@ mod test {
 
     #[test]
     fn test_get_all_customers() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
         match CustomerService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

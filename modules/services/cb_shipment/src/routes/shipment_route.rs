@@ -15,7 +15,7 @@ pub fn get_shipments(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<se
     if offset.is_none() {
         offset = Some(0);
     };
-    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
+    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = ShipmentController::get_all(&params).unwrap();
@@ -24,9 +24,9 @@ pub fn get_shipments(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<se
 }
 #[post("/shipment/filter", data = "<param>")]
 pub fn filter_shipments(
-    param: Option<Json<RequestParam<PaginationParam, ShipmentFilter>>>,
+    param: Option<Json<RequestParam<ShipmentFilter>>>,
 ) -> Json<serde_json::Value> {
-    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.unwrap_or(Json(RequestParam::new(Some(PaginationParam::default()), None)));
     let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = ShipmentController::filter(&param).unwrap();

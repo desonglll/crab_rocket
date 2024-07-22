@@ -7,7 +7,7 @@ use diesel::prelude::*;
 use diesel::result::Error;
 use diesel::PgConnection;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
+use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 pub struct PostMapper {}
@@ -16,10 +16,10 @@ impl MapperCRUD for PostMapper {
     type Item = Post;
     type PostItem = PostPost;
     type PatchItem = PatchPost;
-    type Param = RequestParam<PaginationParam, PostFilter>;
+    type Param = RequestParam<PostFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, PostFilter>,
+        param: &RequestParam<PostFilter>,
     ) -> Result<Data<Vec<Post>>, Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -36,8 +36,9 @@ impl MapperCRUD for PostMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::post_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -103,7 +104,7 @@ impl MapperCRUD for PostMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, PostFilter>,
+        param: &RequestParam<PostFilter>,
     ) -> Result<Data<Vec<Post>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -120,8 +121,9 @@ impl MapperCRUD for PostMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::post_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -181,7 +183,7 @@ impl MapperCRUD for PostMapper {
 #[cfg(test)]
 mod tests {
     use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::request::pagination_request_param::PaginationParamTrait;
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 
     use super::*;
 
@@ -203,7 +205,7 @@ mod tests {
     #[test]
     fn test_fetch_all_post_table() {
         let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
 
         // 查詢所有 Post 記錄
         let result = PostMapper::get_all(&mut conn, &param).expect("Failed to fetch all posts");

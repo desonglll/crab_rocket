@@ -1,7 +1,6 @@
 use crate::mappers::category_mapper::CategoryMapper;
 use crate::models::category::{Category, PatchCategory, PostCategory};
 use crate::models::category_filter::CategoryFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,9 +15,9 @@ impl ServiceCRUD for CategoryService {
     type Item = Category;
     type PostItem = PostCategory;
     type PatchItem = PatchCategory;
-    type Param = RequestParam<PaginationParam, CategoryFilter>;
+    type Param = RequestParam<CategoryFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, CategoryFilter>,
+        param: &RequestParam<CategoryFilter>,
     ) -> Result<Data<Vec<Category>>, Box<dyn Error>> {
         service_get_all::<Category, CategoryMapper, CategoryFilter>(param)
     }
@@ -38,7 +37,7 @@ impl ServiceCRUD for CategoryService {
         service_update_by_id::<Category, CategoryMapper, PatchCategory>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, CategoryFilter>,
+        param: &RequestParam<CategoryFilter>,
     ) -> Result<Data<Vec<Category>>, Box<dyn std::error::Error>> {
         service_filter::<Category, CategoryMapper, CategoryFilter>(param)
     }
@@ -63,7 +62,7 @@ mod test {
 
     #[test]
     fn test_get_all_categorys() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
         match CategoryService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

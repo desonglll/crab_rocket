@@ -5,13 +5,13 @@ use obj_traits::{
         controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
         controller_get_by_id, controller_update_by_id, ControllerCRUD,
     },
-    request::{pagination_request_param::PaginationParam, request_param::RequestParam},
+    request::request_param::RequestParam,
     response::{api_response::ApiResponse, data::Data},
 };
 
 use crate::{
     models::{
-        post::{PostPost, PatchPost, Post},
+        post::{PatchPost, Post, PostPost},
         post_filter::PostFilter,
     },
     services::post_service::PostService,
@@ -23,9 +23,9 @@ impl ControllerCRUD for PostController {
     type Item = Post;
     type PostItem = PostPost;
     type PatchItem = PatchPost;
-    type Param = RequestParam<PaginationParam, PostFilter>;
+    type Param = RequestParam<PostFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, PostFilter>,
+        param: &RequestParam<PostFilter>,
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn Error>> {
         controller_get_all::<Self::Item, PostService, PostFilter>(param)
     }
@@ -46,7 +46,7 @@ impl ControllerCRUD for PostController {
         controller_update_by_id::<Self::Item, PostService, PatchPost>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, PostFilter>,
+        param: &RequestParam<PostFilter>,
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
         controller_filter::<Self::Item, PostService, PostFilter>(param)
     }

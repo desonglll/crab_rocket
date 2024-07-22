@@ -1,5 +1,5 @@
 use crate::controllers::permission_controller::PermissionController;
-use crate::models::permission::{PostPermission, PatchPermission};
+use crate::models::permission::{PatchPermission, PostPermission};
 use crate::models::permission_filter::PermissionFilter;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
@@ -17,14 +17,8 @@ use rocket::{delete, get, options, patch, post};
 /// 例如PUT/items/1的意思是替換/items/1，如果已經存在就替換，沒有就新增。
 /// PUT必須包含items/1的所有屬性資料
 #[get("/permission?<limit>&<offset>")]
-pub fn get_permissions(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
-    if limit.is_none() {
-        limit = Some(10);
-    };
-    if offset.is_none() {
-        offset = Some(0);
-    };
-    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
+pub fn get_permissions(limit: Option<i32>, offset: Option<i32>) -> Json<serde_json::Value> {
+    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = PermissionController::get_all(&params).unwrap();
@@ -34,9 +28,9 @@ pub fn get_permissions(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<
 
 #[post("/permission/filter", data = "<param>")]
 pub fn filter_permissions(
-    param: Option<Json<RequestParam<PaginationParam, PermissionFilter>>>,
+    param: Option<Json<RequestParam<PermissionFilter>>>,
 ) -> Json<serde_json::Value> {
-    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
     let param = param.into_inner();
     println!("{param:?}");
     let resp = PermissionController::filter(&param).unwrap();

@@ -1,9 +1,8 @@
 use std::error::Error;
 
 use crate::mappers::task_mapper::TaskMapper;
-use crate::models::task::{PostTask, PatchTask, Task};
+use crate::models::task::{PatchTask, PostTask, Task};
 use crate::models::task_filter::TaskFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -17,10 +16,8 @@ impl ServiceCRUD for TaskService {
     type Item = Task;
     type PostItem = PostTask;
     type PatchItem = PatchTask;
-    type Param = RequestParam<PaginationParam, TaskFilter>;
-    fn get_all(
-        param: &RequestParam<PaginationParam, TaskFilter>,
-    ) -> Result<Data<Vec<Task>>, Box<dyn Error>> {
+    type Param = RequestParam<TaskFilter>;
+    fn get_all(param: &RequestParam<TaskFilter>) -> Result<Data<Vec<Task>>, Box<dyn Error>> {
         service_get_all::<Task, TaskMapper, TaskFilter>(param)
     }
     fn get_by_id(pid: i32) -> Result<Task, Box<dyn Error>> {
@@ -39,7 +36,7 @@ impl ServiceCRUD for TaskService {
         service_update_by_id::<Task, TaskMapper, PatchTask>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, TaskFilter>,
+        param: &RequestParam<TaskFilter>,
     ) -> Result<Data<Vec<Task>>, Box<dyn std::error::Error>> {
         service_filter::<Task, TaskMapper, TaskFilter>(param)
     }
@@ -50,7 +47,7 @@ mod tests {
     use super::*;
     use crate::models::task::PostTask;
     use crab_rocket_utils::time::get_e8_time;
-    use obj_traits::request::pagination_request_param::PaginationParamTrait;
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 
     #[test]
     fn test_insert_single_task() {
@@ -66,7 +63,7 @@ mod tests {
 
     #[test]
     fn test_get_all_tasks() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
         let all_tasks = TaskService::get_all(&param).unwrap();
         println!("{all_tasks}");
     }

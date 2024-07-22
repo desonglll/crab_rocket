@@ -9,6 +9,7 @@
 /// ## 示例
 ///
 /// ```
+/// use crab_rocket_utils::time::get_e8_time;
 /// let bj_time = get_e8_time();
 /// println!("当前北京时间: {}", bj_time);
 /// ```

@@ -1,7 +1,6 @@
 use crate::mappers::role_mapper::RoleMapper;
-use crate::models::role::{PostRole, PatchRole, Role};
+use crate::models::role::{PatchRole, PostRole, Role};
 use crate::models::role_filter::RoleFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,10 +15,8 @@ impl ServiceCRUD for RoleService {
     type Item = Role;
     type PostItem = PostRole;
     type PatchItem = PatchRole;
-    type Param = RequestParam<PaginationParam, RoleFilter>;
-    fn get_all(
-        param: &RequestParam<PaginationParam, RoleFilter>,
-    ) -> Result<Data<Vec<Role>>, Box<dyn Error>> {
+    type Param = RequestParam<RoleFilter>;
+    fn get_all(param: &RequestParam<RoleFilter>) -> Result<Data<Vec<Role>>, Box<dyn Error>> {
         service_get_all::<Role, RoleMapper, RoleFilter>(param)
     }
     fn get_by_id(pid: i32) -> Result<Role, Box<dyn Error>> {
@@ -38,7 +35,7 @@ impl ServiceCRUD for RoleService {
         service_update_by_id::<Role, RoleMapper, PatchRole>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, RoleFilter>,
+        param: &RequestParam<RoleFilter>,
     ) -> Result<Data<Vec<Role>>, Box<dyn std::error::Error>> {
         service_filter::<Role, RoleMapper, RoleFilter>(param)
     }

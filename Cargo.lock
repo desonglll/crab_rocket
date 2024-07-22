@@ -586,6 +586,7 @@ dependencies = [
 name = "crab_rocket_task"
 version = "0.1.0"
 dependencies = [
+ "auth",
  "chrono",
  "chrono-tz",
  "crab_rocket_schema",
@@ -1315,6 +1316,7 @@ dependencies = [
  "crab_rocket_schema",
  "diesel",
  "rocket",
+ "uuid",
 ]
 
 [[package]]

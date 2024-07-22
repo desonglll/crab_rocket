@@ -1,7 +1,6 @@
 use crate::mappers::product_mapper::ProductMapper;
 use crate::models::product::{PatchProduct, PostProduct, Product};
 use crate::models::product_filter::ProductFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,10 +15,8 @@ impl ServiceCRUD for ProductService {
     type Item = Product;
     type PostItem = PostProduct;
     type PatchItem = PatchProduct;
-    type Param = RequestParam<PaginationParam, ProductFilter>;
-    fn get_all(
-        param: &RequestParam<PaginationParam, ProductFilter>,
-    ) -> Result<Data<Vec<Product>>, Box<dyn Error>> {
+    type Param = RequestParam<ProductFilter>;
+    fn get_all(param: &RequestParam<ProductFilter>) -> Result<Data<Vec<Product>>, Box<dyn Error>> {
         service_get_all::<Product, ProductMapper, ProductFilter>(param)
     }
     fn get_by_id(pid: i32) -> Result<Product, Box<dyn Error>> {
@@ -38,7 +35,7 @@ impl ServiceCRUD for ProductService {
         service_update_by_id::<Product, ProductMapper, PatchProduct>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, ProductFilter>,
+        param: &RequestParam<ProductFilter>,
     ) -> Result<Data<Vec<Product>>, Box<dyn std::error::Error>> {
         service_filter::<Product, ProductMapper, ProductFilter>(param)
     }
@@ -63,7 +60,7 @@ mod test {
 
     #[test]
     fn test_get_all_products() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
         match ProductService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

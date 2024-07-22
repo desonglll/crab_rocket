@@ -1,6 +1,8 @@
 use rocket::serde::{Deserialize, Serialize};
 
-use super::pagination_request_param::PaginationParamTrait;
+use crate::modules::auth_param::AuthParam;
+
+use super::pagination_request_param::{PaginationParam, PaginationParamTrait};
 
 /// ## Json Deserialize for passing request param.
 /// ```
@@ -11,21 +13,39 @@ use super::pagination_request_param::PaginationParamTrait;
 /// ```
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
-pub struct RequestParam<PaginationParamGeneric, FilterParamGeneric> {
-    pub pagination: PaginationParamGeneric,
+pub struct RequestParam<FilterParamGeneric> {
+    pub auth: Option<AuthParam>,
+    pub pagination: Option<PaginationParam>,
     pub filter: Option<FilterParamGeneric>,
 }
 
-impl<P: PaginationParamTrait, T> RequestParam<P, T> {
-    pub fn new(pagination: P, filter: Option<T>) -> Self {
-        Self {
-            pagination,
-            filter,
+impl<T> RequestParam<T> {
+    pub fn new(pagination: Option<PaginationParam>, filter: Option<T>) -> Self {
+        if pagination.is_none() {
+            Self {
+                auth: Some(AuthParam::new()),
+                pagination: Some(PaginationParam::default()),
+                filter,
+            }
+        } else {
+            Self {
+                auth: Some(AuthParam::new()),
+                pagination,
+                filter,
+            }
         }
     }
     pub fn default() -> Self {
         Self {
-            pagination: P::default(),
+            auth: Some(AuthParam::new()),
+            pagination: Some(PaginationParam::default()),
+            filter: None,
+        }
+    }
+    pub fn demo() -> Self {
+        Self {
+            auth: Some(AuthParam::new()),
+            pagination: Some(PaginationParam::default()),
             filter: None,
         }
     }

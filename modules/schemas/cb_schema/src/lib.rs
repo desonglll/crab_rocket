@@ -1,7 +1,7 @@
 use colored::Colorize;
 use diesel::{Connection, PgConnection};
-use std::env;
 use dotenv::dotenv;
+use std::env;
 
 pub mod common;
 pub mod controllers;

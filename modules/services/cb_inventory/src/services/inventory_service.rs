@@ -1,7 +1,6 @@
 use crate::mappers::inventory_mapper::InventoryMapper;
 use crate::models::inventory::{Inventory, PatchInventory, PostInventory};
 use crate::models::inventory_filter::InventoryFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,9 +15,9 @@ impl ServiceCRUD for InventoryService {
     type Item = Inventory;
     type PostItem = PostInventory;
     type PatchItem = PatchInventory;
-    type Param = RequestParam<PaginationParam, InventoryFilter>;
+    type Param = RequestParam<InventoryFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, InventoryFilter>,
+        param: &RequestParam<InventoryFilter>,
     ) -> Result<Data<Vec<Inventory>>, Box<dyn Error>> {
         service_get_all::<Inventory, InventoryMapper, InventoryFilter>(param)
     }
@@ -38,7 +37,7 @@ impl ServiceCRUD for InventoryService {
         service_update_by_id::<Inventory, InventoryMapper, PatchInventory>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, InventoryFilter>,
+        param: &RequestParam<InventoryFilter>,
     ) -> Result<Data<Vec<Inventory>>, Box<dyn std::error::Error>> {
         service_filter::<Inventory, InventoryMapper, InventoryFilter>(param)
     }
@@ -47,7 +46,6 @@ impl ServiceCRUD for InventoryService {
 #[cfg(test)]
 mod test {
     use crate::services::inventory_service::InventoryService;
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
 
@@ -63,7 +61,7 @@ mod test {
 
     #[test]
     fn test_get_all_inventorys() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(None, None);
         match InventoryService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

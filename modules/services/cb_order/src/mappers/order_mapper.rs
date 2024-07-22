@@ -1,9 +1,6 @@
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,7 +17,7 @@ impl MapperCRUD for OrderMapper {
     type Item = Order;
     type PostItem = PostOrder;
     type PatchItem = PatchOrder;
-    type Param = RequestParam<PaginationParam, OrderFilter>;
+    type Param = RequestParam<OrderFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -40,8 +37,9 @@ impl MapperCRUD for OrderMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::order_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -109,7 +107,7 @@ impl MapperCRUD for OrderMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, OrderFilter>,
+        param: &RequestParam<OrderFilter>,
     ) -> Result<Data<Vec<Order>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -126,8 +124,9 @@ impl MapperCRUD for OrderMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::order_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -190,7 +189,7 @@ mod test {
 
     #[test]
     fn test_fetch_all_order_table() {
-        let param = RequestParam::<PaginationParam, OrderFilter>::default();
+        let param = RequestParam::<OrderFilter>::default();
         match establish_pg_connection() {
             Ok(mut conn) => match OrderMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
@@ -330,15 +329,9 @@ mod test {
             status: None,
             order_id: None,
         };
-        let param = RequestParam::<PaginationParam, OrderFilter> {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: Some(filter),
-        };
-
+        let param = RequestParam::<OrderFilter>::new(None, Some(filter));
         let result = OrderMapper::filter(&mut conn, &param).expect("Failed to filter orders");
+        println!("{:#?}", result);
         assert_eq!(result.data().len(), 6);
     }
 }

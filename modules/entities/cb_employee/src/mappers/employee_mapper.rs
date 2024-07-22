@@ -1,10 +1,7 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,10 +17,10 @@ impl MapperCRUD for EmployeeMapper {
     type Item = Employee;
     type PostItem = PostEmployee;
     type PatchItem = PatchEmployee;
-    type Param = RequestParam<PaginationParam, EmployeeFilter>;
+    type Param = RequestParam<EmployeeFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Employee>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -40,8 +37,9 @@ impl MapperCRUD for EmployeeMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::employee_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -111,7 +109,7 @@ impl MapperCRUD for EmployeeMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -130,8 +128,9 @@ impl MapperCRUD for EmployeeMapper {
         let filter = &param.filter;
         println!("{filter:?}");
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::employee_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -234,13 +233,7 @@ mod test {
         employee_filter::EmployeeFilter,
     };
     use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::{
-        mapper::mapper_crud::MapperCRUD,
-        request::{
-            pagination_request_param::{PaginationParam, PaginationParamTrait},
-            request_param::RequestParam,
-        },
-    };
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
 
     #[test]
     fn test_insert_employee() {
@@ -296,7 +289,7 @@ mod test {
         }
         "#;
         let filter = EmployeeFilter::from_json(json_data).unwrap();
-        let params = RequestParam::new(PaginationParam::demo(), Some(filter));
+        let params = RequestParam::new(None, Some(filter));
 
         match establish_pg_connection() {
             Ok(mut conn) => match EmployeeMapper::get_all(&mut conn, &params) {
@@ -353,7 +346,7 @@ mod test {
         }
         "#;
         let filter = EmployeeFilter::from_json(json_data).unwrap();
-        let params = RequestParam::new(PaginationParam::demo(), Some(filter));
+        let params = RequestParam::new(None, Some(filter));
 
         match establish_pg_connection() {
             Ok(mut conn) => match EmployeeMapper::filter(&mut conn, &params) {

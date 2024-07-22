@@ -1,7 +1,6 @@
 use crate::mappers::shipment_mapper::ShipmentMapper;
 use crate::models::shipment::{PatchShipment, PostShipment, Shipment};
 use crate::models::shipment_filter::ShipmentFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,9 +15,9 @@ impl ServiceCRUD for ShipmentService {
     type Item = Shipment;
     type PostItem = PostShipment;
     type PatchItem = PatchShipment;
-    type Param = RequestParam<PaginationParam, ShipmentFilter>;
+    type Param = RequestParam<ShipmentFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, ShipmentFilter>,
+        param: &RequestParam<ShipmentFilter>,
     ) -> Result<Data<Vec<Shipment>>, Box<dyn Error>> {
         service_get_all::<Shipment, ShipmentMapper, ShipmentFilter>(param)
     }
@@ -38,7 +37,7 @@ impl ServiceCRUD for ShipmentService {
         service_update_by_id::<Shipment, ShipmentMapper, PatchShipment>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, ShipmentFilter>,
+        param: &RequestParam<ShipmentFilter>,
     ) -> Result<Data<Vec<Shipment>>, Box<dyn std::error::Error>> {
         service_filter::<Shipment, ShipmentMapper, ShipmentFilter>(param)
     }
@@ -47,7 +46,6 @@ impl ServiceCRUD for ShipmentService {
 #[cfg(test)]
 mod test {
     use crate::services::shipment_service::ShipmentService;
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
 
@@ -63,7 +61,7 @@ mod test {
 
     #[test]
     fn test_get_all_shipments() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(None, None);
         match ShipmentService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

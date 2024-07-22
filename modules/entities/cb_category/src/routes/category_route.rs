@@ -8,14 +8,8 @@ use crate::models::category::{PatchCategory, PostCategory};
 use crate::models::category_filter::CategoryFilter;
 
 #[get("/category?<limit>&<offset>")]
-pub fn get_categorys(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_json::Value> {
-    if limit.is_none() {
-        limit = Some(10);
-    };
-    if offset.is_none() {
-        offset = Some(0);
-    };
-    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
+pub fn get_categorys(limit: Option<i32>, offset: Option<i32>) -> Json<serde_json::Value> {
+    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = CategoryController::get_all(&params).unwrap();
@@ -24,9 +18,9 @@ pub fn get_categorys(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<se
 }
 #[post("/category/filter", data = "<param>")]
 pub fn filter_categorys(
-    param: Option<Json<RequestParam<PaginationParam, CategoryFilter>>>,
+    param: Option<Json<RequestParam<CategoryFilter>>>,
 ) -> Json<serde_json::Value> {
-    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
     let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = CategoryController::filter(&param).unwrap();

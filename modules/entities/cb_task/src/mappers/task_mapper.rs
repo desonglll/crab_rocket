@@ -5,7 +5,7 @@ use crab_rocket_schema::schema::task_table::{self};
 use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
+use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 
@@ -15,10 +15,10 @@ impl MapperCRUD for TaskMapper {
     type Item = Task;
     type PostItem = PostTask;
     type PatchItem = PatchTask;
-    type Param = RequestParam<PaginationParam, TaskFilter>;
+    type Param = RequestParam<TaskFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, TaskFilter>,
+        param: &RequestParam<TaskFilter>,
     ) -> Result<Data<Vec<Task>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -35,8 +35,9 @@ impl MapperCRUD for TaskMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::task_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -102,7 +103,7 @@ impl MapperCRUD for TaskMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, TaskFilter>,
+        param: &RequestParam<TaskFilter>,
     ) -> Result<Data<Vec<Task>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -119,8 +120,9 @@ impl MapperCRUD for TaskMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::task_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -207,7 +209,7 @@ mod tests {
     fn test_get_all_tasks() {
         let mut conn = establish_pg_connection().expect("Failed to establish connection");
 
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
 
         let result = TaskMapper::get_all(&mut conn, &param);
         assert!(result.is_ok());

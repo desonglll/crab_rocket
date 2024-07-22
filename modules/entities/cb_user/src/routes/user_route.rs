@@ -4,7 +4,7 @@ use obj_traits::request::request_param::RequestParam;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::user_controller::UserController;
-use crate::models::user::{PostUser, PatchUser};
+use crate::models::user::{PatchUser, PostUser};
 use crate::models::user_filter::UserFilter;
 
 #[get("/user?<limit>&<offset>")]
@@ -15,7 +15,7 @@ pub fn get_users(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
     if offset.is_none() {
         offset = Some(0);
     };
-    let params = RequestParam::new(PaginationParam::new(limit, offset), None);
+    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
     println!("{:?}", params);
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = UserController::get_all(&params).unwrap();
@@ -24,11 +24,9 @@ pub fn get_users(mut limit: Option<i32>, mut offset: Option<i32>) -> Json<serde_
 }
 
 #[post("/user/filter", data = "<param>")]
-pub fn filter_users(
-    param: Option<Json<RequestParam<PaginationParam, UserFilter>>>,
-) -> Json<serde_json::Value> {
+pub fn filter_users(param: Option<Json<RequestParam<UserFilter>>>) -> Json<serde_json::Value> {
     println!("{:?}", param);
-    let param = param.unwrap_or(Json(RequestParam::new(PaginationParam::default(), None)));
+    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
     let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count();
     let resp = UserController::filter(&param).unwrap();

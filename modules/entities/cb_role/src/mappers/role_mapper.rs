@@ -7,7 +7,7 @@ use diesel::prelude::*;
 use diesel::result::Error;
 use diesel::PgConnection;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
+use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 
@@ -17,10 +17,10 @@ impl MapperCRUD for RoleMapper {
     type Item = Role;
     type PostItem = PostRole;
     type PatchItem = PatchRole;
-    type Param = RequestParam<PaginationParam, RoleFilter>;
+    type Param = RequestParam<RoleFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, RoleFilter>,
+        param: &RequestParam<RoleFilter>,
     ) -> Result<Data<Vec<Role>>, Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -37,8 +37,9 @@ impl MapperCRUD for RoleMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::role_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -102,7 +103,7 @@ impl MapperCRUD for RoleMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, RoleFilter>,
+        param: &RequestParam<RoleFilter>,
     ) -> Result<Data<Vec<Role>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -119,8 +120,9 @@ impl MapperCRUD for RoleMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::role_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -198,7 +200,7 @@ mod tests {
 
     #[test]
     fn test_get_all() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(None, None);
         let mut conn = establish_pg_connection().expect("Failed to establish connection");
         let result = RoleMapper::get_all(&mut conn, &param);
         assert!(result.is_ok());
@@ -256,7 +258,8 @@ mod tests {
     #[test]
     fn test_filter() {
         let param = RequestParam {
-            pagination: PaginationParam::default(),
+            auth: None,
+            pagination: Some(PaginationParam::default()),
             filter: Some(RoleFilter {
                 role_name: Some("Admin".to_string()),
                 role_id: None,

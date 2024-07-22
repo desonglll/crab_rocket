@@ -1,7 +1,6 @@
 use crate::mappers::employee_mapper::EmployeeMapper;
-use crate::models::employee::{Employee, PostEmployee, PatchEmployee};
+use crate::models::employee::{Employee, PatchEmployee, PostEmployee};
 use crate::models::employee_filter::EmployeeFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -16,9 +15,9 @@ impl ServiceCRUD for EmployeeService {
     type Item = Employee;
     type PostItem = PostEmployee;
     type PatchItem = PatchEmployee;
-    type Param = RequestParam<PaginationParam, EmployeeFilter>;
+    type Param = RequestParam<EmployeeFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, Box<dyn Error>> {
         service_get_all::<Employee, EmployeeMapper, EmployeeFilter>(param)
     }
@@ -38,7 +37,7 @@ impl ServiceCRUD for EmployeeService {
         service_update_by_id::<Employee, EmployeeMapper, PatchEmployee>(pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, Box<dyn std::error::Error>> {
         service_filter::<Employee, EmployeeMapper, EmployeeFilter>(param)
     }
@@ -63,7 +62,7 @@ mod test {
 
     #[test]
     fn test_get_all_employees() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
         match EmployeeService::get_all(&param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),

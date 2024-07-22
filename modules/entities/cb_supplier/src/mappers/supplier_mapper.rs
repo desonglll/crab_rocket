@@ -1,10 +1,7 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -21,7 +18,7 @@ impl MapperCRUD for SupplierMapper {
     type Item = Supplier;
     type PostItem = PostSupplier;
     type PatchItem = PatchSupplier;
-    type Param = RequestParam<PaginationParam, SupplierFilter>;
+    type Param = RequestParam<SupplierFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -41,8 +38,9 @@ impl MapperCRUD for SupplierMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::supplier_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -112,7 +110,7 @@ impl MapperCRUD for SupplierMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, SupplierFilter>,
+        param: &RequestParam<SupplierFilter>,
     ) -> Result<Data<Vec<Supplier>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -129,8 +127,9 @@ impl MapperCRUD for SupplierMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::supplier_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -192,7 +191,7 @@ mod tests {
 
     #[test]
     fn test_fetch_all_supplier_table() {
-        let param = RequestParam::<PaginationParam, SupplierFilter>::default();
+        let param = RequestParam::<SupplierFilter>::default();
         match establish_pg_connection() {
             Ok(mut conn) => match SupplierMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
