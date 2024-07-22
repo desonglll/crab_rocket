@@ -22,6 +22,7 @@ entities = { path = "./modules/entities" }
 services = { path = "./modules/services" }
 schemas = { path = "./modules/schemas" }
 crab_rocket_utils = { path = "./modules/utils/cb_utils" }
+crab_rocket_schema = { path = "./modules/schemas/cb_schema" }
 
 [profile.dev]
 opt-level = 0

@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -76,6 +77,17 @@ pub struct PostTask {
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
     pub user_id: Option<i32>,
+}
+impl PostTask {
+    pub fn demo() -> Self {
+        Self {
+            title: "Post Task".to_owned(),
+            content: None,
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
+            user_id: None,
+        }
+    }
 }
 
 impl PostTask {

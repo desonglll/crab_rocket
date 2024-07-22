@@ -1,10 +1,7 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -21,7 +18,7 @@ impl MapperCRUD for CategoryMapper {
     type Item = Category;
     type PostItem = PostCategory;
     type PatchItem = PatchCategory;
-    type Param = RequestParam<PaginationParam, CategoryFilter>;
+    type Param = RequestParam<CategoryFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -41,8 +38,9 @@ impl MapperCRUD for CategoryMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::category_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -111,7 +109,7 @@ impl MapperCRUD for CategoryMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, CategoryFilter>,
+        param: &RequestParam<CategoryFilter>,
     ) -> Result<Data<Vec<Category>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -128,8 +126,9 @@ impl MapperCRUD for CategoryMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::category_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -182,13 +181,16 @@ impl MapperCRUD for CategoryMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_category_table() {
         let param = RequestParam::default(); // 預設的請求參數
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
@@ -206,7 +208,9 @@ mod test {
     #[test]
     fn test_fetch_category_by_id() {
         let test_id = 1; // 測試用的 ID
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::get_by_id(&mut conn, test_id) {
                 Ok(category) => {
                     println!("{:#?}", category);
@@ -230,7 +234,9 @@ mod test {
             created_at: None,
             updated_at: None,
         };
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::add_single(&mut conn, &new_category) {
                 Ok(category) => {
                     println!("Added category: {:#?}", category);
@@ -255,7 +261,9 @@ mod test {
             created_at: None,
             updated_at: None,
         };
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match CategoryMapper::update_by_id(&mut conn, category_id, &updated_category) {
                     Ok(category) => {
@@ -275,7 +283,9 @@ mod test {
     #[test]
     fn test_delete_category() {
         let category_id = 1; // 測試用的 ID
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::delete_by_id(&mut conn, category_id) {
                 Ok(category) => {
                     println!("Deleted category: {:#?}", category);
@@ -302,15 +312,11 @@ mod test {
             updated_at_min: None,
             updated_at_max: None,
         };
-        let param = RequestParam {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: Some(filter_params),
-        };
+        let param = RequestParam::new(None, Some(filter_params));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CategoryMapper::filter(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);

@@ -28,6 +28,16 @@ pub struct PostShipment {
     pub status: Option<String>,
 }
 
+impl PostShipment {
+    pub fn demo() -> Self {
+        Self {
+            order_id: None,
+            shipment_date: None,
+            delivery_address: None,
+            status: None,
+        }
+    }
+}
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]

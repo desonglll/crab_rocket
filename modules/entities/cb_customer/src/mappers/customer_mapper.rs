@@ -1,9 +1,6 @@
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,7 +17,7 @@ impl MapperCRUD for CustomerMapper {
     type Item = Customer;
     type PostItem = PostCustomer;
     type PatchItem = PatchCustomer;
-    type Param = RequestParam<PaginationParam, CustomerFilter>;
+    type Param = RequestParam<CustomerFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -40,8 +37,9 @@ impl MapperCRUD for CustomerMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::customer_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -109,7 +107,7 @@ impl MapperCRUD for CustomerMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, CustomerFilter>,
+        param: &RequestParam<CustomerFilter>,
     ) -> Result<Data<Vec<Customer>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -126,8 +124,9 @@ impl MapperCRUD for CustomerMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::customer_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -179,18 +178,22 @@ mod test {
         customer::{PatchCustomer, PostCustomer},
         customer_filter::CustomerFilter,
     };
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State;
     #[test]
     fn test_get_all() {
-        let param = RequestParam {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: None,
+        let filter = CustomerFilter {
+            customer_id: None,
+            name: Some("John".to_string()),
+            email: None,
+            phone: None,
+            address: None,
         };
+        let param = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     assert!(!data.data().is_empty(), "Customer table should not be empty");
@@ -209,7 +212,9 @@ mod test {
     #[test]
     fn test_get_by_id() {
         let test_id = 1; // 请确保你的数据库中有这个ID的数据
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::get_by_id(&mut conn, test_id) {
                 Ok(customer) => {
                     assert_eq!(
@@ -239,7 +244,9 @@ mod test {
             address: Some("123 Test St".to_string()),
         };
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::add_single(&mut conn, &new_customer) {
                 Ok(customer) => {
                     assert_eq!(customer.name, "John Doe", "Name should match the added customer");
@@ -257,7 +264,9 @@ mod test {
     #[test]
     fn test_delete_by_id() {
         let test_id = 3; // 请确保你的数据库中有这个ID的数据
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::delete_by_id(&mut conn, test_id) {
                 Ok(customer) => {
                     assert_eq!(
@@ -288,7 +297,9 @@ mod test {
             address: Some("456 Test Ave".to_string()),
         };
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match CustomerMapper::update_by_id(&mut conn, test_id, &updated_customer) {
                     Ok(customer) => {
@@ -310,21 +321,18 @@ mod test {
 
     #[test]
     fn test_filter() {
-        let param = RequestParam {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: Some(CustomerFilter {
-                customer_id: None,
-                name: Some("John".to_string()),
-                email: None,
-                phone: None,
-                address: None,
-            }),
+        let filter = CustomerFilter {
+            customer_id: None,
+            name: Some("John".to_string()),
+            email: None,
+            phone: None,
+            address: None,
         };
+        let param = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match CustomerMapper::filter(&mut conn, &param) {
                 Ok(data) => {
                     assert!(

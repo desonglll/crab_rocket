@@ -1,10 +1,7 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -21,7 +18,7 @@ impl MapperCRUD for SupplierMapper {
     type Item = Supplier;
     type PostItem = PostSupplier;
     type PatchItem = PatchSupplier;
-    type Param = RequestParam<PaginationParam, SupplierFilter>;
+    type Param = RequestParam<SupplierFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -41,8 +38,9 @@ impl MapperCRUD for SupplierMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::supplier_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -112,7 +110,7 @@ impl MapperCRUD for SupplierMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, SupplierFilter>,
+        param: &RequestParam<SupplierFilter>,
     ) -> Result<Data<Vec<Supplier>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -129,8 +127,9 @@ impl MapperCRUD for SupplierMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::supplier_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -187,13 +186,16 @@ mod tests {
     use super::*;
     use crate::models::supplier::{PatchSupplier, PostSupplier};
     use crate::models::supplier_filter::SupplierFilter;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::request::request_param::RequestParam;
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_supplier_table() {
-        let param = RequestParam::<PaginationParam, SupplierFilter>::default();
-        match establish_pg_connection() {
+        let param = RequestParam::<SupplierFilter>::default();
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
@@ -214,7 +216,9 @@ mod tests {
     #[test]
     fn test_get_by_id() {
         let test_supplier_id = 3; // Replace with an actual ID from your test database
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::get_by_id(&mut conn, test_supplier_id) {
                 Ok(supplier) => {
                     println!("{:#?}", supplier);
@@ -235,7 +239,9 @@ mod tests {
     #[test]
     fn test_add_single() {
         let new_supplier = PostSupplier::demo(); // Using demo data for testing
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::add_single(&mut conn, &new_supplier) {
                 Ok(supplier) => {
                     println!("{:#?}", supplier);
@@ -256,7 +262,9 @@ mod tests {
     #[test]
     fn test_delete_by_id() {
         let test_supplier_id = 1; // Replace with an actual ID from your test database
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match SupplierMapper::delete_by_id(&mut conn, test_supplier_id) {
                 Ok(supplier) => {
                     println!("{:#?}", supplier);
@@ -285,7 +293,9 @@ mod tests {
             created_at: None,
             updated_at: Some(get_e8_time()), // Ensure this matches your expected format
         };
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match SupplierMapper::update_by_id(&mut conn, test_supplier_id, &updated_supplier) {
                     Ok(supplier) => {

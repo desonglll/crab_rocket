@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
@@ -26,6 +27,16 @@ pub struct PostInventory {
     pub location: Option<String>,
     pub quantity: Option<i32>,
     pub last_updated: Option<NaiveDateTime>,
+}
+impl PostInventory {
+    pub fn demo() -> Self {
+        Self {
+            product_id: Some(1),
+            location: None,
+            quantity: None,
+            last_updated: Some(get_e8_time()),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]

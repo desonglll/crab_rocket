@@ -57,7 +57,6 @@ fn rocket() -> _ {
                 insert_single_task,
                 delete_task_by_id,
                 update_task_by_id,
-                options_task_filter
             ],
         )
         .attach(cors)

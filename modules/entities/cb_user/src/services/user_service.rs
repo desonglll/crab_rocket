@@ -1,13 +1,14 @@
 use crate::mappers::user_mapper::UserMapper;
-use crate::models::user::{PostUser, PatchUser, User};
+use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
-use obj_traits::request::pagination_request_param::PaginationParam;
+use crab_rocket_schema::DbPool;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
     service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
     service_update_by_id, ServiceCRUD,
 };
+use rocket::State;
 use std::error::Error;
 
 pub struct UserService {}
@@ -16,46 +17,56 @@ impl ServiceCRUD for UserService {
     type Item = User;
     type PostItem = PostUser;
     type PatchItem = PatchUser;
-    type Param = RequestParam<PaginationParam, UserFilter>;
+    type Param = RequestParam<UserFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, UserFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<UserFilter>,
     ) -> Result<Data<Vec<User>>, Box<dyn Error>> {
-        service_get_all::<User, UserMapper, UserFilter>(param)
+        service_get_all::<User, UserMapper, UserFilter>(pool, param)
     }
-    fn get_by_id(pid: i32) -> Result<User, Box<dyn Error>> {
-        service_get_by_id::<User, UserMapper>(pid)
-    }
-
-    fn add_single(obj: &PostUser) -> Result<User, Box<dyn Error>> {
-        service_add_single::<User, UserMapper, PostUser>(obj)
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<User, Box<dyn Error>> {
+        service_get_by_id::<User, UserMapper>(pool, pid)
     }
 
-    fn delete_by_id(pid: i32) -> Result<User, Box<dyn Error>> {
-        service_delete_by_id::<User, UserMapper>(pid)
+    fn add_single(pool: &State<DbPool>, obj: &PostUser) -> Result<User, Box<dyn Error>> {
+        service_add_single::<User, UserMapper, PostUser>(pool, obj)
     }
 
-    fn update_by_id(pid: i32, obj: &PatchUser) -> Result<User, Box<dyn Error>> {
-        service_update_by_id::<User, UserMapper, PatchUser>(pid, obj)
+    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<User, Box<dyn Error>> {
+        service_delete_by_id::<User, UserMapper>(pool, pid)
+    }
+
+    fn update_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+        obj: &PatchUser,
+    ) -> Result<User, Box<dyn Error>> {
+        service_update_by_id::<User, UserMapper, PatchUser>(pool, pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, UserFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<UserFilter>,
     ) -> Result<Data<Vec<User>>, Box<dyn std::error::Error>> {
-        service_filter::<User, UserMapper, UserFilter>(param)
+        service_filter::<User, UserMapper, UserFilter>(pool, param)
     }
 }
 
 #[cfg(test)]
 mod test {
     use crate::services::user_service::UserService;
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
+    use rocket::State;
 
     #[test]
     fn test_insert_single_user() {
         use crate::models::user::PostUser;
         let user = PostUser::demo();
-        match UserService::add_single(&user) {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match UserService::add_single(pool, &user) {
             Ok(result) => println!("{result}"),
             Err(e) => println!("{e:?}"),
         }
@@ -63,8 +74,10 @@ mod test {
 
     #[test]
     fn test_get_all_users() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
-        match UserService::get_all(&param) {
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match UserService::get_all(pool, &param) {
             Ok(res) => println!("{res}"),
             Err(e) => println!("{e:?}"),
         }
@@ -72,7 +85,9 @@ mod test {
 
     #[test]
     fn test_get_user_by_id() {
-        match UserService::get_by_id(1) {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match UserService::get_by_id(pool, 1) {
             Ok(res) => println!("{res:?}"),
             Err(e) => println!("{e:?}"),
         }
@@ -80,7 +95,9 @@ mod test {
 
     #[test]
     fn test_delete_user_by_id() {
-        match UserService::delete_by_id(2) {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match UserService::delete_by_id(pool, 2) {
             Ok(res) => println!("{res:?}"),
             Err(e) => println!("{e:?}"),
         }

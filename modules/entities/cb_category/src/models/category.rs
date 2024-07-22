@@ -1,3 +1,4 @@
+use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
@@ -49,7 +50,17 @@ pub struct PostCategory {
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
 }
-
+impl PostCategory {
+    pub fn demo() -> Self {
+        Self {
+            name: "post_category".to_owned(),
+            description: None,
+            parent_id: None,
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
+        }
+    }
+}
 impl PostCategory {
     pub fn new(
         name: String,

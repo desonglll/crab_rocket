@@ -20,11 +20,14 @@ pub fn get_info(conn: &mut PgConnection) -> Result<Info, diesel::result::Error> 
 #[cfg(test)]
 mod test {
     use super::get_info;
-    use crab_rocket_schema::establish_pg_connection; // 建立数据库连接
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State; // 建立数据库连接
 
     #[test]
     fn test_get_info() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match get_info(&mut conn) {
                 Ok(data) => {
                     println!("{data:?}");

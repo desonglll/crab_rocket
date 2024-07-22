@@ -1,9 +1,6 @@
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,11 +17,11 @@ impl MapperCRUD for FollowMapper {
     type Item = Follow;
     type PostItem = PostFollow;
     type PatchItem = PatchFollow;
-    type Param = RequestParam<PaginationParam, FollowFilter>;
+    type Param = RequestParam<FollowFilter>;
 
     fn get_all(
         conn: &mut diesel::PgConnection,
-        param: &RequestParam<PaginationParam, FollowFilter>,
+        param: &RequestParam<FollowFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Follow>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -41,8 +38,9 @@ impl MapperCRUD for FollowMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -115,7 +113,7 @@ impl MapperCRUD for FollowMapper {
 
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, FollowFilter>,
+        param: &RequestParam<FollowFilter>,
     ) -> Result<Data<Vec<Follow>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -134,8 +132,9 @@ impl MapperCRUD for FollowMapper {
         let filter = &param.filter;
         println!("{filter:?}");
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -208,7 +207,7 @@ impl FollowMapperTrait for FollowMapper {
     fn get_followings_by_user_id(
         conn: &mut PgConnection,
         uid: i32,
-        param: &RequestParam<PaginationParam, FollowFilter>,
+        param: &RequestParam<FollowFilter>,
     ) -> Result<Data<Vec<Follow>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -225,8 +224,9 @@ impl FollowMapperTrait for FollowMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -258,7 +258,7 @@ impl FollowMapperTrait for FollowMapper {
     fn get_followeds_by_user_id(
         conn: &mut PgConnection,
         uid: i32,
-        param: &RequestParam<PaginationParam, FollowFilter>,
+        param: &RequestParam<FollowFilter>,
     ) -> Result<Data<Vec<Follow>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -275,8 +275,9 @@ impl FollowMapperTrait for FollowMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::follow_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -329,12 +330,15 @@ pub fn check_exist_follow(
 mod test {
     use super::*;
     use crate::models::follow::{PatchFollow, PostFollow};
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State;
 
     #[test]
     fn test_create_new_follow() {
         let follow = PostFollow::new(1, 3, None);
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::add_single(&mut conn, &follow);
                 match result {
@@ -360,7 +364,9 @@ mod test {
     fn test_check_exist_follow() {
         let following_id = 1;
         let followed_id = 5;
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = check_exist_follow(&mut conn, following_id, followed_id);
                 println!("Follow exists: {}", result);
@@ -376,7 +382,9 @@ mod test {
     #[test]
     fn test_delete_follow() {
         let follow_id = 1;
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::delete_by_id(&mut conn, follow_id);
                 match result {
@@ -400,7 +408,9 @@ mod test {
     #[test]
     fn test_delete_follow_specifically() {
         let follow = PostFollow::demo();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::delete_follow_specifically(&mut conn, &follow);
                 match result {
@@ -426,7 +436,9 @@ mod test {
     fn test_update_follow() {
         let follow_id = 2;
         let updated_follow = PatchFollow::new(2, 4, None);
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::update_by_id(&mut conn, follow_id, &updated_follow);
                 match result {
@@ -456,14 +468,10 @@ mod test {
 
     #[test]
     fn test_get_all_follows() {
-        let param = RequestParam {
-            pagination: PaginationParam {
-                offset: Some(0),
-                limit: Some(10),
-            },
-            filter: None,
-        };
-        match establish_pg_connection() {
+        let param = RequestParam::demo();
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::get_all(&mut conn, &param);
                 match result {
@@ -487,14 +495,10 @@ mod test {
     #[test]
     fn test_get_followings_by_user_id() {
         let user_id = 1;
-        let param = RequestParam {
-            pagination: PaginationParam {
-                offset: Some(0),
-                limit: Some(10),
-            },
-            filter: None,
-        };
-        match establish_pg_connection() {
+        let param = RequestParam::demo();
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::get_followings_by_user_id(&mut conn, user_id, &param);
                 match result {
@@ -518,14 +522,10 @@ mod test {
     #[test]
     fn test_get_followeds_by_user_id() {
         let user_id = 1;
-        let param = RequestParam {
-            pagination: PaginationParam {
-                offset: Some(0),
-                limit: Some(10),
-            },
-            filter: None,
-        };
-        match establish_pg_connection() {
+        let param = RequestParam::demo();
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let result = FollowMapper::get_followeds_by_user_id(&mut conn, user_id, &param);
                 match result {

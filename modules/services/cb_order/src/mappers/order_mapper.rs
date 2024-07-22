@@ -1,9 +1,6 @@
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,7 +17,7 @@ impl MapperCRUD for OrderMapper {
     type Item = Order;
     type PostItem = PostOrder;
     type PatchItem = PatchOrder;
-    type Param = RequestParam<PaginationParam, OrderFilter>;
+    type Param = RequestParam<OrderFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -40,8 +37,9 @@ impl MapperCRUD for OrderMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::order_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -109,7 +107,7 @@ impl MapperCRUD for OrderMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, OrderFilter>,
+        param: &RequestParam<OrderFilter>,
     ) -> Result<Data<Vec<Order>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -126,8 +124,9 @@ impl MapperCRUD for OrderMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::order_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -184,14 +183,17 @@ impl MapperCRUD for OrderMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use crab_rocket_utils::time::get_e8_time;
     use diesel::result::Error;
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_order_table() {
-        let param = RequestParam::<PaginationParam, OrderFilter>::default();
-        match establish_pg_connection() {
+        let param = RequestParam::<OrderFilter>::default();
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match OrderMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     println!("{:#?}", data);
@@ -211,7 +213,9 @@ mod test {
 
     #[test]
     fn test_get_order_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(1),
             order_date: Some(get_e8_time()),
@@ -232,7 +236,9 @@ mod test {
 
     #[test]
     fn test_add_single_order() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(2),
             order_date: Some(get_e8_time()),
@@ -249,7 +255,9 @@ mod test {
 
     #[test]
     fn test_delete_order_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(2),
             order_date: Some(get_e8_time()),
@@ -273,7 +281,9 @@ mod test {
 
     #[test]
     fn test_update_order_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order = PostOrder {
             customer_id: Some(2),
             order_date: Some(get_e8_time()),
@@ -305,7 +315,9 @@ mod test {
 
     #[test]
     fn test_filter_orders() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_order1 = PostOrder {
             customer_id: Some(1),
             order_date: Some(get_e8_time()),
@@ -330,15 +342,9 @@ mod test {
             status: None,
             order_id: None,
         };
-        let param = RequestParam::<PaginationParam, OrderFilter> {
-            pagination: PaginationParam {
-                limit: Some(10),
-                offset: Some(0),
-            },
-            filter: Some(filter),
-        };
-
+        let param = RequestParam::<OrderFilter>::new(None, Some(filter));
         let result = OrderMapper::filter(&mut conn, &param).expect("Failed to filter orders");
+        println!("{:#?}", result);
         assert_eq!(result.data().len(), 6);
     }
 }

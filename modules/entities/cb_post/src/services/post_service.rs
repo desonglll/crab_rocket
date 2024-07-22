@@ -1,102 +1,105 @@
+use crate::mappers::post_mapper::PostMapper;
+use crate::models::post::{PatchPost, Post, PostPost};
+use crate::models::post_filter::PostFilter;
+use crab_rocket_schema::DbPool;
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::data::Data;
+use obj_traits::service::service_crud::{
+    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
+    service_update_by_id, ServiceCRUD,
+};
+use rocket::State;
 use std::error::Error;
 
-use obj_traits::{
-    request::{pagination_request_param::PaginationParam, request_param::RequestParam},
-    response::data::Data,
-    service::service_crud::{
-        service_add_single, service_delete_by_id, service_filter, service_get_all,
-        service_get_by_id, service_update_by_id, ServiceCRUD,
-    },
-};
-
-use crate::{
-    mappers::post_mapper::PostMapper,
-    models::{
-        post::{PostPost, PatchPost, Post},
-        post_filter::PostFilter,
-    },
-};
-
 pub struct PostService {}
+
 impl ServiceCRUD for PostService {
     type Item = Post;
     type PostItem = PostPost;
     type PatchItem = PatchPost;
-    type Param = RequestParam<PaginationParam, PostFilter>;
+    type Param = RequestParam<PostFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, PostFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<PostFilter>,
     ) -> Result<Data<Vec<Post>>, Box<dyn Error>> {
-        service_get_all::<Post, PostMapper, PostFilter>(param)
+        service_get_all::<Post, PostMapper, PostFilter>(pool, param)
     }
-    fn get_by_id(pid: i32) -> Result<Post, Box<dyn Error>> {
-        service_get_by_id::<Post, PostMapper>(pid)
-    }
-
-    fn add_single(obj: &PostPost) -> Result<Post, Box<dyn Error>> {
-        service_add_single::<Post, PostMapper, PostPost>(obj)
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Post, Box<dyn Error>> {
+        service_get_by_id::<Post, PostMapper>(pool, pid)
     }
 
-    fn delete_by_id(pid: i32) -> Result<Post, Box<dyn Error>> {
-        service_delete_by_id::<Post, PostMapper>(pid)
+    fn add_single(pool: &State<DbPool>, obj: &PostPost) -> Result<Post, Box<dyn Error>> {
+        service_add_single::<Post, PostMapper, PostPost>(pool, obj)
     }
 
-    fn update_by_id(pid: i32, obj: &PatchPost) -> Result<Post, Box<dyn Error>> {
-        service_update_by_id::<Post, PostMapper, PatchPost>(pid, obj)
+    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Post, Box<dyn Error>> {
+        service_delete_by_id::<Post, PostMapper>(pool, pid)
+    }
+
+    fn update_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+        obj: &PatchPost,
+    ) -> Result<Post, Box<dyn Error>> {
+        service_update_by_id::<Post, PostMapper, PatchPost>(pool, pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, PostFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<PostFilter>,
     ) -> Result<Data<Vec<Post>>, Box<dyn std::error::Error>> {
-        service_filter::<Post, PostMapper, PostFilter>(param)
+        service_filter::<Post, PostMapper, PostFilter>(pool, param)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use obj_traits::{
-        request::{
-            pagination_request_param::{PaginationParam, PaginationParamTrait},
-            request_param::RequestParam,
-        },
-        service::service_crud::ServiceCRUD,
-    };
-
     use crate::services::post_service::PostService;
+    use crab_rocket_schema::{establish_pool, DbPool};
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use obj_traits::request::request_param::RequestParam;
+    use obj_traits::service::service_crud::ServiceCRUD;
+    use rocket::State;
 
     #[test]
     fn test_insert_single_post() {
         use crate::models::post::PostPost;
         let post = PostPost::demo();
-        let inserted_post = PostService::add_single(&post);
-        println!("{inserted_post:?}");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match PostService::add_single(pool, &post) {
+            Ok(result) => println!("{result:?}"),
+            Err(e) => println!("{e:?}"),
+        }
     }
+
     #[test]
     fn test_get_all_posts() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
-        match PostService::get_all(&param) {
-            Ok(all_posts) => {
-                println!("{all_posts}");
-            }
-            Err(_) => (),
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match PostService::get_all(pool, &param) {
+            Ok(res) => println!("{res}"),
+            Err(e) => println!("{e:?}"),
         }
     }
 
     #[test]
     fn test_get_post_by_id() {
-        match PostService::get_by_id(1) {
-            Ok(post) => {
-                println!("{post:?}");
-            }
-            Err(_) => (),
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match PostService::get_by_id(pool, 1) {
+            Ok(res) => println!("{res:?}"),
+            Err(e) => println!("{e:?}"),
         }
     }
 
     #[test]
     fn test_delete_post_by_id() {
-        match PostService::delete_by_id(4) {
-            Ok(deleted_post) => {
-                println!("{deleted_post:?}");
-            }
-            Err(_) => (),
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match PostService::delete_by_id(pool, 2) {
+            Ok(res) => println!("{res:?}"),
+            Err(e) => println!("{e:?}"),
         }
     }
 }

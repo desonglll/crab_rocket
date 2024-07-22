@@ -57,7 +57,6 @@ fn rocket() -> _ {
                 insert_single_post,
                 delete_post_by_id,
                 update_post_by_id,
-                options_post_filter
             ],
         )
         .attach(cors)

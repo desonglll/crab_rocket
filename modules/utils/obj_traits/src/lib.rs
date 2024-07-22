@@ -21,3 +21,6 @@ pub mod response {
     pub mod api_response;
     pub mod data;
 }
+pub mod modules {
+    pub mod auth_param;
+}

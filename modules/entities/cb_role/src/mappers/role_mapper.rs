@@ -7,7 +7,7 @@ use diesel::prelude::*;
 use diesel::result::Error;
 use diesel::PgConnection;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
-use obj_traits::request::pagination_request_param::{Pagination, PaginationParam};
+use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 
@@ -17,10 +17,10 @@ impl MapperCRUD for RoleMapper {
     type Item = Role;
     type PostItem = PostRole;
     type PatchItem = PatchRole;
-    type Param = RequestParam<PaginationParam, RoleFilter>;
+    type Param = RequestParam<RoleFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, RoleFilter>,
+        param: &RequestParam<RoleFilter>,
     ) -> Result<Data<Vec<Role>>, Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -37,8 +37,9 @@ impl MapperCRUD for RoleMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::role_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -102,7 +103,7 @@ impl MapperCRUD for RoleMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, RoleFilter>,
+        param: &RequestParam<RoleFilter>,
     ) -> Result<Data<Vec<Role>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -119,8 +120,9 @@ impl MapperCRUD for RoleMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::role_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -182,14 +184,17 @@ mod tests {
     use super::*;
     use crate::models::role::{PatchRole, PostRole};
     use crate::models::role_filter::RoleFilter;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
+    use rocket::State;
 
     #[test]
     fn test_add_single() {
         let new_role = PostRole::demo();
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let result = RoleMapper::add_single(&mut conn, &new_role);
         assert!(result.is_ok());
         let inserted_role = result.unwrap();
@@ -198,8 +203,10 @@ mod tests {
 
     #[test]
     fn test_get_all() {
-        let param = RequestParam::new(PaginationParam::demo(), None);
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let param = RequestParam::new(None, None);
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let result = RoleMapper::get_all(&mut conn, &param);
         assert!(result.is_ok());
         let data = result.unwrap();
@@ -208,8 +215,9 @@ mod tests {
 
     #[test]
     fn test_get_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let result = RoleMapper::get_by_id(&mut conn, 2);
         assert!(result.is_ok());
         let role = result.unwrap();
@@ -218,7 +226,9 @@ mod tests {
 
     #[test]
     fn test_delete_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_role = PostRole::new("DeleteUser".to_owned(), Some(String::new()), None);
         let inserted_role =
             RoleMapper::add_single(&mut conn, &new_role).expect("Failed to insert role");
@@ -234,7 +244,9 @@ mod tests {
 
     #[test]
     fn test_update_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_role = PostRole::new("UpdatedUser".to_owned(), None, None);
         let inserted_role =
             RoleMapper::add_single(&mut conn, &new_role).expect("Failed to insert role");
@@ -256,7 +268,8 @@ mod tests {
     #[test]
     fn test_filter() {
         let param = RequestParam {
-            pagination: PaginationParam::default(),
+            auth: None,
+            pagination: Some(PaginationParam::default()),
             filter: Some(RoleFilter {
                 role_name: Some("Admin".to_string()),
                 role_id: None,
@@ -269,7 +282,9 @@ mod tests {
             }),
         };
 
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let result = RoleMapper::filter(&mut conn, &param);
         assert!(result.is_ok());
         let data = result.unwrap();

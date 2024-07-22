@@ -221,6 +221,16 @@ diesel::table! {
 }
 
 diesel::table! {
+    session_table (id) {
+        id -> Int4,
+        user_id -> Int4,
+        session_id -> Uuid,
+        expires -> Timestamp,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     shipment_table (shipment_id) {
         shipment_id -> Int4,
         order_id -> Nullable<Int4>,
@@ -284,6 +294,7 @@ diesel::joinable!(inventory_table -> product_table (product_id));
 diesel::joinable!(order_table -> customer_table (customer_id));
 diesel::joinable!(product_table -> supplier_table (supplier_id));
 diesel::joinable!(product_table -> user_table (user_id));
+diesel::joinable!(session_table -> user_table (user_id));
 diesel::joinable!(shipment_table -> order_table (order_id));
 diesel::joinable!(task_table -> user_table (user_id));
 diesel::joinable!(user_table -> role_table (role_id));
@@ -302,6 +313,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     product_table,
     reload_counts,
     role_table,
+    session_table,
     shipment_table,
     supplier_table,
     task_table,

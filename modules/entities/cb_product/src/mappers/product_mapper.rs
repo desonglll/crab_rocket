@@ -1,10 +1,7 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -21,7 +18,7 @@ impl MapperCRUD for ProductMapper {
     type Item = Product;
     type PostItem = PostProduct;
     type PatchItem = PatchProduct;
-    type Param = RequestParam<PaginationParam, ProductFilter>;
+    type Param = RequestParam<ProductFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -41,8 +38,9 @@ impl MapperCRUD for ProductMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::product_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -121,7 +119,7 @@ impl MapperCRUD for ProductMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, ProductFilter>,
+        param: &RequestParam<ProductFilter>,
     ) -> Result<Data<Vec<Product>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -138,8 +136,9 @@ impl MapperCRUD for ProductMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::product_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -268,13 +267,16 @@ impl MapperCRUD for ProductMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::request::pagination_request_param::PaginationParamTrait;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use rocket::State;
 
     #[test]
     fn test_fetch_all_product_table() {
         let param = RequestParam::default();
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match ProductMapper::get_all(&mut conn, &param) {
                 Ok(data) => {
                     assert!(!data.data().is_empty(), "Product table should not be empty");
@@ -291,7 +293,9 @@ mod test {
 
     #[test]
     fn test_get_by_id() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let pid = 2; // 假设ID为1的记录存在
                 match ProductMapper::get_by_id(&mut conn, pid) {
@@ -317,7 +321,9 @@ mod test {
 
     #[test]
     fn test_add_single() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let new_product = PostProduct {
                     name: "Test Product".to_string(),
@@ -358,7 +364,9 @@ mod test {
 
     #[test]
     fn test_update_by_id() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let pid = 2; // 假设ID为1的记录存在
                 let updated_product = PatchProduct {
@@ -401,7 +409,9 @@ mod test {
 
     #[test]
     fn test_delete_by_id() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let pid = 1; // 假设ID为1的记录存在
                 match ProductMapper::delete_by_id(&mut conn, pid) {
@@ -427,10 +437,13 @@ mod test {
 
     #[test]
     fn test_filter() {
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 let param = RequestParam {
-                    pagination: PaginationParam::demo(),
+                    auth: None,
+                    pagination: Some(PaginationParam::demo()),
                     filter: Some(ProductFilter {
                         product_id: Some(1),
                         user_id: None,

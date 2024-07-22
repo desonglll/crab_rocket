@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
@@ -54,7 +55,29 @@ pub struct PostProduct {
     pub status: Option<String>,
     pub public: Option<bool>,
 }
-
+impl PostProduct {
+    pub fn demo() -> Self {
+        Self {
+            name: "Demo Product".to_string(),
+            description: Some("This is a demo product.".to_string()),
+            sku: "DEMO123".to_string(),
+            image: Some("http://example.com/demo.jpg".to_string()),
+            price: Some(19.99),
+            discount_price: Some(14.99),
+            is_discounted: Some(true),
+            is_valid: Some(true),
+            inventory: Some(100),
+            is_in_stock: Some(true),
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
+            supplier_id: Some(42),
+            weight: Some(1.5),
+            dimensions: Some("10x10x10 cm".to_string()),
+            status: Some("Available".to_string()),
+            public: Some(true),
+        }
+    }
+}
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable, QueryableByName)]

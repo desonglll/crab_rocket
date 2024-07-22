@@ -6,4 +6,5 @@ edition = "2021"
 [dependencies]
 rocket = { version = "0.5.1", features = ["json", "uuid"] }
 diesel = { version = "2.1.0", features = ["postgres", "chrono", "uuid"] }
+uuid = { version = "1.0", features = ["serde", "v4"] }
 crab_rocket_schema = { path = "../../schemas/cb_schema" }

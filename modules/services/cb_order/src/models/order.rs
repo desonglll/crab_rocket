@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
@@ -26,6 +27,18 @@ pub struct PostOrder {
     pub order_date: Option<NaiveDateTime>,
     pub total_amount: Option<f64>,
     pub status: Option<String>,
+}
+
+impl PostOrder {
+    pub fn demo() -> Self {
+        Self {
+            customer_id: None,
+
+            order_date: Some(get_e8_time()),
+            total_amount: None,
+            status: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]

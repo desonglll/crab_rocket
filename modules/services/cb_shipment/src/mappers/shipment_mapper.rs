@@ -1,9 +1,6 @@
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,7 +17,7 @@ impl MapperCRUD for ShipmentMapper {
     type Item = Shipment;
     type PostItem = PostShipment;
     type PatchItem = PatchShipment;
-    type Param = RequestParam<PaginationParam, ShipmentFilter>;
+    type Param = RequestParam<ShipmentFilter>;
     fn get_all(
         conn: &mut diesel::PgConnection,
         param: &Self::Param,
@@ -40,8 +37,9 @@ impl MapperCRUD for ShipmentMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::shipment_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -109,7 +107,7 @@ impl MapperCRUD for ShipmentMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, ShipmentFilter>,
+        param: &RequestParam<ShipmentFilter>,
     ) -> Result<Data<Vec<Shipment>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -126,8 +124,9 @@ impl MapperCRUD for ShipmentMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::shipment_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -179,8 +178,9 @@ impl MapperCRUD for ShipmentMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::establish_pg_connection;
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use crab_rocket_utils::time::get_e8_time;
+    use rocket::State;
 
     // Helper function to create a new shipment for testing
     fn create_test_shipment(conn: &mut PgConnection) -> Result<Shipment, diesel::result::Error> {
@@ -195,14 +195,10 @@ mod test {
 
     #[test]
     fn test_get_all_shipments() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let param = RequestParam {
-            pagination: PaginationParam {
-                offset: Some(0),
-                limit: Some(10),
-            },
-            filter: None,
-        };
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
+        let param = RequestParam::demo();
         match ShipmentMapper::get_all(&mut conn, &param) {
             Ok(data) => println!("{:#?}", data),
             Err(e) => panic!("Error fetching all shipments: {:?}", e),
@@ -211,7 +207,9 @@ mod test {
 
     #[test]
     fn test_get_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
 
         match ShipmentMapper::get_by_id(&mut conn, shipment.shipment_id) {
@@ -222,8 +220,9 @@ mod test {
 
     #[test]
     fn test_add_single_shipment() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_shipment = PostShipment {
             order_id: Some(1),
             shipment_date: Some(get_e8_time()),
@@ -241,7 +240,9 @@ mod test {
 
     #[test]
     fn test_delete_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
 
         match ShipmentMapper::delete_by_id(&mut conn, shipment.shipment_id) {
@@ -256,7 +257,9 @@ mod test {
 
     #[test]
     fn test_update_by_id() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let shipment = create_test_shipment(&mut conn).expect("Failed to create test shipment");
 
         let updated_info = PatchShipment {
@@ -278,9 +281,9 @@ mod test {
 
     #[test]
     fn test_filter_shipments() {
-        let mut conn = establish_pg_connection().expect("Failed to establish connection");
-        let _ = create_test_shipment(&mut conn).expect("Failed to create test shipment");
-
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let filter = ShipmentFilter {
             shipment_id: None,
             order_id: None,
@@ -289,13 +292,7 @@ mod test {
             delivery_address: None,
             status: None,
         };
-        let param = RequestParam {
-            pagination: PaginationParam {
-                offset: Some(0),
-                limit: Some(10),
-            },
-            filter: Some(filter),
-        };
+        let param = RequestParam::new(None, Some(filter));
 
         match ShipmentMapper::filter(&mut conn, &param) {
             Ok(data) => {

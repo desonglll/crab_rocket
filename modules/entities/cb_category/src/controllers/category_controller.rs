@@ -1,14 +1,15 @@
 use crate::models::category::{Category, PatchCategory, PostCategory};
 use crate::models::category_filter::CategoryFilter;
 use crate::services::category_service::CategoryService;
+use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::{
     controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
     controller_get_by_id, controller_update_by_id, ControllerCRUD,
 };
-use obj_traits::request::pagination_request_param::PaginationParam;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
+use rocket::State;
 use std::error::Error;
 
 pub struct CategoryController {}
@@ -17,34 +18,46 @@ impl ControllerCRUD for CategoryController {
     type Item = Category;
     type PostItem = PostCategory;
     type PatchItem = PatchCategory;
-    type Param = RequestParam<PaginationParam, CategoryFilter>;
+    type Param = RequestParam<CategoryFilter>;
     fn get_all(
-        param: &RequestParam<PaginationParam, CategoryFilter>,
-    ) -> Result<ApiResponse<Data<Vec<Category>>>, Box<dyn Error>> {
-        controller_get_all::<Category, CategoryService, CategoryFilter>(param)
+        pool: &State<DbPool>,
+        param: &RequestParam<CategoryFilter>,
+    ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn Error>> {
+        controller_get_all::<Self::Item, CategoryService, CategoryFilter>(pool, param)
     }
 
-    fn get_by_id(pid: i32) -> Result<ApiResponse<Category>, Box<dyn Error>> {
-        controller_get_by_id::<Category, CategoryService>(pid)
+    fn get_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_get_by_id::<Self::Item, CategoryService>(pool, pid)
     }
 
-    fn add_single(obj: &mut PostCategory) -> Result<ApiResponse<Category>, Box<dyn Error>> {
-        controller_add_single::<Category, CategoryService, PostCategory>(obj)
+    fn add_single(
+        pool: &State<DbPool>,
+        obj: &mut PostCategory,
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_add_single::<Self::Item, CategoryService, PostCategory>(pool, obj)
     }
 
-    fn delete_by_id(pid: i32) -> Result<ApiResponse<Category>, Box<dyn Error>> {
-        controller_delete_by_id::<Category, CategoryService>(pid)
+    fn delete_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_delete_by_id::<Self::Item, CategoryService>(pool, pid)
     }
 
     fn update_by_id(
+        pool: &State<DbPool>,
         pid: i32,
         obj: &PatchCategory,
-    ) -> Result<ApiResponse<Category>, Box<dyn Error>> {
-        controller_update_by_id::<Category, CategoryService, PatchCategory>(pid, obj)
+    ) -> Result<ApiResponse<Self::Item>, Box<dyn Error>> {
+        controller_update_by_id::<Self::Item, CategoryService, PatchCategory>(pool, pid, obj)
     }
     fn filter(
-        param: &RequestParam<PaginationParam, CategoryFilter>,
-    ) -> Result<ApiResponse<Data<Vec<Category>>>, Box<dyn std::error::Error>> {
-        controller_filter::<Category, CategoryService, CategoryFilter>(param)
+        pool: &State<DbPool>,
+        param: &RequestParam<CategoryFilter>,
+    ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
+        controller_filter::<Self::Item, CategoryService, CategoryFilter>(pool, param)
     }
 }

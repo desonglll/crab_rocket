@@ -1,10 +1,7 @@
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
-    request::{
-        pagination_request_param::{Pagination, PaginationParam},
-        request_param::RequestParam,
-    },
+    request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
 
@@ -20,10 +17,10 @@ impl MapperCRUD for EmployeeMapper {
     type Item = Employee;
     type PostItem = PostEmployee;
     type PatchItem = PatchEmployee;
-    type Param = RequestParam<PaginationParam, EmployeeFilter>;
+    type Param = RequestParam<EmployeeFilter>;
     fn get_all(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<obj_traits::response::data::Data<Vec<Employee>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -40,8 +37,9 @@ impl MapperCRUD for EmployeeMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::employee_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -111,7 +109,7 @@ impl MapperCRUD for EmployeeMapper {
     }
     fn filter(
         conn: &mut PgConnection,
-        param: &RequestParam<PaginationParam, EmployeeFilter>,
+        param: &RequestParam<EmployeeFilter>,
     ) -> Result<Data<Vec<Employee>>, diesel::result::Error> {
         // 当前页码（page）
         // 每页条目数（per_page）
@@ -130,8 +128,9 @@ impl MapperCRUD for EmployeeMapper {
         let filter = &param.filter;
         println!("{filter:?}");
         // 计算分页相关
-        let page = (param.pagination.offset.unwrap() / param.pagination.limit.unwrap()) + 1;
-        let per_page = param.pagination.limit.unwrap();
+        let pagination = param.pagination.as_ref().unwrap();
+        let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
+        let per_page = pagination.limit.unwrap();
         // 获取总记录数
         let total_count = dsl::employee_table.count().get_result::<i64>(conn)? as i32;
         // 计算总页数
@@ -233,14 +232,9 @@ mod test {
         employee::{PatchEmployee, PostEmployee},
         employee_filter::EmployeeFilter,
     };
-    use crab_rocket_schema::establish_pg_connection;
-    use obj_traits::{
-        mapper::mapper_crud::MapperCRUD,
-        request::{
-            pagination_request_param::{PaginationParam, PaginationParamTrait},
-            request_param::RequestParam,
-        },
-    };
+    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+    use rocket::State;
 
     #[test]
     fn test_insert_employee() {
@@ -266,7 +260,9 @@ mod test {
             role_id: Some(1),
         };
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::add_single(&mut conn, &new_employee) {
                 Ok(inserted_employee) => println!("{:?}", inserted_employee),
                 Err(e) => eprintln!("Error inserting employee: {:?}", e),
@@ -279,7 +275,9 @@ mod test {
     fn test_delete_employee_by_id() {
         let employee_id = 1; // Ensure this ID exists in your test database
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::delete_by_id(&mut conn, employee_id) {
                 Ok(deleted_employee) => println!("{:?}", deleted_employee),
                 Err(e) => eprintln!("Error deleting employee: {:?}", e),
@@ -296,9 +294,11 @@ mod test {
         }
         "#;
         let filter = EmployeeFilter::from_json(json_data).unwrap();
-        let params = RequestParam::new(PaginationParam::demo(), Some(filter));
+        let params = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::get_all(&mut conn, &params) {
                 Ok(result) => println!("{:?}", result),
                 Err(e) => eprintln!("Error fetching employees: {:?}", e),
@@ -333,7 +333,9 @@ mod test {
 
         let employee_id = 2; // Ensure this ID exists in your test database
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => {
                 match EmployeeMapper::update_by_id(&mut conn, employee_id, &updated_emp) {
                     Ok(updated_employee) => println!("{:?}", updated_employee),
@@ -353,9 +355,11 @@ mod test {
         }
         "#;
         let filter = EmployeeFilter::from_json(json_data).unwrap();
-        let params = RequestParam::new(PaginationParam::demo(), Some(filter));
+        let params = RequestParam::new(None, Some(filter));
 
-        match establish_pg_connection() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+        match establish_pg_connection(pool) {
             Ok(mut conn) => match EmployeeMapper::filter(&mut conn, &params) {
                 Ok(result) => println!("{:?}", result),
                 Err(e) => eprintln!("Error filtering employees: {:?}", e),
