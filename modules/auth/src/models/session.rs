@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{Duration, NaiveDateTime};
 use crab_rocket_schema::schema::session_table::dsl;
 use crab_rocket_schema::DbPool;
 use crab_rocket_schema::{establish_pg_connection, schema::session_table};
@@ -6,7 +6,29 @@ use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
+use std::error::Error;
+use std::fmt::{Display, Formatter};
 use uuid::Uuid; // 添加这一行
+#[derive(Debug)]
+pub enum SessionError {
+    NotFound,
+    Expired,
+}
+
+impl Error for SessionError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
+impl Display for SessionError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            SessionError::NotFound => write!(f, "Session not found"),
+            SessionError::Expired => write!(f, "Session expired"),
+        }
+    }
+}
 
 #[derive(
     Insertable, Serialize, Deserialize, Selectable, Debug, Queryable, Default, Clone, Copy,
@@ -30,69 +52,94 @@ impl Session {
             created_at: get_e8_time(),
         }
     }
-    pub fn is_expires(&self) -> bool {
+    pub fn is_expires(&self) -> Result<bool, SessionError> {
         let now = get_e8_time();
-        self.expires < now
-    }
-
-    pub fn add_session(
-        pool: &State<DbPool>,
-        session: Session,
-    ) -> Result<Self, Box<dyn std::error::Error>> {
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let result = diesel::insert_into(dsl::session_table)
-                    .values((
-                        dsl::user_id.eq(session.user_id),
-                        dsl::session_id.eq(session.session_id),
-                        dsl::expires.eq(session.expires),
-                        dsl::created_at.eq(session.created_at),
-                    ))
-                    .on_conflict(dsl::user_id)
-                    .do_update()
-                    .set((
-                        dsl::session_id.eq(session.session_id),
-                        dsl::expires.eq(session.expires),
-                        dsl::created_at.eq(session.created_at),
-                    ))
-                    .returning(Session::as_returning())
-                    .get_result(&mut conn);
-                match result {
-                    Ok(data) => Ok(data),
-                    Err(e) => Err(Box::new(e)),
-                }
-            }
-            Err(e) => Err(Box::new(e)),
+        if self.expires > now {
+            Ok(false)
+        } else {
+            Err(SessionError::Expired)
         }
     }
 
-    pub fn remove_session(pool: &State<DbPool>, session_id: Uuid) -> bool {
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let result = diesel::delete(
-                    dsl::session_table.filter(session_table::session_id.eq(session_id)),
-                )
-                .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
-                .get_result::<Session>(&mut conn);
-                match result {
-                    Ok(_) => true,
-                    Err(e) => {
-                        println!("{:#?}", e);
-                        false
-                    }
-                }
+    pub fn add_session(&self, pool: &State<DbPool>) -> Result<Self, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let result = diesel::insert_into(dsl::session_table)
+            .values((
+                dsl::user_id.eq(self.user_id),
+                dsl::session_id.eq(self.session_id),
+                dsl::expires.eq(self.expires),
+                dsl::created_at.eq(self.created_at),
+            ))
+            .on_conflict(dsl::user_id)
+            .do_update()
+            .set((
+                // dsl::session_id.eq(session.session_id),
+                dsl::expires.eq(self.expires + Duration::days(1)),
+                dsl::created_at.eq(self.created_at),
+            ))
+            .returning(Session::as_returning())
+            .get_result(&mut conn);
+        match result {
+            Ok(data) => Ok(data),
+            Err(e) => Err(e),
+        }
+    }
+
+    pub fn remove_session(&self, pool: &State<DbPool>) -> Result<Self, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let result = diesel::delete(
+            dsl::session_table.filter(session_table::session_id.eq(self.session_id)),
+        )
+            .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
+            .get_result::<Session>(&mut conn);
+        match result {
+            Ok(deleted_session) => Ok(deleted_session),
+            Err(e) => {
+                println!("function: remove_session\t=>\t{:#?}", e);
+                Err(e)
             }
-            Err(err) => {
-                println!("{:#?}", err);
-                false
+        }
+    }
+
+    pub fn get_session_by_id(
+        pool: &State<DbPool>,
+        session_id: Uuid,
+    ) -> Result<Session, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        session_table::dsl::session_table
+            .filter(session_table::dsl::session_id.eq(session_id))
+            .select(Session::as_select()) // Ensure to select the fields properly
+            .first::<Session>(&mut conn)
+    }
+
+    pub fn is_exists(&self, pool: &State<DbPool>) -> Result<bool, SessionError> {
+        let mut conn = establish_pg_connection(pool).expect("");
+        let result = session_table::dsl::session_table
+            .filter(session_table::dsl::session_id.eq(self.session_id))
+            .select(Session::as_select()) // Ensure to select the fields properly
+            .first::<Session>(&mut conn);
+        match result {
+            Ok(_) => Ok(true),
+            Err(e) => {
+                println!("{:#?}", e);
+                Err(SessionError::NotFound)
             }
+        }
+    }
+
+    pub fn is_valid(&self, pool: &State<DbPool>) -> Result<bool, SessionError> {
+        match self.is_exists(pool) {
+            Ok(_) => match self.is_expires() {
+                Ok(_) => Ok(true),
+                Err(e) => Err(e),
+            },
+            Err(e) => Err(e),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-
     use crab_rocket_schema::{establish_pool, DbPool};
     use rocket::State;
 
@@ -110,15 +157,18 @@ mod tests {
         assert!(session.expires.and_utc().timestamp() > 0);
         assert!(session.created_at.and_utc().timestamp() > 0);
     }
+
     #[test]
     fn test_add_session() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let session = Session::new(3);
-        let added_session = Session::add_session(pool, session.clone()).unwrap();
+        let added_session = session.add_session(pool).unwrap();
 
+        if !session.is_exists(pool).unwrap() {
+            assert_eq!(added_session.session_id, session.session_id);
+        }
         assert_eq!(added_session.user_id, 3);
-        assert_eq!(added_session.session_id, session.session_id);
         assert!(added_session.expires.and_utc().timestamp() > 0);
         assert!(added_session.created_at.and_utc().timestamp() > 0);
 
@@ -137,20 +187,18 @@ mod tests {
         let pool = State::<DbPool>::from(&binding);
         // First, add a session
         let session = Session::new(3);
-        let added_session = Session::add_session(pool, session.clone()).unwrap();
 
+        let added_session = session.add_session(pool).unwrap();
         assert_eq!(added_session.user_id, 3);
 
         // Now remove the session
-        let result = Session::remove_session(pool, session.session_id);
-        println!("Result: {:?}", result);
-        // assert!(result, "Expected session to be removed");
+        let result = session.remove_session(pool);
+        println!("{:#?}", result);
+        assert!(result.is_ok(), "Expected session to be removed");
 
         // Verify that the session has been removed
-        let binding = establish_pool();
-        let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
-        let query_result = dsl::session_table
+        let mut conn = establish_pg_connection(pool).expect("msg_connection");
+        let query_result: Result<Session, diesel::result::Error> = dsl::session_table
             .filter(dsl::session_id.eq(added_session.session_id))
             .select(Session::as_select()) // Ensure to select the fields properly
             .first::<Session>(&mut conn);

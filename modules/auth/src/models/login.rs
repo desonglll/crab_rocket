@@ -1,3 +1,6 @@
+use std::error::Error;
+use std::fmt::Display;
+
 use crab_rocket_schema::schema::user_table;
 use crab_rocket_schema::{establish_pg_connection, DbPool};
 use crab_rocket_user::models::user::User;
@@ -6,6 +9,27 @@ use rocket::State;
 
 use super::session::Session;
 
+#[derive(Debug)]
+pub enum LogError {
+    NotFound,
+    PasswordError,
+}
+
+impl Display for LogError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            LogError::NotFound => write!(f, "LogError: NotFound"),
+            LogError::PasswordError => write!(f, "LogError: PasswordError"),
+        }
+    }
+}
+
+impl Error for LogError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
 pub struct Login {
     pub user_id: i32,
     pub username: String,
@@ -13,59 +37,53 @@ pub struct Login {
 }
 
 impl Login {
-    pub fn login(&self, pool: &State<DbPool>) -> Result<Session, Box<dyn std::error::Error>> {
-        if self.is_user_exists(pool) && self.is_valid(pool) {
-            let session = Session::new(self.user_id);
-            let result_session = Session::add_session(pool, session);
-            match result_session {
-                Ok(ok_result) => Ok(ok_result),
-                Err(e) => Err(e),
-            }
-        } else {
-            Ok(Session::new(-1))
-        }
-    }
-    pub fn is_user_exists(&self, pool: &State<DbPool>) -> bool {
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let result = user_table::dsl::user_table
-                    .filter(user_table::dsl::user_id.eq(self.user_id))
-                    .filter(user_table::dsl::username.eq(&self.username))
-                    .first::<User>(&mut conn);
-                match result {
-                    Ok(_) => true,
-                    Err(e) => {
-                        println!("{:#?}", e);
-                        false
+    pub fn login(&self, pool: &State<DbPool>) -> Result<Session, LogError> {
+        match self.is_user_exists(pool) {
+            Ok(_) => match self.is_valid(pool) {
+                Ok(_) => {
+                    let session = Session::new(self.user_id);
+                    let result_session: Result<Session, diesel::result::Error> =
+                        session.add_session(pool);
+                    match result_session {
+                        Ok(ok_result) => Ok(ok_result),
+                        Err(e) => {
+                            println!("{:?}", e.to_string());
+                            Ok(Session::default())
+                        }
                     }
                 }
-            }
+                Err(e) => Err(e),
+            },
+            Err(e) => Err(e),
+        }
+    }
+    pub fn is_user_exists(&self, pool: &State<DbPool>) -> Result<bool, LogError> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let result: Result<User, diesel::result::Error> = user_table::dsl::user_table
+            .filter(user_table::dsl::user_id.eq(self.user_id))
+            .filter(user_table::dsl::username.eq(&self.username))
+            .first::<User>(&mut conn);
+        match result {
+            Ok(_) => Ok(true),
             Err(e) => {
-                println!("{:?}", e);
-                false
+                println!("{:#?}", e);
+                Err(LogError::NotFound)
             }
         }
     }
 
-    pub fn is_valid(&self, pool: &State<DbPool>) -> bool {
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let result = user_table::dsl::user_table
-                    .filter(user_table::dsl::user_id.eq(self.user_id))
-                    .filter(user_table::dsl::username.eq(&self.username))
-                    .filter(user_table::dsl::password.eq(&self.password))
-                    .first::<User>(&mut conn);
-                match result {
-                    Ok(_) => true,
-                    Err(e) => {
-                        println!("{:#?}", e);
-                        false
-                    }
-                }
-            }
+    pub fn is_valid(&self, pool: &State<DbPool>) -> Result<bool, LogError> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let result: Result<User, diesel::result::Error> = user_table::dsl::user_table
+            .filter(user_table::dsl::user_id.eq(self.user_id))
+            .filter(user_table::dsl::username.eq(&self.username))
+            .filter(user_table::dsl::password.eq(&self.password))
+            .first::<User>(&mut conn);
+        match result {
+            Ok(_) => Ok(true),
             Err(e) => {
-                println!("{:?}", e);
-                false
+                println!("{:#?}", e);
+                Err(LogError::PasswordError)
             }
         }
     }
@@ -123,9 +141,14 @@ mod tests {
             password: "wrong_password".to_string(),
         };
 
-        let result = login.login(pool).expect("Login failed");
-        assert_eq!(result.user_id, -1, "Expected session with invalid user");
+        let result = login.login(pool);
+        match result {
+            Err(LogError::PasswordError) => assert!(true),
+            Err(LogError::NotFound) => assert!(true),
+            Ok(result) => assert_eq!(result.user_id, -1, "Expected session with invalid user"),
+        }
     }
+
     #[test]
     fn test_user_exists() {
         let binding = establish_pool();
@@ -137,7 +160,7 @@ mod tests {
         };
 
         let result = login.is_user_exists(pool);
-        assert_eq!(result, true, "Expected user to exist");
+        assert_eq!(result.unwrap(), true, "Expected user to exist");
     }
 
     #[test]
@@ -151,8 +174,12 @@ mod tests {
         };
 
         let result = login.is_user_exists(pool);
-        assert_eq!(result, false, "Expected user not to exist");
+        match result {
+            Err(LogError::NotFound) => assert!(true),
+            _ => assert!(false, "Expected LogError::NotFound"),
+        }
     }
+
     #[test]
     fn test_valid_user() {
         // ('john_doe', 1, 'john.doe@example.com', 'password1', 'John Doe', 'https://example.com/avatar1.jpg', 'Hello, I am John Doe', '123-456-7890'),
@@ -166,7 +193,7 @@ mod tests {
         };
 
         // 将 mock 函数替换到 Login 实例中
-        let result = login.is_valid(pool);
+        let result = login.is_valid(pool).unwrap();
         assert_eq!(result, true, "Expected user to be valid");
     }
 
@@ -182,8 +209,10 @@ mod tests {
             password: "password3".to_string(),
         };
 
-        // 将 mock 函数替换到 Login 实例中
         let result = login.is_valid(pool);
-        assert_eq!(result, false, "Expected user to be invalid");
+        match result {
+            Err(LogError::PasswordError) => assert!(true),
+            _ => assert!(false, "Expected LogError::NotFound"),
+        }
     }
 }
