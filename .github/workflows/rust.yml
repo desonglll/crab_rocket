@@ -19,7 +19,9 @@ jobs:
       - name: Check
         run: cargo check
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --release
+      - name: Check status of release binaries
+        run: stat ./target/release/crab_rocket
 
   test:
     runs-on: ubuntu-latest
