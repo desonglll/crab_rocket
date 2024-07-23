@@ -187,7 +187,7 @@ mod tests {
     use crate::models::role::{PatchRole, PostRole};
     use crate::models::role_filter::RoleFilter;
     use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use obj_traits::request::pagination_request_param::PaginationParam;
     use obj_traits::request::request_param::RequestParam;
     use rocket::State;
 
