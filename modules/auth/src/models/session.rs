@@ -172,9 +172,11 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let session = Session::new(3);
+        println!("{:#?}", session);
         let added_session = session.add_session(pool).unwrap();
+        println!("{:#?}", added_session);
 
-        if !session.is_exists(pool).unwrap() {
+        if !added_session.is_exists(pool).unwrap() {
             assert_eq!(added_session.session_id, session.session_id);
         }
         assert_eq!(added_session.user_id, 3);
