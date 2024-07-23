@@ -48,4 +48,4 @@ jobs:
           done
 
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test --workspace
