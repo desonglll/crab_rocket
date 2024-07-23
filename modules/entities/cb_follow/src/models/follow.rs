@@ -46,12 +46,12 @@ impl PostFollow {
     pub fn new(
         following_user_id: i32,
         followed_user_id: i32,
-        created_at: Option<chrono::NaiveDateTime>,
+        // created_at: Option<chrono::NaiveDateTime>,
     ) -> Self {
         Self {
             following_user_id,
             followed_user_id,
-            created_at,
+            created_at: Some(get_e8_time()),
         }
     }
 

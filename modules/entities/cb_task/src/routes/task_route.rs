@@ -31,8 +31,8 @@ pub fn get_tasks(
 
 #[post("/task/filter", data = "<param>")]
 pub fn filter_tasks(
-    pool: &State<DbPool>,
     param: Option<Json<RequestParam<TaskFilter>>>,
+    pool: &State<DbPool>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
     let param = param.unwrap_or(Json(RequestParam::new(None, None)));

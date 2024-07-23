@@ -38,7 +38,8 @@ impl MapperCRUD for FollowMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
@@ -132,7 +133,8 @@ impl MapperCRUD for FollowMapper {
         let filter = &param.filter;
         println!("{filter:?}");
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
@@ -224,7 +226,8 @@ impl FollowMapperTrait for FollowMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
@@ -275,7 +278,8 @@ impl FollowMapperTrait for FollowMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
@@ -335,7 +339,7 @@ mod test {
 
     #[test]
     fn test_create_new_follow() {
-        let follow = PostFollow::new(1, 3, None);
+        let follow = PostFollow::new(1, 3);
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         match establish_pg_connection(pool) {

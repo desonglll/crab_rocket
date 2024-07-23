@@ -2,7 +2,7 @@ use rocket::serde::{Deserialize, Serialize};
 
 use crate::modules::auth_param::AuthParam;
 
-use super::pagination_request_param::{PaginationParam, PaginationParamTrait};
+use super::pagination_request_param::PaginationParam;
 
 /// ## Json Deserialize for passing request param.
 /// ```
@@ -11,7 +11,7 @@ use super::pagination_request_param::{PaginationParam, PaginationParamTrait};
 ///    pub filter: Option<FilterParamGeneric>,
 ///}
 /// ```
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 #[serde(crate = "rocket::serde")]
 pub struct RequestParam<FilterParamGeneric> {
     pub auth: Option<AuthParam>,
@@ -35,14 +35,17 @@ impl<T> RequestParam<T> {
             }
         }
     }
-    pub fn default() -> Self {
+
+    pub fn demo() -> Self {
         Self {
             auth: Some(AuthParam::new()),
             pagination: Some(PaginationParam::default()),
             filter: None,
         }
     }
-    pub fn demo() -> Self {
+}
+impl<T> Default for RequestParam<T> {
+    fn default() -> Self {
         Self {
             auth: Some(AuthParam::new()),
             pagination: Some(PaginationParam::default()),
