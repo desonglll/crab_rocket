@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
+use auth::auth_routes;
 use crab_rocket::env_variables;
 use crab_rocket_schema::establish_pool;
 use crab_rocket_utils;
@@ -59,6 +60,7 @@ fn rocket() -> _ {
     routes.extend(entities_routes().clone());
     routes.extend(services_routes().clone());
     routes.extend(schemas_routes().clone());
+    routes.extend(auth_routes().clone());
 
     rocket::build().mount("/api", routes).attach(cors).manage(pool)
 }

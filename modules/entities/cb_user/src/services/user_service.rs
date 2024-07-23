@@ -1,7 +1,7 @@
 use crate::mappers::user_mapper::UserMapper;
 use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
-use crab_rocket_schema::DbPool;
+use crab_rocket_schema::{establish_pg_connection, DbPool};
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -12,6 +12,15 @@ use rocket::State;
 use std::error::Error;
 
 pub struct UserService {}
+impl UserService {
+    pub fn get_by_username(pool: &State<DbPool>, username: String) -> Result<User, Box<dyn Error>> {
+        let mut conn = establish_pg_connection(pool).expect("Error establish_pg_connection");
+        match UserMapper::get_by_username(&mut conn, username) {
+            Ok(user) => Ok(user),
+            Err(err) => Err(Box::new(err)),
+        }
+    }
+}
 
 impl ServiceCRUD for UserService {
     type Item = User;

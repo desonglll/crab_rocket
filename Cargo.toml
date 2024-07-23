@@ -21,6 +21,7 @@ utoipa = { version = "4", features = ["rocket_extras"] }
 entities = { path = "./modules/entities" }
 services = { path = "./modules/services" }
 schemas = { path = "./modules/schemas" }
+auth = { path = "./modules/auth" }
 crab_rocket_utils = { path = "./modules/utils/cb_utils" }
 crab_rocket_schema = { path = "./modules/schemas/cb_schema" }
 
