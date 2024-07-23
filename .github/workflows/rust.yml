@@ -11,6 +11,13 @@ env:
   DATABASE_URL: postgres://postgres:password@localhost:5432/hello_rocket
 
 jobs:
+  check_system:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Show info of system
+        run: free -h && lscpu && lshw
+
   build:
     runs-on: ubuntu-latest
 
