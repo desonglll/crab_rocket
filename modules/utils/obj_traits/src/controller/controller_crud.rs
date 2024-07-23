@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::fmt::Debug;
 
 use crab_rocket_schema::DbPool;
 use rocket::State;
@@ -148,6 +149,7 @@ pub fn controller_filter<Obj, ObjService, ObjFilter>(
 ) -> Result<ApiResponse<Data<Vec<Obj>>>, Box<dyn Error>>
 where
     ObjService: ServiceCRUD<Item = Obj, Param = RequestParam<ObjFilter>>,
+    ObjFilter: Debug,
 {
     match ObjService::filter(pool, param) {
         Ok(all_employees) => {

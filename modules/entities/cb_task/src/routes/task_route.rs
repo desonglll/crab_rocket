@@ -31,11 +31,11 @@ pub fn get_tasks(
 
 #[post("/task/filter", data = "<param>")]
 pub fn filter_tasks(
-    pool: &State<DbPool>,
     param: Option<Json<RequestParam<TaskFilter>>>,
+    pool: &State<DbPool>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
-    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
+    let param = param.unwrap_or(Json(RequestParam::default()));
     let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count(pool);
     let resp = TaskController::filter(pool, &param).unwrap();

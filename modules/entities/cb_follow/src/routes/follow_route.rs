@@ -36,7 +36,7 @@ pub fn filter_follows(
     param: Option<Json<RequestParam<FollowFilter>>>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
-    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
+    let param = param.unwrap_or(Json(RequestParam::default()));
     let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count(pool);
     let resp = FollowController::filter(pool, &param).unwrap();
@@ -52,13 +52,13 @@ pub fn get_follow_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/follow", data = "<follow>")]
+#[post("/follow?<follower_id>&<follow_id>")]
 pub fn insert_single_follow(
     pool: &State<DbPool>,
-    follow: Json<PostFollow>,
+    follower_id: i32,
+    follow_id: i32,
 ) -> Json<serde_json::Value> {
-    let mut obj: PostFollow = follow.into_inner();
-
+    let mut obj: PostFollow = PostFollow::new(follower_id, follow_id);
     let resp = FollowController::add_single(pool, &mut obj).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())

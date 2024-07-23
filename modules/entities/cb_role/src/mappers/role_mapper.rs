@@ -37,7 +37,8 @@ impl MapperCRUD for RoleMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
@@ -120,7 +121,8 @@ impl MapperCRUD for RoleMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
@@ -185,7 +187,7 @@ mod tests {
     use crate::models::role::{PatchRole, PostRole};
     use crate::models::role_filter::RoleFilter;
     use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use obj_traits::request::pagination_request_param::PaginationParam;
     use obj_traits::request::request_param::RequestParam;
     use rocket::State;
 

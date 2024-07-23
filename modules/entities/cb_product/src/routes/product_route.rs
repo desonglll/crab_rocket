@@ -35,7 +35,7 @@ pub fn filter_products(
     param: Option<Json<RequestParam<ProductFilter>>>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
-    let param = param.unwrap_or(Json(RequestParam::new(None, None)));
+    let param = param.unwrap_or(Json(RequestParam::default()));
     let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count(pool);
     let resp = ProductController::filter(pool, &param).unwrap();

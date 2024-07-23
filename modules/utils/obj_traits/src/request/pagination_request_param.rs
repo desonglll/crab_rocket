@@ -1,6 +1,6 @@
 use rocket::serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 #[serde(crate = "rocket::serde")]
 pub struct PaginationParam {
     pub limit: Option<i32>,
@@ -9,7 +9,6 @@ pub struct PaginationParam {
 pub trait PaginationParamTrait {
     fn new(limit: Option<i32>, offset: Option<i32>) -> Self;
     fn demo() -> Self;
-    fn default() -> Self;
 }
 impl PaginationParamTrait for PaginationParam {
     fn new(limit: Option<i32>, offset: Option<i32>) -> Self {
@@ -24,6 +23,8 @@ impl PaginationParamTrait for PaginationParam {
             offset: Some(0),
         }
     }
+}
+impl Default for PaginationParam {
     fn default() -> Self {
         Self {
             limit: Some(10),

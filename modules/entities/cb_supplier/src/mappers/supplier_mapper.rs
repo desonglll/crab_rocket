@@ -38,7 +38,8 @@ impl MapperCRUD for SupplierMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
@@ -127,7 +128,8 @@ impl MapperCRUD for SupplierMapper {
         //
         // limit 始终为 per_page
         // 计算分页相关
-        let pagination = param.pagination.as_ref().unwrap();
+        let pagination = param.pagination.unwrap_or_default().clone();
+
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数

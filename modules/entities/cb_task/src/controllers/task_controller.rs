@@ -1,6 +1,7 @@
 use crate::models::task::{PatchTask, PostTask, Task};
 use crate::models::task_filter::TaskFilter;
 use crate::services::task_service::TaskService;
+use auth::models::session::Session;
 use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::{
     controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
@@ -58,6 +59,14 @@ impl ControllerCRUD for TaskController {
         pool: &State<DbPool>,
         param: &RequestParam<TaskFilter>,
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
-        controller_filter::<Self::Item, TaskService, TaskFilter>(pool, param)
+        let session_id = param.auth.unwrap().session_id;
+        let session = Session::get_session_by_id(pool, session_id);
+        match session {
+            Ok(existing_session) => match existing_session.is_valid(pool) {
+                Ok(_) => controller_filter::<Self::Item, TaskService, TaskFilter>(pool, param),
+                Err(e) => Ok(ApiResponse::error(Box::new(e))),
+            },
+            Err(_) => Ok(ApiResponse::new(4001, "Session Not Found".to_owned(), Data::default())),
+        }
     }
 }
