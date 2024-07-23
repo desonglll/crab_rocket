@@ -11,6 +11,13 @@ env:
   DATABASE_URL: postgres://postgres:password@localhost:5432/hello_rocket
 
 jobs:
+  check_system:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Show info of system
+        run: free -h && lscpu && lshw
+
   build:
     runs-on: ubuntu-latest
 
@@ -19,7 +26,9 @@ jobs:
       - name: Check
         run: cargo check
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --release
+      - name: Check status of release binaries
+        run: stat ./target/release/crab_rocket
 
   test:
     runs-on: ubuntu-latest
@@ -53,4 +62,4 @@ jobs:
         run: cd ./modules/schemas/cb_schema && diesel setup && diesel database reset
 
       - name: Run tests
-        run: cargo test --workspace
+        run: cargo test --workspace -- --test-threads=1
