@@ -224,6 +224,8 @@ diesel::table! {
     session_table (id) {
         id -> Int4,
         user_id -> Int4,
+        #[max_length = 255]
+        username -> Varchar,
         session_id -> Uuid,
         expires -> Timestamp,
         created_at -> Timestamp,
@@ -294,7 +296,6 @@ diesel::joinable!(inventory_table -> product_table (product_id));
 diesel::joinable!(order_table -> customer_table (customer_id));
 diesel::joinable!(product_table -> supplier_table (supplier_id));
 diesel::joinable!(product_table -> user_table (user_id));
-diesel::joinable!(session_table -> user_table (user_id));
 diesel::joinable!(shipment_table -> order_table (order_id));
 diesel::joinable!(task_table -> user_table (user_id));
 diesel::joinable!(user_table -> role_table (role_id));

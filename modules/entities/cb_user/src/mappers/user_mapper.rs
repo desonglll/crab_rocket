@@ -177,7 +177,11 @@ impl MapperCRUD for UserMapper {
         Ok(body)
     }
 }
-
+impl UserMapper {
+    pub fn get_by_username(conn: &mut PgConnection, uname: String) -> Result<User, Error> {
+        dsl::user_table.filter(dsl::username.eq(uname)).first(conn)
+    }
+}
 #[cfg(test)]
 mod test {
     use super::*;

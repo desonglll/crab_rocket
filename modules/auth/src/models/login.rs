@@ -1,47 +1,28 @@
-use std::error::Error;
-use std::fmt::Display;
-
 use crab_rocket_schema::schema::user_table;
 use crab_rocket_schema::{establish_pg_connection, DbPool};
 use crab_rocket_user::models::user::User;
+use crab_rocket_user::services::user_service::UserService;
 use diesel::prelude::*;
+use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
 
+use super::log_error::LogError;
 use super::session::Session;
 
-#[derive(Debug)]
-pub enum LogError {
-    NotFound,
-    PasswordError,
-}
-
-impl Display for LogError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            LogError::NotFound => write!(f, "LogError: NotFound"),
-            LogError::PasswordError => write!(f, "LogError: PasswordError"),
-        }
-    }
-}
-
-impl Error for LogError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-}
-
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[serde(crate = "rocket::serde")]
 pub struct Login {
-    pub user_id: i32,
     pub username: String,
     pub password: String,
 }
 
 impl Login {
     pub fn login(&self, pool: &State<DbPool>) -> Result<Session, LogError> {
+        let user = UserService::get_by_username(pool, self.username.clone()).unwrap();
         match self.is_user_exists(pool) {
             Ok(_) => match self.is_valid(pool) {
                 Ok(_) => {
-                    let session = Session::new(self.user_id);
+                    let session = Session::new(user.user_id);
                     let result_session: Result<Session, diesel::result::Error> =
                         session.add_session(pool);
                     match result_session {
@@ -60,7 +41,6 @@ impl Login {
     pub fn is_user_exists(&self, pool: &State<DbPool>) -> Result<bool, LogError> {
         let mut conn = establish_pg_connection(pool).expect("msg");
         let result: Result<User, diesel::result::Error> = user_table::dsl::user_table
-            .filter(user_table::dsl::user_id.eq(self.user_id))
             .filter(user_table::dsl::username.eq(&self.username))
             .first::<User>(&mut conn);
         match result {
@@ -75,7 +55,6 @@ impl Login {
     pub fn is_valid(&self, pool: &State<DbPool>) -> Result<bool, LogError> {
         let mut conn = establish_pg_connection(pool).expect("msg");
         let result: Result<User, diesel::result::Error> = user_table::dsl::user_table
-            .filter(user_table::dsl::user_id.eq(self.user_id))
             .filter(user_table::dsl::username.eq(&self.username))
             .filter(user_table::dsl::password.eq(&self.password))
             .first::<User>(&mut conn);
@@ -111,7 +90,6 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let login = Login {
-            user_id: 1,
             username: "john_doe".to_string(),
             password: "password1".to_string(),
         };
@@ -136,7 +114,6 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let login = Login {
-            user_id: 1,
             username: "john_doe".to_string(),
             password: "wrong_password".to_string(),
         };
@@ -154,7 +131,6 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let login = Login {
-            user_id: 1,
             username: "john_doe".to_string(),
             password: "password1".to_string(),
         };
@@ -168,7 +144,6 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let login = Login {
-            user_id: 99,
             username: "user3".to_string(),
             password: "password3".to_string(),
         };
@@ -187,7 +162,6 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let login = Login {
-            user_id: 1,
             username: "john_doe".to_string(),
             password: "password1".to_string(),
         };
@@ -204,7 +178,6 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let login = Login {
-            user_id: 2,
             username: "jane_smith".to_string(),
             password: "password3".to_string(),
         };

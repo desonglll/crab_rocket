@@ -90,8 +90,8 @@ impl Session {
         let result = diesel::delete(
             dsl::session_table.filter(session_table::session_id.eq(self.session_id)),
         )
-            .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
-            .get_result::<Session>(&mut conn);
+        .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
+        .get_result::<Session>(&mut conn);
         match result {
             Ok(deleted_session) => Ok(deleted_session),
             Err(e) => {
@@ -100,7 +100,16 @@ impl Session {
             }
         }
     }
-
+    pub fn get_session_by_uid(
+        pool: &State<DbPool>,
+        uid: i32,
+    ) -> Result<Session, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        session_table::dsl::session_table
+            .filter(session_table::dsl::user_id.eq(uid))
+            .select(Session::as_select()) // Ensure to select the fields properly
+            .first::<Session>(&mut conn)
+    }
     pub fn get_session_by_id(
         pool: &State<DbPool>,
         session_id: Uuid,
@@ -163,9 +172,11 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         let session = Session::new(3);
+        println!("{:#?}", session);
         let added_session = session.add_session(pool).unwrap();
+        println!("{:#?}", added_session);
 
-        if !session.is_exists(pool).unwrap() {
+        if !added_session.is_exists(pool).unwrap() {
             assert_eq!(added_session.session_id, session.session_id);
         }
         assert_eq!(added_session.user_id, 3);
