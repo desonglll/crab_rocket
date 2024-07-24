@@ -1,9 +1,10 @@
-import { Menu, MenuProps, MenuTheme } from "antd";
+import {Menu, MenuProps, MenuTheme} from "antd";
 
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
 import menuItems from "../../config/menuItems";
 import "./TopMenu.scss";
+
 const TopMenu: React.FC<{ themeMode: MenuTheme }> = ({
   themeMode = "light",
 }) => {

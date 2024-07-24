@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import TaskDetail from "../components/Task/TaskDetail";
 import TaskList from "../components/Task/TaskList";
 import TaskNew from "../components/Task/TaskNew";

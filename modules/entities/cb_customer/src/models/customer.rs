@@ -27,6 +27,7 @@ pub struct PostCustomer {
     pub phone: Option<String>,
     pub address: Option<String>,
 }
+
 impl PostCustomer {
     pub fn demo() -> Self {
         Self {
@@ -37,6 +38,7 @@ impl PostCustomer {
         }
     }
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]

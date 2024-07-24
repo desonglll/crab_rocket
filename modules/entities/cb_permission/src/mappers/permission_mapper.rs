@@ -204,6 +204,7 @@ impl MapperCRUD for PermissionMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod tests {
     use rocket::State;
@@ -223,6 +224,7 @@ mod tests {
         let data = result.unwrap();
         assert!(data.data().len() > 0); // Ensure there's data or at least an empty vector
     }
+
     #[test]
     fn test_get_by_id() {
         let binding = establish_pool();
@@ -235,6 +237,7 @@ mod tests {
         let fetched_permission = result.unwrap();
         assert_eq!(fetched_permission.permission_id, permission.permission_id);
     }
+
     #[test]
     fn test_add_single() {
         let binding = establish_pool();
@@ -246,6 +249,7 @@ mod tests {
         let inserted_permission = result.unwrap();
         assert_eq!(inserted_permission.permission_name, new_permission.permission_name);
     }
+
     #[test]
     fn test_delete_by_id() {
         let binding = establish_pool();
@@ -258,6 +262,7 @@ mod tests {
         let deleted_permission = result.unwrap();
         assert_eq!(deleted_permission.permission_id, inserted_permission.permission_id);
     }
+
     #[test]
     fn test_update_by_id() {
         let binding = establish_pool();

@@ -1,11 +1,11 @@
-import { Fade } from "@mui/material";
-import { Button, DatePicker, Form, Input, message } from "antd";
-import { useNavigate } from "react-router-dom";
+import {Fade} from "@mui/material";
+import {Button, DatePicker, Form, Input, message} from "antd";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
-import { BackButton } from "../Common/BackButton.tsx";
-import { SelectPermission } from "../Permission/SelectPermission.tsx";
-import { SubmittedRole } from "../../models/models.ts";
+import {BackButton} from "../Common/BackButton.tsx";
+import {SelectPermission} from "../Permission/SelectPermission.tsx";
+import {SubmittedRole} from "../../models/models.ts";
 
 export function RoleNew() {
   const navigate = useNavigate();

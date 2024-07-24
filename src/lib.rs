@@ -1,5 +1,6 @@
-use diesel::prelude::*;
 use std::env;
+
+use diesel::prelude::*;
 
 pub mod env_variables;
 

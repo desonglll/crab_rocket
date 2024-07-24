@@ -79,6 +79,7 @@ pub struct PostTask {
     pub updated_at: Option<chrono::NaiveDateTime>,
     pub user_id: Option<i32>,
 }
+
 impl PostTask {
     pub fn demo() -> Self {
         Self {

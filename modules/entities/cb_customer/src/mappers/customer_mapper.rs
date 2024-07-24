@@ -174,6 +174,7 @@ impl MapperCRUD for CustomerMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod test {
     use rocket::State;

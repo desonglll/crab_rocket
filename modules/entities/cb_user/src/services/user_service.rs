@@ -2,7 +2,7 @@ use std::error::Error;
 
 use rocket::State;
 
-use crab_rocket_schema::{DbPool};
+use crab_rocket_schema::DbPool;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{

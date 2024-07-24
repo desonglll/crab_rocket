@@ -25,6 +25,7 @@ pub struct EmployeeFilter {
     pub role_name: Option<String>,
     pub role_id: Option<i32>,
 }
+
 impl EmployeeFilter {
     // 方法：从 JSON 字符串解析为 EmployeeFilter 实例
     pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {

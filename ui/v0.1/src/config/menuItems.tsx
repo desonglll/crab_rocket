@@ -1,12 +1,13 @@
-import { ItemType, MenuItemType } from "antd/es/menu/hooks/useItems";
+import {ItemType, MenuItemType} from "antd/es/menu/hooks/useItems";
 import {
-  FormOutlined,
-  SettingOutlined,
-  HomeOutlined,
-  FileOutlined,
-  UnorderedListOutlined,
-  UploadOutlined,
+    FileOutlined,
+    FormOutlined,
+    HomeOutlined,
+    SettingOutlined,
+    UnorderedListOutlined,
+    UploadOutlined,
 } from "@ant-design/icons";
+
 const menuItems: ItemType<MenuItemType>[] = [
   {
     label: "主页",

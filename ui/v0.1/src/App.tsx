@@ -1,6 +1,6 @@
-import { Route, BrowserRouter, Routes } from "react-router-dom";
-import { Home } from "./pages/Home/Home.tsx";
-import { ConfigProvider } from "antd";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {Home} from "./pages/Home/Home.tsx";
+import {ConfigProvider} from "antd";
 import zhCN from "antd/es/locale/zh_CN";
 import "antd/dist/reset.css";
 import "./index.css";

@@ -183,6 +183,7 @@ impl MapperCRUD for TaskMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod tests {
     use rocket::State;

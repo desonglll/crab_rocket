@@ -1,5 +1,5 @@
-import { Button } from "antd";
-import { useNavigate } from "react-router-dom";
+import {Button} from "antd";
+import {useNavigate} from "react-router-dom";
 
 export function NewUserButton() {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
-import { Fade } from "@mui/material";
-import { Button, Form, Input, message } from "antd";
+import {Fade} from "@mui/material";
+import {Button, Form, Input, message} from "antd";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { SelectUser } from "../Common/SelectUser.tsx";
+import {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
+import {SelectUser} from "../Common/SelectUser.tsx";
 import dayjs from "dayjs";
 import TextArea from "antd/es/input/TextArea";
-import { PatchTask, Task } from "../../models/models.ts";
+import {PatchTask, Task} from "../../models/models.ts";
 
 function TaskDetail() {
   const { task_id } = useParams();

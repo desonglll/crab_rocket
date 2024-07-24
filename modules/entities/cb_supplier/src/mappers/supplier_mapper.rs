@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::supplier_table::dsl;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
@@ -9,8 +12,6 @@ use crate::models::{
     supplier::{PatchSupplier, PostSupplier, Supplier},
     supplier_filter::SupplierFilter,
 };
-use crab_rocket_schema::schema::supplier_table::dsl;
-use diesel::prelude::*;
 
 pub struct SupplierMapper {}
 
@@ -183,14 +184,18 @@ impl MapperCRUD for SupplierMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+    use obj_traits::request::request_param::RequestParam;
+
     use crate::models::supplier::{PatchSupplier, PostSupplier};
     use crate::models::supplier_filter::SupplierFilter;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use obj_traits::request::request_param::RequestParam;
-    use rocket::State;
+
+    use super::*;
 
     #[test]
     fn test_fetch_all_supplier_table() {

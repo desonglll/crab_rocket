@@ -1,7 +1,8 @@
-import { Menu, MenuProps, MenuTheme } from "antd";
+import {Menu, MenuProps, MenuTheme} from "antd";
 import menuItems from "../../config/menuItems";
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+
 const SideMenu: React.FC<{ themeMode: MenuTheme }> = ({
   themeMode = "light",
 }) => {

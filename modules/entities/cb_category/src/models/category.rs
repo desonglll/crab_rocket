@@ -51,6 +51,7 @@ pub struct PostCategory {
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
 }
+
 impl PostCategory {
     pub fn demo() -> Self {
         Self {
@@ -62,6 +63,7 @@ impl PostCategory {
         }
     }
 }
+
 impl PostCategory {
     pub fn new(
         name: String,

@@ -1,5 +1,5 @@
-import { Collapse, CollapseProps } from "antd";
-import { BackButton } from "../Common/BackButton.tsx";
+import {Collapse, CollapseProps} from "antd";
+import {BackButton} from "../Common/BackButton.tsx";
 import EmployeeTable from "./EmployeeTable.tsx";
 import NewEmployeeButton from "./NewEmployeeButton.tsx";
 

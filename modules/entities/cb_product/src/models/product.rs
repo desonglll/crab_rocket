@@ -57,6 +57,7 @@ pub struct PostProduct {
     pub status: Option<String>,
     pub public: Option<bool>,
 }
+
 impl PostProduct {
     pub fn demo() -> Self {
         Self {
@@ -80,6 +81,7 @@ impl PostProduct {
         }
     }
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable, QueryableByName)]

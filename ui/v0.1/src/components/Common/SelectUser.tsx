@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
-import { Select } from "antd";
+import {Select} from "antd";
 
 export function SelectUser({
   defaultUserId,

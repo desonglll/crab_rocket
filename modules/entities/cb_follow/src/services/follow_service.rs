@@ -117,6 +117,7 @@ impl FollowServiceTrait<RequestParam<FollowFilter>> for FollowService {
         }
     }
 }
+
 #[cfg(test)]
 mod test {
     use rocket::State;

@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 use diesel::result::Error;
 use rocket::State;
-use crab_rocket_schema::{DbPool, establish_pg_connection};
 
+use crab_rocket_schema::{DbPool, establish_pg_connection};
 use crab_rocket_schema::schema::user_table::{self};
 use crab_rocket_schema::schema::user_table::dsl;
 use crab_rocket_utils::time::get_e8_time;

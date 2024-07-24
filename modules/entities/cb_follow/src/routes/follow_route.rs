@@ -92,6 +92,7 @@ pub fn delete_follow_specifically(
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
+
 #[post("/follow", data = "<follow>")]
 pub fn insert_single_follow_by_params(
     pool: &State<DbPool>,
@@ -102,6 +103,7 @@ pub fn insert_single_follow_by_params(
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
+
 #[options("/follow")]
 pub fn options_follow() -> Status {
     Status::Ok

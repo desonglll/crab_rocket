@@ -140,6 +140,7 @@ impl PostPermission {
         }
     }
 }
+
 impl PatchPermission {
     pub fn new(
         permission_name: String,

@@ -15,6 +15,7 @@ use crate::models::{
 use super::follow_mapper_trait::FollowMapperTrait;
 
 pub struct FollowMapper {}
+
 impl MapperCRUD for FollowMapper {
     type Item = Follow;
     type PostItem = PostFollow;
@@ -199,7 +200,7 @@ impl FollowMapperTrait for FollowMapper {
                         .and(dsl::followed_user_id.eq(obj.followed_user_id)),
                 ),
             )
-            .get_result(conn)
+                .get_result(conn)
         } else {
             Err(diesel::result::Error::DatabaseError(
                 diesel::result::DatabaseErrorKind::UniqueViolation,

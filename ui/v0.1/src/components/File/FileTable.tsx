@@ -1,7 +1,7 @@
-import { Button, Card, Table, TableProps, message } from "antd";
-import { useEffect, useState } from "react";
+import {Button, Card, message, Table, TableProps} from "antd";
+import {useEffect, useState} from "react";
 import axios from "axios";
-import { File } from "../../models/models.ts";
+import {File} from "../../models/models.ts";
 import dayjs from "dayjs";
 
 export function FileTable() {

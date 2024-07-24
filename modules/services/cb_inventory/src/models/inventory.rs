@@ -30,6 +30,7 @@ pub struct PostInventory {
     pub quantity: Option<i32>,
     pub last_updated: Option<NaiveDateTime>,
 }
+
 impl PostInventory {
     pub fn demo() -> Self {
         Self {

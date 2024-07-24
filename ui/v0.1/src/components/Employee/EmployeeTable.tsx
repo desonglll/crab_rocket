@@ -1,9 +1,9 @@
-import { Button, message, Space, Table } from "antd";
+import {Button, message, Space, Table} from "antd";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {NavLink} from "react-router-dom";
 import dayjs from "dayjs";
-import { Employee } from "../../models/models.ts";
+import {Employee} from "../../models/models.ts";
 
 interface EmployeeParams {
   employee_id: number | null;
