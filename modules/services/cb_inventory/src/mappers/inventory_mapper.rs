@@ -1,17 +1,18 @@
+use diesel::prelude::*;
+use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection, schema::inventory_table::dsl};
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
-use rocket::State;
 
 use crate::models::{
     inventory::{Inventory, PatchInventory, PostInventory},
     inventory_filter::InventoryFilter,
 };
-use crab_rocket_schema::{establish_pg_connection, schema::inventory_table::dsl, DbPool};
-use diesel::prelude::*;
 
 pub struct InventoryMapper {}
 
@@ -81,7 +82,6 @@ impl MapperCRUD for InventoryMapper {
 
     fn add_single(
         pool: &State<DbPool>,
-
         obj: &PostInventory,
     ) -> Result<Data<Inventory>, diesel::result::Error> {
         let mut conn = establish_pg_connection(pool).expect("msg");
@@ -104,7 +104,6 @@ impl MapperCRUD for InventoryMapper {
 
     fn update_by_id(
         pool: &State<DbPool>,
-
         pid: i32,
         obj: &PatchInventory,
     ) -> Result<Data<Inventory>, diesel::result::Error> {
@@ -198,14 +197,17 @@ impl MapperCRUD for InventoryMapper {
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+
     use crate::models::{
         inventory::{PatchInventory, PostInventory},
         inventory_filter::InventoryFilter,
     };
-    use crab_rocket_schema::{establish_pool, DbPool};
-    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-    use rocket::State;
+
+    use super::*;
 
     #[test]
     fn test_fetch_all_inventory_table() {

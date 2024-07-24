@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::employee::{Employee, PatchEmployee, PostEmployee};
 use crate::models::employee_filter::EmployeeFilter;
 use crate::services::employee_service::EmployeeService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct EmployeeController {}
 

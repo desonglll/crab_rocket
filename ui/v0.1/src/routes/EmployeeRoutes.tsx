@@ -1,6 +1,6 @@
-import { Route, Routes } from "react-router-dom";
-import { EmployeeList } from "../components/Employee/EmployeeList";
-import { EmployeeDetail } from "../components/Employee/EmployeeDetail";
+import {Route, Routes} from "react-router-dom";
+import {EmployeeList} from "../components/Employee/EmployeeList";
+import {EmployeeDetail} from "../components/Employee/EmployeeDetail";
 import EmployeeNew from "../components/Employee/EmployeeNew";
 
 function EmployeeRoutes() {

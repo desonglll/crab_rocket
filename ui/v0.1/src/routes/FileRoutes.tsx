@@ -1,5 +1,5 @@
-import { Routes, Route } from "react-router-dom";
-import { FileTable } from "../components/File/FileTable";
+import {Route, Routes} from "react-router-dom";
+import {FileTable} from "../components/File/FileTable";
 import FileList from "../components/File/FileList";
 import FileUpload from "../components/File/FileUpload";
 

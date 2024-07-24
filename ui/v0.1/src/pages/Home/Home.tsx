@@ -1,23 +1,20 @@
-import { Route, Routes } from "react-router-dom";
-import { Greet } from "../../components/Common/Greet.tsx";
+import {Route, Routes} from "react-router-dom";
+import {Greet} from "../../components/Common/Greet.tsx";
 import EmployeeRoutes from "../../routes/EmployeeRoutes.tsx";
 import PostRoutes from "../../routes/PostRoutes.tsx";
 import UserRoutes from "../../routes/UserRoutes.tsx";
 import TaskRoutes from "../../routes/TaskRoutes.tsx";
 import FileRoutes from "../../routes/FileRoutes.tsx";
 import RoleRoutes from "../../routes/RoleRoutes.tsx";
-import { useEffect, useState } from "react";
-import { Divider, Flex, Layout, MenuTheme } from "antd";
-const { Header, Footer, Sider, Content } = Layout;
-import { Button } from "antd";
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  SunOutlined,
-} from "@ant-design/icons";
+import {useEffect, useState} from "react";
+import {Button, Divider, Flex, Layout, MenuTheme} from "antd";
+import {MenuFoldOutlined, MenuUnfoldOutlined, SunOutlined,} from "@ant-design/icons";
 import TopMenu from "../../components/Common/TopMenu.tsx";
 import SideMenu from "../../components/Common/SideMenu.tsx";
 import "./Home.scss";
+
+const { Header, Footer, Sider, Content } = Layout;
+
 export function Home() {
   const [isMobile, setIsMobile] = useState(
     window.matchMedia("(max-width: 767px)").matches

@@ -1,9 +1,11 @@
 use chrono::NaiveDateTime;
-use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
@@ -52,6 +54,7 @@ pub struct PatchOrder {
     pub total_amount: Option<f64>,
     pub status: Option<String>,
 }
+
 impl From<Order> for PostOrder {
     fn from(order: Order) -> Self {
         PostOrder {

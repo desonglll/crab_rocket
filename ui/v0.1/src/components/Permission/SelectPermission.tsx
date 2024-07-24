@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Select } from "antd";
+import {useEffect, useState} from "react";
+import type {SelectProps} from "antd";
+import {Select} from "antd";
 import axios from "axios";
-import { Permission } from "../../models/models.ts";
-import type { SelectProps } from "antd";
+import {Permission} from "../../models/models.ts";
 
 export function SelectPermission({
   defaultSelected,

@@ -1,3 +1,5 @@
+use rocket::{Route, routes};
+
 use crab_rocket_category::routes::category_route::*;
 use crab_rocket_customer::routes::customer_route::*;
 use crab_rocket_employee::routes::employee_route::*;
@@ -11,7 +13,6 @@ use crab_rocket_role::routes::role_route::*;
 use crab_rocket_supplier::routes::supplier_route::*;
 use crab_rocket_task::routes::task_route::*;
 use crab_rocket_user::routes::user_route::*;
-use rocket::{routes, Route};
 
 pub fn entities_routes() -> Vec<Route> {
     routes![

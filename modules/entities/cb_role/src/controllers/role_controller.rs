@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::role::{PatchRole, PostRole, Role};
 use crate::models::role_filter::RoleFilter;
 use crate::services::role_service::RoleService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct RoleController {}
 

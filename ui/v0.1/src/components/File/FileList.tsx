@@ -1,5 +1,5 @@
-import { Collapse, CollapseProps } from "antd";
-import { FileTable } from "./FileTable";
+import {Collapse, CollapseProps} from "antd";
+import {FileTable} from "./FileTable";
 import FileUpload from "./FileUpload";
 
 function FileList() {

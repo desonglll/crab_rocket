@@ -1,11 +1,13 @@
-use crate::models::info::Info;
+use diesel::{PgConnection, QueryDsl};
+use diesel::dsl::count_star;
+use diesel::RunQueryDsl;
+
 use crab_rocket_schema::schema::employee_table::dsl::*;
 use crab_rocket_schema::schema::post_table::dsl::*;
 use crab_rocket_schema::schema::task_table::dsl::*;
 use crab_rocket_schema::schema::user_table::dsl::*;
-use diesel::dsl::count_star;
-use diesel::RunQueryDsl;
-use diesel::{PgConnection, QueryDsl};
+
+use crate::models::info::Info;
 
 pub fn get_info(conn: &mut PgConnection) -> Result<Info, diesel::result::Error> {
     let post_count: i64 = post_table.select(count_star()).first(conn)?;
@@ -19,9 +21,13 @@ pub fn get_info(conn: &mut PgConnection) -> Result<Info, diesel::result::Error> 
 
 #[cfg(test)]
 mod test {
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+
     use super::get_info;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use rocket::State; // 建立数据库连接
+
+// 建立数据库连接
 
     #[test]
     fn test_get_info() {

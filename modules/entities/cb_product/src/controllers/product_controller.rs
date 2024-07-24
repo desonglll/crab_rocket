@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::product::{PatchProduct, PostProduct, Product};
 use crate::models::product_filter::ProductFilter;
 use crate::services::product_service::ProductService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct ProductController {}
 

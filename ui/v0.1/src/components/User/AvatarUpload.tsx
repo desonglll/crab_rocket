@@ -1,8 +1,9 @@
-import { GetProp, Upload, UploadProps, message } from "antd";
-import { useState } from "react";
-type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import {GetProp, message, Upload, UploadProps} from "antd";
+import {useState} from "react";
+import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 import axios from "axios";
+
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";

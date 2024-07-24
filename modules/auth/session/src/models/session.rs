@@ -1,14 +1,18 @@
+use std::error::Error;
+use std::fmt::{Display, Formatter};
+
 use chrono::{Duration, NaiveDateTime};
-use crab_rocket_schema::schema::session_table::dsl;
-use crab_rocket_schema::DbPool;
-use crab_rocket_schema::{establish_pg_connection, schema::session_table};
-use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
-use std::error::Error;
-use std::fmt::{Display, Formatter};
-use uuid::Uuid; // 添加这一行
+use uuid::Uuid;
+
+use crab_rocket_schema::{establish_pg_connection, schema::session_table};
+use crab_rocket_schema::DbPool;
+use crab_rocket_schema::schema::session_table::dsl;
+use crab_rocket_utils::time::get_e8_time;
+
+// 添加这一行
 #[derive(Debug)]
 pub enum SessionError {
     NotFound,
@@ -90,8 +94,8 @@ impl Session {
         let result = diesel::delete(
             dsl::session_table.filter(session_table::session_id.eq(self.session_id)),
         )
-        .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
-        .get_result::<Session>(&mut conn);
+            .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
+            .get_result::<Session>(&mut conn);
         match result {
             Ok(deleted_session) => Ok(deleted_session),
             Err(e) => {
@@ -150,8 +154,9 @@ impl Session {
 
 #[cfg(test)]
 mod tests {
-    use crab_rocket_schema::{establish_pool, DbPool};
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
 
     use super::*;
 

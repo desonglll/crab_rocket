@@ -1,15 +1,17 @@
-use crate::models::{
-    permission::{PatchPermission, Permission, PostPermission},
-    permission_filter::PermissionFilter,
-};
-use crab_rocket_schema::{establish_pg_connection, schema::permission_table::dsl, DbPool};
 use diesel::{prelude::*, result::Error};
+use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection, schema::permission_table::dsl};
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
-use rocket::State;
+
+use crate::models::{
+    permission::{PatchPermission, Permission, PostPermission},
+    permission_filter::PermissionFilter,
+};
 
 pub struct PermissionMapper {}
 
@@ -207,11 +209,14 @@ impl MapperCRUD for PermissionMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crab_rocket_schema::{establish_pool, DbPool};
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
+
+    use super::*;
 
     #[test]
     fn test_get_all() {
@@ -223,6 +228,7 @@ mod tests {
         let data = result.unwrap();
         assert!(data.data.len() > 0); // Ensure there's data or at least an empty vector
     }
+
     #[test]
     fn test_get_by_id() {
         let binding = establish_pool();
@@ -234,6 +240,7 @@ mod tests {
         let fetched_permission = result.unwrap();
         assert_eq!(fetched_permission.data.permission_id, permission.data.permission_id);
     }
+
     #[test]
     fn test_add_single() {
         let binding = establish_pool();
@@ -244,6 +251,7 @@ mod tests {
         let inserted_permission = result.unwrap();
         assert_eq!(inserted_permission.data.permission_name, new_permission.permission_name);
     }
+
     #[test]
     fn test_delete_by_id() {
         let binding = establish_pool();
@@ -255,6 +263,7 @@ mod tests {
         let deleted_permission = result.unwrap();
         assert_eq!(deleted_permission.data.permission_id, inserted_permission.data.permission_id);
     }
+
     #[test]
     fn test_update_by_id() {
         let binding = establish_pool();

@@ -1,17 +1,21 @@
-use crate::models::product::{PatchProduct, PostProduct, Product};
-use crate::models::product_filter::ProductFilter;
-use crab_rocket_schema::schema::product_table::dsl; //配合下面的 `products.filter()`
-use crab_rocket_schema::schema::product_table::{self};
-use crab_rocket_schema::{establish_pg_connection, DbPool};
-use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
+use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection};
+//配合下面的 `products.filter()`
+use crab_rocket_schema::schema::product_table::{self};
+use crab_rocket_schema::schema::product_table::dsl;
+use crab_rocket_utils::time::get_e8_time;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
-use rocket::State;
+
+use crate::models::product::{PatchProduct, PostProduct, Product};
+use crate::models::product_filter::ProductFilter;
 
 pub struct ProductMapper {}
+
 impl MapperCRUD for ProductMapper {
     type Item = Product;
     type PostItem = PostProduct;
@@ -278,13 +282,17 @@ impl MapperCRUD for ProductMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
-    use rocket::State;
+
+    use super::*;
+
     #[test]
     fn test_get_all_products() {
         let binding = establish_pool();
@@ -330,6 +338,7 @@ mod tests {
         let inserted_product = result.unwrap();
         assert_eq!(inserted_product.data.name, "Test Product");
     }
+
     #[test]
     fn test_get_product_by_id() {
         let binding = establish_pool();

@@ -2,6 +2,7 @@
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
@@ -26,6 +27,7 @@ pub struct PostCustomer {
     pub phone: Option<String>,
     pub address: Option<String>,
 }
+
 impl PostCustomer {
     pub fn demo() -> Self {
         Self {
@@ -36,6 +38,7 @@ impl PostCustomer {
         }
     }
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
@@ -47,6 +50,7 @@ pub struct PatchCustomer {
     pub phone: Option<String>,
     pub address: Option<String>,
 }
+
 impl From<Customer> for PostCustomer {
     fn from(customer: Customer) -> Self {
         PostCustomer {

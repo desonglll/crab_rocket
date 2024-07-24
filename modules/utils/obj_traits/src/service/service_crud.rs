@@ -1,5 +1,6 @@
-use crab_rocket_schema::DbPool;
 use rocket::State;
+
+use crab_rocket_schema::DbPool;
 
 use crate::{
     mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam, response::data::Data,

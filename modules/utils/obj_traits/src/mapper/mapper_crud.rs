@@ -1,6 +1,8 @@
-use crate::{request::request_param::RequestParam, response::data::Data};
-use crab_rocket_schema::DbPool;
 use rocket::State;
+
+use crab_rocket_schema::DbPool;
+
+use crate::{request::request_param::RequestParam, response::data::Data};
 
 /// ## Construct
 /// T is for the fully fields object.

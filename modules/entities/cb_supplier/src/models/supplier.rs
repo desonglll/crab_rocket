@@ -1,8 +1,9 @@
-use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
@@ -84,6 +85,7 @@ impl PostSupplier {
         }
     }
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
@@ -117,6 +119,7 @@ impl PatchSupplier {
         }
     }
 }
+
 impl From<Supplier> for PatchSupplier {
     fn from(supplier: Supplier) -> Self {
         PatchSupplier {
@@ -129,6 +132,7 @@ impl From<Supplier> for PatchSupplier {
         }
     }
 }
+
 impl From<Supplier> for PostSupplier {
     fn from(supplier: Supplier) -> Self {
         PostSupplier {

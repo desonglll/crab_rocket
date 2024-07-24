@@ -1,7 +1,7 @@
-import { Fade } from "@mui/material";
-import { UserTable } from "./UserTable.tsx";
-import { BackButton } from "../Common/BackButton.tsx";
-import { NewUserButton } from "./NewUserButton.tsx";
+import {Fade} from "@mui/material";
+import {UserTable} from "./UserTable.tsx";
+import {BackButton} from "../Common/BackButton.tsx";
+import {NewUserButton} from "./NewUserButton.tsx";
 
 export function UserList() {
   return (

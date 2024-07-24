@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::category::{Category, PatchCategory, PostCategory};
 use crate::models::category_filter::CategoryFilter;
 use crate::services::category_service::CategoryService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct CategoryController {}
 

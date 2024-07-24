@@ -1,8 +1,8 @@
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::task_mapper::TaskMapper;
 use crate::models::task::{PatchTask, PostTask, Task};
 use crate::models::task_filter::TaskFilter;
-
-use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct TaskService {}
 
@@ -16,12 +16,14 @@ impl ServiceCRUD for TaskService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::task_service::TaskService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::task_service::TaskService;
 
     #[test]
     fn test_insert_single_task() {

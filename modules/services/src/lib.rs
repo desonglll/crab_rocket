@@ -1,7 +1,8 @@
+use rocket::{Route, routes};
+
 use crab_rocket_inventory::routes::inventory_route::*;
 use crab_rocket_order::routes::order_route::*;
 use crab_rocket_shipment::routes::shipment_route::*;
-use rocket::{routes, Route};
 
 pub fn services_routes() -> Vec<Route> {
     routes![

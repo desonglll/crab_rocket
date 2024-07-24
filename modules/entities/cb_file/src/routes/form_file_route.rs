@@ -1,5 +1,17 @@
 use std::path::Path;
 
+use mime_guess::mime;
+use rocket::{get, options, post, State};
+use rocket::form::Form;
+use rocket::http::Status;
+use rocket::response::stream::ByteStream;
+use rocket::serde::json::Json;
+use rocket::tokio::io::AsyncReadExt;
+use serde_json::json;
+use uuid::Uuid;
+
+use crab_rocket_schema::DbPool;
+
 use crate::controllers::file_controller::{
     self, download_file_controller, retrieve_file_controller,
 };
@@ -7,16 +19,6 @@ use crate::models::file::File;
 use crate::models::file_response::{FileDownloadResponse, FileRetrieveResponse};
 use crate::models::upload::{AvatarUpload, Upload};
 use crate::services::file_service::GetFile;
-use crab_rocket_schema::DbPool;
-use mime_guess::mime;
-use rocket::form::Form;
-use rocket::http::Status;
-use rocket::response::stream::ByteStream;
-use rocket::serde::json::Json;
-use rocket::tokio::io::AsyncReadExt;
-use rocket::{get, options, post, State};
-use serde_json::json;
-use uuid::Uuid;
 
 #[post("/upload", data = "<upload>")]
 pub async fn upload(pool: &State<DbPool>, upload: Form<Upload<'_>>) -> Json<serde_json::Value> {

@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::order::{Order, PatchOrder, PostOrder};
 use crate::models::order_filter::OrderFilter;
 use crate::services::order_service::OrderService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct OrderController {}
 

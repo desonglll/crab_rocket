@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
-import { Button, message, Space, Table } from "antd";
+import {Button, message, Space, Table} from "antd";
 import dayjs from "dayjs";
-import { NavLink } from "react-router-dom";
+import {NavLink} from "react-router-dom";
 
 interface role {
   role_id: number;

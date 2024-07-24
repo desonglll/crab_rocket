@@ -3,6 +3,7 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
@@ -38,6 +39,7 @@ impl PostShipment {
         }
     }
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]
@@ -49,6 +51,7 @@ pub struct PatchShipment {
     pub delivery_address: Option<String>,
     pub status: Option<String>,
 }
+
 impl From<Shipment> for PostShipment {
     fn from(shipment: Shipment) -> Self {
         PostShipment {
