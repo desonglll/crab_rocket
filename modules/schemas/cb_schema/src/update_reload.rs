@@ -5,7 +5,7 @@ use rocket::State;
 use crate::{DbPool, establish_pg_connection};
 
 pub fn update_reload_count(pool: &State<DbPool>) {
-    use self::schema::reload_counts::dsl::*;
+    use crate::schema::reload_counts::dsl::*;
     use chrono::Local;
     use diesel::dsl::insert_into;
 
