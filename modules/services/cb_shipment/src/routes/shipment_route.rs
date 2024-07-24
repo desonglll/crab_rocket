@@ -3,29 +3,20 @@ use rocket::State;
 
 use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::ControllerCRUD;
-use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 use obj_traits::request::request_param::RequestParam;
 
 use crate::controllers::shipment_controller::ShipmentController;
 use crate::models::shipment::Shipment;
 use crate::models::shipment_filter::ShipmentFilter;
 
-#[get("/shipment?<limit>&<offset>")]
+#[get("/shipment", data = "<param>")]
 pub fn get_shipments(
+    param: Option<Json<RequestParam<Shipment, ShipmentFilter>>>,
     pool: &State<DbPool>,
-    mut limit: Option<i32>,
-    mut offset: Option<i32>,
 ) -> Json<serde_json::Value> {
-    if limit.is_none() {
-        limit = Some(10);
-    };
-    if offset.is_none() {
-        offset = Some(0);
-    };
-    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
-    println!("{:?}", params);
+    let param = param.unwrap_or(Json(RequestParam::default()));
     crab_rocket_schema::update_reload::update_reload_count(pool);
-    let resp = ShipmentController::get_all(pool, &params).unwrap();
+    let resp = ShipmentController::get_all(pool, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

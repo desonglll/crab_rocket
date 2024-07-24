@@ -3,29 +3,20 @@ use rocket::State;
 
 use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::ControllerCRUD;
-use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 use obj_traits::request::request_param::RequestParam;
 
 use crate::controllers::product_controller::ProductController;
 use crate::models::product::Product;
 use crate::models::product_filter::ProductFilter;
 
-#[get("/product?<limit>&<offset>")]
+#[get("/product", data = "<param>")]
 pub fn get_products(
+    param: Option<Json<RequestParam<Product, ProductFilter>>>,
     pool: &State<DbPool>,
-    mut limit: Option<i32>,
-    mut offset: Option<i32>,
 ) -> Json<serde_json::Value> {
-    if limit.is_none() {
-        limit = Some(10);
-    };
-    if offset.is_none() {
-        offset = Some(0);
-    };
-    let params = RequestParam::new(Some(PaginationParam::new(limit, offset)), None);
-    println!("{:?}", params);
+    let param = param.unwrap_or(Json(RequestParam::default()));
     crab_rocket_schema::update_reload::update_reload_count(pool);
-    let resp = ProductController::get_all(pool, &params).unwrap();
+    let resp = ProductController::get_all(pool, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
