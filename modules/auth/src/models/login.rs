@@ -1,11 +1,11 @@
-use diesel::prelude::*;
-use rocket::serde::{Deserialize, Serialize};
-use rocket::State;
-
 use crab_rocket_schema::{DbPool, establish_pg_connection};
 use crab_rocket_schema::schema::user_table;
 use crab_rocket_user::models::user::User;
 use crab_rocket_user::services::user_service::UserService;
+use diesel::prelude::*;
+use rocket::serde::{Deserialize, Serialize};
+use rocket::State;
+
 use crate::models::log_trait::LogTrait;
 
 use super::log_error::LogError;

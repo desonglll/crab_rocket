@@ -1,8 +1,7 @@
-use rocket::serde::{Deserialize, Serialize};
-use rocket::State;
-
 use crab_rocket_schema::DbPool;
 use crab_rocket_user::services::user_service::UserService;
+use rocket::serde::{Deserialize, Serialize};
+use rocket::State;
 
 use crate::models::log_trait::LogTrait;
 
@@ -41,9 +40,8 @@ impl LogTrait for Logout {}
 
 #[cfg(test)]
 mod test {
-    use rocket::State;
-
     use crab_rocket_schema::{DbPool, establish_pool};
+    use rocket::State;
 
     use crate::models::logout::Logout;
 

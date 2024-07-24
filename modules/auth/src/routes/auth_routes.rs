@@ -1,6 +1,5 @@
-use rocket::{post, serde::json::Json, State};
-
 use crab_rocket_schema::DbPool;
+use rocket::{post, serde::json::Json, State};
 
 use crate::models::{login::Login, logout::Logout};
 
@@ -13,6 +12,7 @@ pub fn login(param: Option<Json<Login>>, pool: &State<DbPool>) -> Json<serde_jso
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
+
 #[post("/logout", data = "<param>")]
 pub fn logout(param: Option<Json<Logout>>, pool: &State<DbPool>) -> Json<serde_json::Value> {
     println!("{:?}", param);

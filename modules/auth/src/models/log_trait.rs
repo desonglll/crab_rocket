@@ -1,7 +1,6 @@
-use rocket::State;
-
 use crab_rocket_schema::DbPool;
 use crab_rocket_user::services::user_service::UserService;
+use rocket::State;
 
 use crate::models::log_error::LogError;
 
