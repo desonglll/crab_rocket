@@ -1,10 +1,10 @@
-import { Button, Space, Table } from "antd";
-import { NavLink } from "react-router-dom";
+import {Button, Space, Table} from "antd";
+import {NavLink} from "react-router-dom";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import dayjs from "dayjs";
-import { Fade } from "@mui/material";
-import { Post } from "../../models/models.ts";
+import {Fade} from "@mui/material";
+import {Post} from "../../models/models.ts";
 
 interface PostParams {
   user_id: number | null;

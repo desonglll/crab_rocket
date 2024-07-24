@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
 use crate::services::user_service::UserService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct UserController {}
 

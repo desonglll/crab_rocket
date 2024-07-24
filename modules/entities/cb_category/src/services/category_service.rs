@@ -1,8 +1,8 @@
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::category_mapper::CategoryMapper;
 use crate::models::category::{Category, PatchCategory, PostCategory};
 use crate::models::category_filter::CategoryFilter;
-
-use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct CategoryService {}
 
@@ -16,12 +16,14 @@ impl ServiceCRUD for CategoryService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::category_service::CategoryService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::category_service::CategoryService;
 
     #[test]
     fn test_insert_single_category() {

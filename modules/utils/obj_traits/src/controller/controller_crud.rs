@@ -1,5 +1,6 @@
-use crab_rocket_schema::DbPool;
 use rocket::State;
+
+use crab_rocket_schema::DbPool;
 use session::models::session::Session;
 
 use crate::request::request_param::RequestParam;

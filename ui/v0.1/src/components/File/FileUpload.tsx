@@ -1,7 +1,8 @@
-import { UploadOutlined } from "@ant-design/icons";
-import type { UploadProps } from "antd";
-import { Button, message, Upload } from "antd";
+import {UploadOutlined} from "@ant-design/icons";
+import type {UploadProps} from "antd";
+import {Button, message, Upload} from "antd";
 import "./FileUpload.scss";
+
 const host = window.location.hostname;
 const props: UploadProps = {
   name: "file",

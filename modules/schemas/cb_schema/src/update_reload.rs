@@ -1,8 +1,9 @@
+use colored::Colorize;
 use diesel::prelude::*;
 use rocket::State;
 
-use crate::{establish_pg_connection, schema, DbPool};
-use colored::Colorize;
+use crate::{DbPool, establish_pg_connection};
+
 pub fn update_reload_count(pool: &State<DbPool>) {
     use self::schema::reload_counts::dsl::*;
     use chrono::Local;
@@ -35,7 +36,7 @@ pub fn update_reload_count(pool: &State<DbPool>) {
 mod test {
     use rocket::State;
 
-    use crate::{establish_pool, DbPool};
+    use crate::{DbPool, establish_pool};
 
     #[test]
     fn test_update_reload_count() {

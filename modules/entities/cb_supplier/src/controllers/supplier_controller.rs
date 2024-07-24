@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::supplier::{PatchSupplier, PostSupplier, Supplier};
 use crate::models::supplier_filter::SupplierFilter;
 use crate::services::supplier_service::SupplierService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct SupplierController {}
 

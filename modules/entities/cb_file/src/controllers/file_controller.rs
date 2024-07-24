@@ -1,12 +1,13 @@
 use std::path::Path;
 
-use crab_rocket_schema::DbPool;
 use rocket::{
     fs::TempFile,
     http::{ContentType, MediaType},
     State,
 };
 use uuid::Uuid;
+
+use crab_rocket_schema::DbPool;
 
 use crate::{
     models::{
@@ -16,6 +17,7 @@ use crate::{
     },
     services::file_service::GetFile,
 };
+
 pub async fn insert_file_controller(
     pool: &State<DbPool>,
     files: Vec<TempFile<'_>>,

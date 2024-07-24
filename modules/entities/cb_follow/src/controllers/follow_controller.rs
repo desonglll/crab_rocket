@@ -1,13 +1,15 @@
-use crate::models::follow::{Follow, PatchFollow, PostFollow};
-use crate::models::follow_filter::FollowFilter;
-use crate::services::follow_service::FollowService;
-use crate::services::follow_service_trait::FollowServiceTrait;
+use rocket::State;
+
 use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
-use rocket::State;
+
+use crate::models::follow::{Follow, PatchFollow, PostFollow};
+use crate::models::follow_filter::FollowFilter;
+use crate::services::follow_service::FollowService;
+use crate::services::follow_service_trait::FollowServiceTrait;
 
 use super::follow_controller_trait::FollowControllerTrait;
 

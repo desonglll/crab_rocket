@@ -1,17 +1,21 @@
-use crate::models::task::{PatchTask, PostTask, Task};
-use crate::models::task_filter::TaskFilter;
-use crab_rocket_schema::schema::task_table::dsl; //配合下面的 `tasks.filter()`
-use crab_rocket_schema::schema::task_table::{self};
-use crab_rocket_schema::{establish_pg_connection, DbPool};
-use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
+use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection};
+//配合下面的 `tasks.filter()`
+use crab_rocket_schema::schema::task_table::{self};
+use crab_rocket_schema::schema::task_table::dsl;
+use crab_rocket_utils::time::get_e8_time;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
-use rocket::State;
+
+use crate::models::task::{PatchTask, PostTask, Task};
+use crate::models::task_filter::TaskFilter;
 
 pub struct TaskMapper {}
+
 impl MapperCRUD for TaskMapper {
     type Item = Task;
     type PostItem = PostTask;
@@ -188,13 +192,17 @@ impl MapperCRUD for TaskMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
-    use rocket::State;
+
+    use super::*;
+
     #[test]
     fn test_get_all_tasks() {
         let binding = establish_pool();
@@ -227,6 +235,7 @@ mod tests {
         let inserted_task = result.unwrap();
         assert_eq!(inserted_task.data.title, "Test Task Title");
     }
+
     #[test]
     fn test_get_task_by_id() {
         let binding = establish_pool();

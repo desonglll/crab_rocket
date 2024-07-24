@@ -1,6 +1,6 @@
-import { Fade } from "@mui/material";
-import { TaskTable } from "./TaskTable.tsx";
-import { BackButton } from "../Common/BackButton.tsx";
+import {Fade} from "@mui/material";
+import {TaskTable} from "./TaskTable.tsx";
+import {BackButton} from "../Common/BackButton.tsx";
 import NewTaskButton from "./NewTaskButton.tsx";
 
 function TaskList() {

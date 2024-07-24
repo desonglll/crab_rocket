@@ -1,8 +1,9 @@
-use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
@@ -50,6 +51,7 @@ pub struct PostCategory {
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
 }
+
 impl PostCategory {
     pub fn demo() -> Self {
         Self {
@@ -61,6 +63,7 @@ impl PostCategory {
         }
     }
 }
+
 impl PostCategory {
     pub fn new(
         name: String,
@@ -109,6 +112,7 @@ impl PatchCategory {
         }
     }
 }
+
 impl From<Category> for PostCategory {
     fn from(category: Category) -> Self {
         PostCategory {

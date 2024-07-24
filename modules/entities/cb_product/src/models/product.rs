@@ -1,9 +1,11 @@
 use chrono::NaiveDateTime;
-use crab_rocket_utils::time::get_e8_time;
 // 定义供应商结构体
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable, QueryableByName)]
@@ -56,6 +58,7 @@ pub struct PostProduct {
     pub status: Option<String>,
     pub public: Option<bool>,
 }
+
 impl PostProduct {
     pub fn demo() -> Self {
         Self {
@@ -80,6 +83,7 @@ impl PostProduct {
         }
     }
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable, QueryableByName)]
@@ -105,6 +109,7 @@ pub struct PatchProduct {
     pub status: Option<String>,
     pub public: Option<bool>,
 }
+
 impl From<Product> for PostProduct {
     fn from(product: Product) -> Self {
         PostProduct {

@@ -1,12 +1,16 @@
+use std::error::Error;
+
+use rocket::State;
+
+use crab_rocket_schema::DbPool;
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::user_mapper::UserMapper;
 use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
-use crab_rocket_schema::DbPool;
-use obj_traits::service::service_crud::ServiceCRUD;
-use rocket::State;
-use std::error::Error;
 
 pub struct UserService {}
+
 impl UserService {
     pub fn get_by_username(pool: &State<DbPool>, username: String) -> Result<User, Box<dyn Error>> {
         match UserMapper::get_by_username(pool, username) {
@@ -26,12 +30,14 @@ impl ServiceCRUD for UserService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::user_service::UserService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::user_service::UserService;
 
     #[test]
     fn test_insert_single_user() {

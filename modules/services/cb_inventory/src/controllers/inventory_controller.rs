@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::inventory::{Inventory, PatchInventory, PostInventory};
 use crate::models::inventory_filter::InventoryFilter;
 use crate::services::inventory_service::InventoryService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct InventoryController {}
 

@@ -1,18 +1,20 @@
 #[macro_use]
 extern crate rocket;
 
+// use services::services_routes;
+use std::env;
+
+use dotenvy::dotenv;
+use rocket::{http::Method, Route};
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
+
 use crab_rocket::env_variables;
 use crab_rocket_schema::establish_pool;
 use crab_rocket_utils;
-use dotenvy::dotenv;
 use entities::entities_routes;
 use login::auth_routes;
-use rocket::{http::Method, Route};
-use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use schemas::schemas_routes;
 use services::services_routes;
-// use services::services_routes;
-use std::env;
 
 #[launch]
 fn rocket() -> _ {

@@ -1,5 +1,5 @@
-import { Select } from "antd";
-import { useEffect, useState } from "react";
+import {Select} from "antd";
+import {useEffect, useState} from "react";
 import axios from "axios";
 
 const SelectRole = ({

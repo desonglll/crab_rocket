@@ -1,8 +1,8 @@
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::employee_mapper::EmployeeMapper;
 use crate::models::employee::{Employee, PatchEmployee, PostEmployee};
 use crate::models::employee_filter::EmployeeFilter;
-
-use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct EmployeeService {}
 
@@ -16,12 +16,14 @@ impl ServiceCRUD for EmployeeService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::employee_service::EmployeeService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::employee_service::EmployeeService;
 
     #[test]
     fn test_insert_single_employee() {

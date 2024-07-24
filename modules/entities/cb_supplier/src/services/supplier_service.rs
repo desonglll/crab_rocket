@@ -1,7 +1,8 @@
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::supplier_mapper::SupplierMapper;
 use crate::models::supplier::{PatchSupplier, PostSupplier, Supplier};
 use crate::models::supplier_filter::SupplierFilter;
-use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct SupplierService {}
 
@@ -15,12 +16,14 @@ impl ServiceCRUD for SupplierService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::supplier_service::SupplierService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::supplier_service::SupplierService;
 
     #[test]
     fn test_insert_single_supplier() {

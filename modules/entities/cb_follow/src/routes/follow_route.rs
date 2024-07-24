@@ -1,9 +1,10 @@
+use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
+use rocket::State;
+
 use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 use obj_traits::request::request_param::RequestParam;
-use rocket::State;
-use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::follow_controller::FollowController;
 use crate::controllers::follow_controller_trait::FollowControllerTrait;
@@ -69,6 +70,7 @@ pub fn insert_single_follow(
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
+
 #[delete("/follow/<id>", data = "<param>")]
 pub fn delete_follow_by_id(
     pool: &State<DbPool>,
@@ -93,6 +95,7 @@ pub fn update_follow_by_id(
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
+
 #[delete("/follow/spec", data = "<param>")]
 pub fn delete_follow_specifically(
     pool: &State<DbPool>,
@@ -118,6 +121,7 @@ pub fn insert_single_follow_by_params(
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
+
 #[options("/follow")]
 pub fn options_follow() -> Status {
     Status::Ok

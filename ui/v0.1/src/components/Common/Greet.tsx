@@ -1,8 +1,9 @@
-import { NavLink } from "react-router-dom";
+import {NavLink} from "react-router-dom";
 
 import ReactECharts from "echarts-for-react";
 import setupChart from "../../config/chartOption";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
+
 export function Greet() {
   const [options, setOptions] = useState<any>();
 

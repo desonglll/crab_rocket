@@ -1,8 +1,8 @@
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::shipment_mapper::ShipmentMapper;
 use crate::models::shipment::{PatchShipment, PostShipment, Shipment};
 use crate::models::shipment_filter::ShipmentFilter;
-
-use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct ShipmentService {}
 
@@ -16,12 +16,14 @@ impl ServiceCRUD for ShipmentService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::shipment_service::ShipmentService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::shipment_service::ShipmentService;
 
     #[test]
     fn test_insert_single_shipment() {

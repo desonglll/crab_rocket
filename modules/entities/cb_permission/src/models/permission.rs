@@ -1,7 +1,8 @@
-use crab_rocket_utils::time::get_e8_time;
 use diesel::{Insertable, Queryable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
@@ -139,6 +140,7 @@ impl PostPermission {
         }
     }
 }
+
 impl PatchPermission {
     pub fn new(
         permission_name: String,
@@ -166,6 +168,7 @@ impl PatchPermission {
         }
     }
 }
+
 impl From<Permission> for PostPermission {
     fn from(permission: Permission) -> Self {
         PostPermission {

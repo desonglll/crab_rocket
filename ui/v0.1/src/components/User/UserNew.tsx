@@ -1,14 +1,14 @@
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import {useNavigate} from "react-router-dom";
+import {useEffect} from "react";
 import axios from "axios";
-import { Fade } from "@mui/material";
-import { Button, DatePicker, Flex, Form, Input, message } from "antd";
-import { BackButton } from "../Common/BackButton";
+import {Fade} from "@mui/material";
+import {Button, DatePicker, Flex, Form, Input, message} from "antd";
+import {BackButton} from "../Common/BackButton";
 import "./UserNew.scss";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // 引入时区插件
 import utc from "dayjs/plugin/utc";
-import { PatchUser } from "../../models/models.ts"; // 引入 UTC 插件
+import {PatchUser} from "../../models/models.ts"; // 引入 UTC 插件
 import SelectRole from "../Common/SelectRole.tsx";
 import AvatarUpload from "./AvatarUpload.tsx";
 // 添加时区和 UTC 插件

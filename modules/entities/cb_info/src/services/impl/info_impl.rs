@@ -1,5 +1,6 @@
+use crab_rocket_schema::{DbPool, establish_pg_connection};
+
 use crate::{mappers::info_mapper::get_info, models::info::Info, services::info_service::GetInfo};
-use crab_rocket_schema::{establish_pg_connection, DbPool};
 
 impl GetInfo for Info {
     fn get_info(pool: &DbPool) -> Result<Info, Box<dyn std::error::Error>> {

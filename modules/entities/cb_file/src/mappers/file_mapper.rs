@@ -1,11 +1,14 @@
-use crate::models::file::{File, PostFile};
-use crab_rocket_schema::schema::file_table::dsl::*;
-use crab_rocket_schema::schema::file_table::{self};
-use diesel::prelude::*;
-use diesel::{PgConnection, RunQueryDsl};
-use rocket::fs::TempFile;
 use std::path::Path;
+
+use diesel::{PgConnection, RunQueryDsl};
+use diesel::prelude::*;
+use rocket::fs::TempFile;
 use uuid::Uuid;
+
+use crab_rocket_schema::schema::file_table::{self};
+use crab_rocket_schema::schema::file_table::dsl::*;
+
+use crate::models::file::{File, PostFile};
 
 pub async fn insert_files(
     conn: &mut PgConnection,
@@ -59,9 +62,12 @@ pub fn fetch_all_files(conn: &mut PgConnection) -> Result<Vec<File>, diesel::res
 
 #[cfg(test)]
 mod test {
-    use crate::mappers::file_mapper::fetch_all_files;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+
+    use crate::mappers::file_mapper::fetch_all_files;
+
     #[test]
     fn test_fetch_all_files() {
         let binding = establish_pool();

@@ -1,9 +1,9 @@
 import "bootstrap/dist/css/bootstrap.css";
-import { Fade } from "@mui/material";
-import { BackButton } from "../Common/BackButton.tsx";
-import { NewPostButton } from "./NewPostButton.tsx";
-import { PostTable } from "./PostTable.tsx";
-import Collapse, { CollapseProps } from "antd/es/collapse/Collapse";
+import {Fade} from "@mui/material";
+import {BackButton} from "../Common/BackButton.tsx";
+import {NewPostButton} from "./NewPostButton.tsx";
+import {PostTable} from "./PostTable.tsx";
+import Collapse, {CollapseProps} from "antd/es/collapse/Collapse";
 
 function PostList() {
   const items: CollapseProps["items"] = [

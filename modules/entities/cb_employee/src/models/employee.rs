@@ -1,7 +1,8 @@
-use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(
     Selectable, Insertable, Debug, Serialize, Deserialize, Queryable, ToSchema, Default, Clone,
@@ -275,6 +276,7 @@ impl PatchEmployee {
         }
     }
 }
+
 impl From<Employee> for PostEmployee {
     fn from(employee: Employee) -> Self {
         PostEmployee {

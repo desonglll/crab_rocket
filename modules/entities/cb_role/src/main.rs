@@ -1,12 +1,15 @@
 #[macro_use]
 extern crate rocket;
 
-use crab_rocket_role::routes::role_route::*;
-use crab_rocket_utils;
+use std::env;
+
 use dotenvy::dotenv;
 use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
-use std::env;
+
+use crab_rocket_role::routes::role_route::*;
+use crab_rocket_utils;
+
 #[launch]
 fn rocket() -> _ {
     // Clear environment variable before running.
@@ -28,9 +31,9 @@ fn rocket() -> _ {
             Method::Put,
             Method::Delete,
         ]
-        .into_iter()
-        .map(From::from)
-        .collect(),
+            .into_iter()
+            .map(From::from)
+            .collect(),
         allowed_headers: AllowedHeaders::some(&[
             "Content-Type",
             "Authorization",
@@ -44,8 +47,8 @@ fn rocket() -> _ {
         allow_credentials: true,
         ..Default::default()
     }
-    .to_cors()
-    .unwrap();
+        .to_cors()
+        .unwrap();
 
     rocket::build()
         .mount(

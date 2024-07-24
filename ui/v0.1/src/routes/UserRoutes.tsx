@@ -1,7 +1,7 @@
-import { Route, Routes } from "react-router-dom";
-import { UserDetail } from "../components/User/UserDetail";
-import { UserList } from "../components/User/UserList";
-import { UserNew } from "../components/User/UserNew";
+import {Route, Routes} from "react-router-dom";
+import {UserDetail} from "../components/User/UserDetail";
+import {UserList} from "../components/User/UserList";
+import {UserNew} from "../components/User/UserNew";
 
 function UserRoutes() {
   return (

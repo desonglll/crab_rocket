@@ -1,4 +1,4 @@
-use rocket::{fs::TempFile, serde::Serialize, FromForm};
+use rocket::{FromForm, fs::TempFile, serde::Serialize};
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]

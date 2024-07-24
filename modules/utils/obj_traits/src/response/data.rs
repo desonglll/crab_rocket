@@ -1,5 +1,6 @@
-use crate::request::pagination_request_param::Pagination;
 use rocket::serde::Serialize;
+
+use crate::request::pagination_request_param::Pagination;
 
 #[derive(Serialize, Default, Debug)]
 #[serde(crate = "rocket::serde")]

@@ -1,4 +1,5 @@
 import "./EqualProportionSpan.scss";
+
 //等比例组件
 export function EqualProportionSpan({
   w,

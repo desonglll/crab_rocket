@@ -1,7 +1,7 @@
-import { Routes, Route } from "react-router-dom";
-import { RoleDetail } from "../components/Role/RoleDetail";
-import { RoleNew } from "../components/Role/RoleNew";
-import { RoleTable } from "../components/Role/RoleTable";
+import {Route, Routes} from "react-router-dom";
+import {RoleDetail} from "../components/Role/RoleDetail";
+import {RoleNew} from "../components/Role/RoleNew";
+import {RoleTable} from "../components/Role/RoleTable";
 
 function RoleRoutes() {
   return (

@@ -1,7 +1,8 @@
-use crab_rocket_utils::time::get_e8_time;
 use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
@@ -88,6 +89,7 @@ impl PatchFollow {
         }
     }
 }
+
 impl From<Follow> for PostFollow {
     fn from(follow: Follow) -> Self {
         PostFollow {

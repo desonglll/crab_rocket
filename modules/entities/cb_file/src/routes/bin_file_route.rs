@@ -1,14 +1,15 @@
+use std::{
+    borrow::Cow,
+    path::{Path, PathBuf},
+};
+
 use rand::Rng;
+use rocket::{Data, fs::NamedFile, get, post};
 use rocket::data::ToByteUnit;
 use rocket::http::uri::Absolute;
 use rocket::request::FromParam;
 use rocket::uri;
 use rocket::UriDisplayPath;
-use rocket::{fs::NamedFile, get, post, Data};
-use std::{
-    borrow::Cow,
-    path::{Path, PathBuf},
-};
 
 // In a real application, these would be retrieved dynamically from a config.
 const HOST: Absolute<'static> = uri!("http://localhost:8000");

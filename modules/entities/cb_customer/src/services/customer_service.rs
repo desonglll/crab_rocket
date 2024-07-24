@@ -1,8 +1,8 @@
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::customer_mapper::CustomerMapper;
 use crate::models::customer::{Customer, PatchCustomer, PostCustomer};
 use crate::models::customer_filter::CustomerFilter;
-
-use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct CustomerService {}
 
@@ -16,12 +16,14 @@ impl ServiceCRUD for CustomerService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::customer_service::CustomerService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::customer_service::CustomerService;
 
     #[test]
     fn test_insert_single_customer() {

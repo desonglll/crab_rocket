@@ -1,17 +1,19 @@
+use diesel::{prelude::*, result::Error};
+use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection, schema::employee_table::dsl};
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
-use rocket::State;
 
 use crate::models::{
     employee::{Employee, PatchEmployee, PostEmployee},
     employee_filter::EmployeeFilter,
 };
-use crab_rocket_schema::{establish_pg_connection, schema::employee_table::dsl, DbPool};
-use diesel::{prelude::*, result::Error};
+
 pub struct EmployeeMapper {}
 
 impl MapperCRUD for EmployeeMapper {
@@ -239,16 +241,20 @@ impl MapperCRUD for EmployeeMapper {
         Ok(body)
     }
 }
+
 #[cfg(test)]
 mod test {
-    use super::*;
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+
     use crate::models::{
         employee::{PatchEmployee, PostEmployee},
         employee_filter::EmployeeFilter,
     };
-    use crab_rocket_schema::{establish_pool, DbPool};
-    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-    use rocket::State;
+
+    use super::*;
 
     #[test]
     fn test_insert_employee() {

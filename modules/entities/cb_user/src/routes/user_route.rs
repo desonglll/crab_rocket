@@ -1,9 +1,10 @@
+use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
+use rocket::State;
+
 use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::ControllerCRUD;
 use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
 use obj_traits::request::request_param::RequestParam;
-use rocket::State;
-use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::user_controller::UserController;
 use crate::models::user::User;

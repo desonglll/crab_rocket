@@ -1,6 +1,7 @@
-use crab_rocket_schema::DbPool;
 use rocket::{get, serde::json::Json, State};
 use serde_json::json;
+
+use crab_rocket_schema::DbPool;
 
 use crate::controllers::info_controller;
 

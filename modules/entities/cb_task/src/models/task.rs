@@ -1,9 +1,10 @@
 use std::fmt::Display;
 
-use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
@@ -52,6 +53,7 @@ impl Display for Task {
         )
     }
 }
+
 impl From<Task> for PostTask {
     fn from(task: Task) -> Self {
         PostTask {
@@ -63,6 +65,7 @@ impl From<Task> for PostTask {
         }
     }
 }
+
 impl From<Task> for PatchTask {
     fn from(task: Task) -> Self {
         PatchTask {
@@ -72,6 +75,7 @@ impl From<Task> for PatchTask {
         }
     }
 }
+
 pub struct TaskList(Vec<Task>);
 
 impl From<Vec<Task>> for TaskList {
@@ -97,6 +101,7 @@ pub struct PostTask {
     pub updated_at: Option<chrono::NaiveDateTime>,
     pub user_id: Option<i32>,
 }
+
 impl PostTask {
     pub fn demo() -> Self {
         Self {

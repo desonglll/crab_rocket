@@ -99,6 +99,7 @@ impl PatchRole {
         }
     }
 }
+
 impl From<Role> for PostRole {
     fn from(role: Role) -> Self {
         PostRole {
@@ -108,6 +109,7 @@ impl From<Role> for PostRole {
         }
     }
 }
+
 impl From<Role> for PatchRole {
     fn from(role: Role) -> Self {
         PatchRole {

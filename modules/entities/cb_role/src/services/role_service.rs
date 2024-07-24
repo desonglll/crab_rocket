@@ -1,8 +1,8 @@
+use obj_traits::service::service_crud::ServiceCRUD;
+
 use crate::mappers::role_mapper::RoleMapper;
 use crate::models::role::{PatchRole, PostRole, Role};
 use crate::models::role_filter::RoleFilter;
-
-use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct RoleService {}
 
@@ -16,12 +16,14 @@ impl ServiceCRUD for RoleService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::role_service::RoleService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::role_service::RoleService;
 
     #[test]
     fn test_insert_single_role() {

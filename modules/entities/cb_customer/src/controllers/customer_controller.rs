@@ -1,7 +1,8 @@
+use obj_traits::controller::controller_crud::ControllerCRUD;
+
 use crate::models::customer::{Customer, PatchCustomer, PostCustomer};
 use crate::models::customer_filter::CustomerFilter;
 use crate::services::customer_service::CustomerService;
-use obj_traits::controller::controller_crud::ControllerCRUD;
 
 pub struct CustomerController {}
 
