@@ -1,5 +1,7 @@
 use diesel::prelude::*;
 use diesel::result::Error;
+use rocket::State;
+use crab_rocket_schema::{DbPool, establish_pg_connection};
 
 use crab_rocket_schema::schema::user_table::{self};
 use crab_rocket_schema::schema::user_table::dsl;
@@ -179,11 +181,18 @@ impl MapperCRUD for UserMapper {
         Ok(body)
     }
 }
+
 impl UserMapper {
-    pub fn get_by_username(conn: &mut PgConnection, uname: String) -> Result<User, Error> {
-        dsl::user_table.filter(dsl::username.eq(uname)).first(conn)
+    pub fn get_by_username(pool: &State<DbPool>, uname: String) -> Result<User, Error> {
+        let mut conn = establish_pg_connection(pool).expect("Error establish_pg_connection");
+        dsl::user_table.filter(dsl::username.eq(uname)).first(&mut conn)
+    }
+    pub fn is_user_exists(pool: &State<DbPool>, uname: String) -> Result<User, Error> {
+        let mut conn = establish_pg_connection(pool).expect("Error establish_pg_connection");
+        dsl::user_table.filter(dsl::username.eq(uname)).first(&mut conn)
     }
 }
+
 #[cfg(test)]
 mod test {
     use rocket::State;

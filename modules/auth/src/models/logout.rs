@@ -1,11 +1,10 @@
-use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
 
-use crab_rocket_schema::{DbPool, establish_pg_connection};
-use crab_rocket_schema::schema::user_table;
-use crab_rocket_user::models::user::User;
+use crab_rocket_schema::DbPool;
 use crab_rocket_user::services::user_service::UserService;
+
+use crate::models::log_trait::LogTrait;
 
 use super::log_error::LogError;
 use super::session::Session;
@@ -20,7 +19,7 @@ pub struct Logout {
 impl Logout {
     pub fn logout(&self, pool: &State<DbPool>) -> Result<Session, LogError> {
         let user = UserService::get_by_username(pool, self.username.clone()).unwrap();
-        match self.is_user_exists(pool) {
+        match <Logout as LogTrait>::is_user_exists(pool, self.username.clone()) {
             Ok(_) => {
                 let session = Session::get_session_by_uid(pool, user.user_id).unwrap();
                 let result_session: Result<Session, diesel::result::Error> =
@@ -36,20 +35,9 @@ impl Logout {
             Err(e) => Err(e),
         }
     }
-    pub fn is_user_exists(&self, pool: &State<DbPool>) -> Result<bool, LogError> {
-        let mut conn = establish_pg_connection(pool).expect("msg");
-        let result: Result<User, diesel::result::Error> = user_table::dsl::user_table
-            .filter(user_table::dsl::username.eq(&self.username))
-            .first::<User>(&mut conn);
-        match result {
-            Ok(_) => Ok(true),
-            Err(e) => {
-                println!("{:#?}", e);
-                Err(LogError::NotFound)
-            }
-        }
-    }
 }
+
+impl LogTrait for Logout {}
 
 #[cfg(test)]
 mod test {

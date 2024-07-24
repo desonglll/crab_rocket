@@ -2,7 +2,7 @@ use std::error::Error;
 
 use rocket::State;
 
-use crab_rocket_schema::{DbPool, establish_pg_connection};
+use crab_rocket_schema::{DbPool};
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
@@ -15,12 +15,18 @@ use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
 
 pub struct UserService {}
+
 impl UserService {
     pub fn get_by_username(pool: &State<DbPool>, username: String) -> Result<User, Box<dyn Error>> {
-        let mut conn = establish_pg_connection(pool).expect("Error establish_pg_connection");
-        match UserMapper::get_by_username(&mut conn, username) {
+        match UserMapper::get_by_username(pool, username) {
             Ok(user) => Ok(user),
             Err(err) => Err(Box::new(err)),
+        }
+    }
+    pub fn is_user_exists(pool: &State<DbPool>, username: String) -> bool {
+        match UserMapper::is_user_exists(pool, username) {
+            Ok(_) => true,
+            Err(_) => false,
         }
     }
 }

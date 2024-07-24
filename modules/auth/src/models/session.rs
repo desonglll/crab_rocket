@@ -48,11 +48,11 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new(user_id: i32) -> Self {
+    pub fn new(user_id: i32, days: i64) -> Self {
         Self {
             user_id,
             session_id: Uuid::new_v4(),
-            expires: get_e8_time(),
+            expires: get_e8_time() + Duration::days(days),
             created_at: get_e8_time(),
         }
     }
@@ -94,8 +94,8 @@ impl Session {
         let result = diesel::delete(
             dsl::session_table.filter(session_table::session_id.eq(self.session_id)),
         )
-        .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
-        .get_result::<Session>(&mut conn);
+            .returning((dsl::user_id, dsl::session_id, dsl::expires, dsl::created_at))
+            .get_result::<Session>(&mut conn);
         match result {
             Ok(deleted_session) => Ok(deleted_session),
             Err(e) => {
@@ -109,8 +109,8 @@ impl Session {
         uid: i32,
     ) -> Result<Session, diesel::result::Error> {
         let mut conn = establish_pg_connection(pool).expect("msg");
-        session_table::dsl::session_table
-            .filter(session_table::dsl::user_id.eq(uid))
+        dsl::session_table
+            .filter(dsl::user_id.eq(uid))
             .select(Session::as_select()) // Ensure to select the fields properly
             .first::<Session>(&mut conn)
     }
@@ -119,16 +119,16 @@ impl Session {
         session_id: Uuid,
     ) -> Result<Session, diesel::result::Error> {
         let mut conn = establish_pg_connection(pool).expect("msg");
-        session_table::dsl::session_table
-            .filter(session_table::dsl::session_id.eq(session_id))
+        dsl::session_table
+            .filter(dsl::session_id.eq(session_id))
             .select(Session::as_select()) // Ensure to select the fields properly
             .first::<Session>(&mut conn)
     }
 
     pub fn is_exists(&self, pool: &State<DbPool>) -> Result<bool, SessionError> {
         let mut conn = establish_pg_connection(pool).expect("");
-        let result = session_table::dsl::session_table
-            .filter(session_table::dsl::session_id.eq(self.session_id))
+        let result = dsl::session_table
+            .filter(dsl::session_id.eq(self.session_id))
             .select(Session::as_select()) // Ensure to select the fields properly
             .first::<Session>(&mut conn);
         match result {
@@ -161,7 +161,7 @@ mod tests {
 
     #[test]
     fn test_create_session() {
-        let session = Session::new(1);
+        let session = Session::new(1, 1);
         println!("{:#?}", session);
 
         assert_eq!(session.user_id, 1);
@@ -176,7 +176,7 @@ mod tests {
     fn test_add_session() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let session = Session::new(3);
+        let session = Session::new(3, 1);
         println!("{:#?}", session);
         let added_session = session.add_session(pool).unwrap();
         println!("{:#?}", added_session);
@@ -202,7 +202,7 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         // First, add a session
-        let session = Session::new(3);
+        let session = Session::new(3, 1);
 
         let added_session = session.add_session(pool).unwrap();
         assert_eq!(added_session.user_id, 3);
