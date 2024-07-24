@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::inventory_table::dsl;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
@@ -9,8 +12,6 @@ use crate::models::{
     inventory::{Inventory, PatchInventory, PostInventory},
     inventory_filter::InventoryFilter,
 };
-use crab_rocket_schema::schema::inventory_table::dsl;
-use diesel::prelude::*;
 
 pub struct InventoryMapper {}
 
@@ -185,14 +186,17 @@ impl MapperCRUD for InventoryMapper {
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+
     use crate::models::{
         inventory::{PatchInventory, PostInventory},
         inventory_filter::InventoryFilter,
     };
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
-    use rocket::State;
+
+    use super::*;
 
     #[test]
     fn test_fetch_all_inventory_table() {

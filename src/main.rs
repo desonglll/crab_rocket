@@ -35,9 +35,9 @@ fn rocket() -> _ {
             Method::Put,
             Method::Delete,
         ]
-        .into_iter()
-        .map(From::from)
-        .collect(),
+            .into_iter()
+            .map(From::from)
+            .collect(),
         allowed_headers: AllowedHeaders::some(&[
             "Content-Type",
             "Authorization",
@@ -51,8 +51,8 @@ fn rocket() -> _ {
         allow_credentials: true,
         ..Default::default()
     }
-    .to_cors()
-    .unwrap();
+        .to_cors()
+        .unwrap();
 
     let mut routes = Vec::<Route>::new();
 

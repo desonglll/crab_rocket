@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::product_table::dsl;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
@@ -9,8 +12,6 @@ use crate::models::{
     product::{PatchProduct, PostProduct, Product},
     product_filter::ProductFilter,
 };
-use crab_rocket_schema::schema::product_table::dsl;
-use diesel::prelude::*;
 
 pub struct ProductMapper {}
 
@@ -268,10 +269,12 @@ impl MapperCRUD for ProductMapper {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+    use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+
+    use super::*;
 
     #[test]
     fn test_fetch_all_product_table() {

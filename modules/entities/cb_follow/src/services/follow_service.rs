@@ -1,16 +1,19 @@
-use crate::mappers::follow_mapper::FollowMapper;
-use crate::mappers::follow_mapper_trait::FollowMapperTrait;
-use crate::models::follow::{Follow, PatchFollow, PostFollow};
-use crate::models::follow_filter::FollowFilter;
-use crab_rocket_schema::{establish_pg_connection, DbPool};
+use std::error::Error;
+
+use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection};
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
     service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
     service_update_by_id, ServiceCRUD,
 };
-use rocket::State;
-use std::error::Error;
+
+use crate::mappers::follow_mapper::FollowMapper;
+use crate::mappers::follow_mapper_trait::FollowMapperTrait;
+use crate::models::follow::{Follow, PatchFollow, PostFollow};
+use crate::models::follow_filter::FollowFilter;
 
 use super::follow_service_trait::FollowServiceTrait;
 
@@ -116,12 +119,14 @@ impl FollowServiceTrait<RequestParam<FollowFilter>> for FollowService {
 }
 #[cfg(test)]
 mod test {
-    use crate::services::follow_service::FollowService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::follow_service::FollowService;
 
     #[test]
     fn test_insert_single_follow() {

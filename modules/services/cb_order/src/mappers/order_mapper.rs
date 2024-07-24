@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::order_table::dsl;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
@@ -8,8 +11,6 @@ use crate::models::{
     order::{Order, PatchOrder, PostOrder},
     order_filter::OrderFilter,
 };
-use crab_rocket_schema::schema::order_table::dsl;
-use diesel::prelude::*;
 
 pub struct OrderMapper {}
 
@@ -184,11 +185,13 @@ impl MapperCRUD for OrderMapper {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use crab_rocket_utils::time::get_e8_time;
     use diesel::result::Error;
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+    use crab_rocket_utils::time::get_e8_time;
+
+    use super::*;
 
     #[test]
     fn test_fetch_all_order_table() {

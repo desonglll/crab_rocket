@@ -1,13 +1,15 @@
-use crate::models::{
-    permission::{PatchPermission, Permission, PostPermission},
-    permission_filter::PermissionFilter,
-};
-use crab_rocket_schema::schema::permission_table::dsl;
 use diesel::{prelude::*, result::Error};
+
+use crab_rocket_schema::schema::permission_table::dsl;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
+};
+
+use crate::models::{
+    permission::{PatchPermission, Permission, PostPermission},
+    permission_filter::PermissionFilter,
 };
 
 pub struct PermissionMapper {}
@@ -204,9 +206,11 @@ impl MapperCRUD for PermissionMapper {
 }
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+
+    use super::*;
 
     #[test]
     fn test_get_all() {

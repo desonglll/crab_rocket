@@ -1,15 +1,18 @@
-use crate::mappers::user_mapper::UserMapper;
-use crate::models::user::{PatchUser, PostUser, User};
-use crate::models::user_filter::UserFilter;
-use crab_rocket_schema::{establish_pg_connection, DbPool};
+use std::error::Error;
+
+use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection};
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
 use obj_traits::service::service_crud::{
     service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
     service_update_by_id, ServiceCRUD,
 };
-use rocket::State;
-use std::error::Error;
+
+use crate::mappers::user_mapper::UserMapper;
+use crate::models::user::{PatchUser, PostUser, User};
+use crate::models::user_filter::UserFilter;
 
 pub struct UserService {}
 impl UserService {
@@ -62,12 +65,14 @@ impl ServiceCRUD for UserService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::user_service::UserService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::user_service::UserService;
 
     #[test]
     fn test_insert_single_user() {

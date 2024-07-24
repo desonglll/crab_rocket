@@ -1,6 +1,7 @@
-use crate::mappers::order_mapper::OrderMapper;
-use crate::models::order::{Order, PatchOrder, PostOrder};
-use crate::models::order_filter::OrderFilter;
+use std::error::Error;
+
+use rocket::State;
+
 use crab_rocket_schema::DbPool;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
@@ -8,8 +9,10 @@ use obj_traits::service::service_crud::{
     service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
     service_update_by_id, ServiceCRUD,
 };
-use rocket::State;
-use std::error::Error;
+
+use crate::mappers::order_mapper::OrderMapper;
+use crate::models::order::{Order, PatchOrder, PostOrder};
+use crate::models::order_filter::OrderFilter;
 
 pub struct OrderService {}
 
@@ -53,12 +56,14 @@ impl ServiceCRUD for OrderService {
 
 #[cfg(test)]
 mod test {
-    use crate::services::order_service::OrderService;
-    use crab_rocket_schema::{establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
     use obj_traits::request::request_param::RequestParam;
     use obj_traits::service::service_crud::ServiceCRUD;
-    use rocket::State;
+
+    use crate::services::order_service::OrderService;
 
     #[test]
     fn test_insert_single_order() {

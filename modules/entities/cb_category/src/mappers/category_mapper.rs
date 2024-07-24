@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::category_table::dsl;
 use crab_rocket_utils::time::get_e8_time;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
@@ -9,8 +12,6 @@ use crate::models::{
     category::{Category, PatchCategory, PostCategory},
     category_filter::CategoryFilter,
 };
-use crab_rocket_schema::schema::category_table::dsl;
-use diesel::prelude::*;
 
 pub struct CategoryMapper {}
 
@@ -182,10 +183,12 @@ impl MapperCRUD for CategoryMapper {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+    use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
+
+    use super::*;
 
     #[test]
     fn test_fetch_all_category_table() {

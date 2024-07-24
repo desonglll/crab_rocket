@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::customer_table::dsl;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
@@ -8,8 +11,6 @@ use crate::models::{
     customer::{Customer, PatchCustomer, PostCustomer},
     customer_filter::CustomerFilter,
 };
-use crab_rocket_schema::schema::customer_table::dsl;
-use diesel::prelude::*;
 
 pub struct CustomerMapper {}
 
@@ -175,13 +176,17 @@ impl MapperCRUD for CustomerMapper {
 }
 #[cfg(test)]
 mod test {
-    use super::*;
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+
     use crate::models::{
         customer::{PatchCustomer, PostCustomer},
         customer_filter::CustomerFilter,
     };
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use rocket::State;
+
+    use super::*;
+
     #[test]
     fn test_get_all() {
         let filter = CustomerFilter {

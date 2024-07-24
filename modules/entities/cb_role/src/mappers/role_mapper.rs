@@ -1,15 +1,18 @@
-use crate::models::role::{PatchRole, PostRole, Role};
-use crate::models::role_filter::RoleFilter;
-use crab_rocket_schema::schema::role_table::dsl; //配合下面的 `posts.filter()`
-use crab_rocket_schema::schema::role_table::{self};
-use crab_rocket_utils::time::get_e8_time;
+use diesel::PgConnection;
 use diesel::prelude::*;
 use diesel::result::Error;
-use diesel::PgConnection;
+
+//配合下面的 `posts.filter()`
+use crab_rocket_schema::schema::role_table::{self};
+use crab_rocket_schema::schema::role_table::dsl;
+use crab_rocket_utils::time::get_e8_time;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
+
+use crate::models::role::{PatchRole, PostRole, Role};
+use crate::models::role_filter::RoleFilter;
 
 pub struct RoleMapper {}
 
@@ -183,13 +186,16 @@ impl MapperCRUD for RoleMapper {
 }
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::models::role::{PatchRole, PostRole};
-    use crate::models::role_filter::RoleFilter;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
     use obj_traits::request::pagination_request_param::PaginationParam;
     use obj_traits::request::request_param::RequestParam;
-    use rocket::State;
+
+    use crate::models::role::{PatchRole, PostRole};
+    use crate::models::role_filter::RoleFilter;
+
+    use super::*;
 
     #[test]
     fn test_add_single() {

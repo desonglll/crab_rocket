@@ -1,5 +1,6 @@
-use crab_rocket_schema::DbPool;
 use rocket::{post, serde::json::Json, State};
+
+use crab_rocket_schema::DbPool;
 
 use crate::models::{login::Login, logout::Logout};
 

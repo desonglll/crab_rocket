@@ -1,12 +1,15 @@
 #[macro_use]
 extern crate rocket;
 
-use crab_rocket_post::routes::post_route::*;
-use crab_rocket_utils;
+use std::env;
+
 use dotenvy::dotenv;
 use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
-use std::env;
+
+use crab_rocket_post::routes::post_route::*;
+use crab_rocket_utils;
+
 #[launch]
 fn rocket() -> _ {
     // Clear environment variable before running.

@@ -1,8 +1,10 @@
-use crate::schema;
 use chrono::NaiveDate;
 use colored::Colorize;
 use diesel::prelude::*;
 use serde::Serialize;
+
+use crate::schema;
+
 #[derive(Serialize, Insertable, Queryable, AsChangeset, Identifiable)]
 #[diesel(table_name = schema::reload_counts)]
 #[diesel(primary_key(reload_date))]

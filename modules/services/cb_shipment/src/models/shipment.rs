@@ -3,6 +3,7 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]
 #[derive(Queryable, Selectable, Insertable)]

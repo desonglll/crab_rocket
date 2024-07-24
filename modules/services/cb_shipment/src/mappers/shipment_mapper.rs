@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::shipment_table::dsl;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
@@ -8,8 +11,6 @@ use crate::models::{
     shipment::{PatchShipment, PostShipment, Shipment},
     shipment_filter::ShipmentFilter,
 };
-use crab_rocket_schema::schema::shipment_table::dsl;
-use diesel::prelude::*;
 
 pub struct ShipmentMapper {}
 
@@ -179,10 +180,12 @@ impl MapperCRUD for ShipmentMapper {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
-    use crab_rocket_utils::time::get_e8_time;
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+    use crab_rocket_utils::time::get_e8_time;
+
+    use super::*;
 
     // Helper function to create a new shipment for testing
     fn create_test_shipment(conn: &mut PgConnection) -> Result<Shipment, diesel::result::Error> {

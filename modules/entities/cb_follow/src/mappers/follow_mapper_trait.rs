@@ -1,4 +1,5 @@
 use diesel::PgConnection;
+
 use obj_traits::{mapper::mapper_crud::MapperCRUD, response::data::Data};
 
 use crate::models::follow::{Follow, PostFollow};

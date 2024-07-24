@@ -1,3 +1,6 @@
+use diesel::prelude::*;
+
+use crab_rocket_schema::schema::follow_table::dsl;
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
@@ -8,10 +11,9 @@ use crate::models::{
     follow::{Follow, PatchFollow, PostFollow},
     follow_filter::FollowFilter,
 };
-use crab_rocket_schema::schema::follow_table::dsl;
-use diesel::prelude::*;
 
 use super::follow_mapper_trait::FollowMapperTrait;
+
 pub struct FollowMapper {}
 impl MapperCRUD for FollowMapper {
     type Item = Follow;
@@ -332,10 +334,13 @@ pub fn check_exist_follow(
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crate::models::follow::{PatchFollow, PostFollow};
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
     use rocket::State;
+
+    use crab_rocket_schema::{DbPool, establish_pg_connection, establish_pool};
+
+    use crate::models::follow::{PatchFollow, PostFollow};
+
+    use super::*;
 
     #[test]
     fn test_create_new_follow() {

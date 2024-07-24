@@ -1,7 +1,8 @@
 use std::error::Error;
 
-use crab_rocket_schema::{establish_pg_connection, DbPool};
 use rocket::State;
+
+use crab_rocket_schema::{DbPool, establish_pg_connection};
 
 use crate::{
     mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam, response::data::Data,

@@ -1,9 +1,10 @@
+use crab_rocket_schema::{DbPool, establish_pg_connection};
+
 use crate::{
     mappers::file_mapper::{fetch_all_files, insert_files, retrieve_file_url_by_uuid},
     models::file::File,
     services::file_service::GetFile,
 };
-use crab_rocket_schema::{establish_pg_connection, DbPool};
 
 impl GetFile for File {
     async fn insert_file(

@@ -1,7 +1,9 @@
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
-use uuid::Uuid; // 添加这一行
+use uuid::Uuid;
+
+// 添加这一行
 
 #[derive(Insertable, Serialize, Deserialize, Selectable, Debug, Queryable, Default)]
 #[serde(crate = "rocket::serde")]

@@ -1,5 +1,6 @@
-use crate::response::data::Data;
 use diesel::PgConnection;
+
+use crate::response::data::Data;
 
 /// ## Construct
 /// T is for the fully fields object.

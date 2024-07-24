@@ -1,8 +1,10 @@
-use crab_rocket_utils::time::get_e8_time;
+use std::fmt::Display;
+
 use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 use rocket::serde::{Deserialize, Serialize};
-use std::fmt::Display;
 use utoipa::ToSchema;
+
+use crab_rocket_utils::time::get_e8_time;
 
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema, Default)]
 #[serde(crate = "rocket::serde")]

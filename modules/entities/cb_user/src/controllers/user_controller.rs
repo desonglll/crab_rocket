@@ -1,6 +1,7 @@
-use crate::models::user::{PatchUser, PostUser, User};
-use crate::models::user_filter::UserFilter;
-use crate::services::user_service::UserService;
+use std::error::Error;
+
+use rocket::State;
+
 use crab_rocket_schema::DbPool;
 use obj_traits::controller::controller_crud::{
     controller_add_single, controller_delete_by_id, controller_filter, controller_get_all,
@@ -9,8 +10,10 @@ use obj_traits::controller::controller_crud::{
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::api_response::ApiResponse;
 use obj_traits::response::data::Data;
-use rocket::State;
-use std::error::Error;
+
+use crate::models::user::{PatchUser, PostUser, User};
+use crate::models::user_filter::UserFilter;
+use crate::services::user_service::UserService;
 
 pub struct UserController {}
 

@@ -1,6 +1,7 @@
+use rocket::State;
+
 use crab_rocket_schema::DbPool;
 use obj_traits::response::{api_response::ApiResponse, data::Data};
-use rocket::State;
 
 use crate::models::follow::{Follow, PostFollow};
 

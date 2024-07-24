@@ -1,5 +1,7 @@
-use colored::Colorize;
 use std::{fs, path::Path};
+
+use colored::Colorize;
+
 /// 在指定路径创建目录
 /// 打印结果
 ///

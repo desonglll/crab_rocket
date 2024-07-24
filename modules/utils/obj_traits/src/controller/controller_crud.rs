@@ -1,8 +1,9 @@
 use std::error::Error;
 use std::fmt::Debug;
 
-use crab_rocket_schema::DbPool;
 use rocket::State;
+
+use crab_rocket_schema::DbPool;
 
 use crate::request::request_param::RequestParam;
 use crate::response::api_response::ApiResponse;

@@ -1,10 +1,12 @@
+use std::env;
+
 use colored::Colorize;
 use diesel::{
-    r2d2::{ConnectionManager, Pool, PooledConnection},
     PgConnection,
+    r2d2::{ConnectionManager, Pool, PooledConnection},
 };
 use dotenv::dotenv;
-use std::env;
+
 pub mod common;
 pub mod controllers;
 pub mod mappers;
