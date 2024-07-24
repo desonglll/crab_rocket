@@ -57,7 +57,6 @@ fn rocket() -> _ {
                 get_follows,
                 filter_follows,
                 insert_single_follow,
-                insert_single_follow_by_params,
                 delete_follow_by_id,
                 update_follow_by_id,
                 delete_follow_specifically

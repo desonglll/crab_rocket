@@ -14,28 +14,36 @@ pub trait ControllerCRUD {
     type PatchItem;
     type Filter;
     type Service: ServiceCRUD<
-        Item = Self::Item,
-        PostItem = Self::PostItem,
-        PatchItem = Self::PatchItem,
-        Filter = Self::Filter,
+        Item=Self::Item,
+        PostItem=Self::PostItem,
+        PatchItem=Self::PatchItem,
+        Filter=Self::Filter,
     >;
     fn get_all(
         pool: &State<DbPool>,
         param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
         let session_id = param.auth.unwrap().session_id;
+        println!("Get Session ID: {}.", session_id);
         let session = Session::get_session_by_id(pool, session_id);
         match session {
-            Ok(existing_session) => match existing_session.is_valid(pool) {
-                Ok(_) => match Self::Service::get_all(pool, param) {
-                    Ok(data) => Ok(ApiResponse::success(data)),
-                    Err(err) => Ok(ApiResponse::error(err)),
-                },
-                Err(e) => Ok(ApiResponse::error(Box::new(e))),
-            },
+            Ok(existing_session) => {
+                println!("Session Exists.");
+                match existing_session.is_valid(pool) {
+                    Ok(_) => {
+                        println!("Session Valid.");
+                        match Self::Service::get_all(pool, param) {
+                            Ok(data) => Ok(ApiResponse::success(data)),
+                            Err(err) => Ok(ApiResponse::error(err)),
+                        }
+                    }
+                    Err(e) => Ok(ApiResponse::error(Box::new(e))),
+                }
+            }
             Err(_) => Ok(ApiResponse::new(4001, "Session Not Found".to_owned(), Data::default())),
         }
     }
+
     fn get_by_id(
         pool: &State<DbPool>,
         pid: i32,
@@ -54,6 +62,7 @@ pub trait ControllerCRUD {
             Err(_) => Ok(ApiResponse::new(4001, "Session Not Found".to_owned(), Data::default())),
         }
     }
+
     fn add_single(
         pool: &State<DbPool>,
         obj: &mut Self::PostItem,
@@ -72,6 +81,7 @@ pub trait ControllerCRUD {
             Err(_) => Ok(ApiResponse::new(4001, "Session Not Found".to_owned(), Data::default())),
         }
     }
+
     fn delete_by_id(
         pool: &State<DbPool>,
         pid: i32,
@@ -90,6 +100,7 @@ pub trait ControllerCRUD {
             Err(_) => Ok(ApiResponse::new(4001, "Session Not Found".to_owned(), Data::default())),
         }
     }
+
     fn update_by_id(
         pool: &State<DbPool>,
         pid: i32,
@@ -109,6 +120,7 @@ pub trait ControllerCRUD {
             Err(_) => Ok(ApiResponse::new(4001, "Session Not Found".to_owned(), Data::default())),
         }
     }
+
     fn filter(
         pool: &State<DbPool>,
         param: &RequestParam<Self::Item, Self::Filter>,
