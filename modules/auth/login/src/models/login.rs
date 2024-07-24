@@ -5,9 +5,9 @@ use crab_rocket_user::services::user_service::UserService;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
+use session::models::session::Session;
 
 use super::log_error::LogError;
-use super::session::Session;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(crate = "rocket::serde")]
@@ -22,7 +22,7 @@ impl Login {
         match self.is_user_exists(pool) {
             Ok(_) => match self.is_valid(pool) {
                 Ok(_) => {
-                    let session = Session::new(user.user_id);
+                    let session = Session::new(user.user_id, 1);
                     let result_session: Result<Session, diesel::result::Error> =
                         session.add_session(pool);
                     match result_session {

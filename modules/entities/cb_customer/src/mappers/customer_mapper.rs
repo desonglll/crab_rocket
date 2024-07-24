@@ -3,12 +3,13 @@ use obj_traits::{
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
+use rocket::State;
 
 use crate::models::{
     customer::{Customer, PatchCustomer, PostCustomer},
     customer_filter::CustomerFilter,
 };
-use crab_rocket_schema::schema::customer_table::dsl;
+use crab_rocket_schema::{establish_pg_connection, schema::customer_table::dsl, DbPool};
 use diesel::prelude::*;
 
 pub struct CustomerMapper {}
@@ -17,11 +18,12 @@ impl MapperCRUD for CustomerMapper {
     type Item = Customer;
     type PostItem = PostCustomer;
     type PatchItem = PatchCustomer;
-    type Param = RequestParam<CustomerFilter>;
+    type Filter = CustomerFilter;
     fn get_all(
-        conn: &mut diesel::PgConnection,
-        param: &Self::Param,
-    ) -> Result<obj_traits::response::data::Data<Vec<Self::Item>>, diesel::result::Error> {
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
+    ) -> Result<Data<Vec<Customer>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -42,7 +44,7 @@ impl MapperCRUD for CustomerMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::customer_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::customer_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -65,51 +67,60 @@ impl MapperCRUD for CustomerMapper {
             .order(dsl::customer_id.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<Customer>(conn)?;
-        let resp_body = Data::new(data, pagination);
+            .load::<Customer>(&mut conn)?;
+        let resp_body = Data::new(data, Some(pagination));
         Ok(resp_body)
     }
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Customer, diesel::result::Error> {
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Customer>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 配合 use crate::schema::customer_table::dsl::*;
-        dsl::customer_table.filter(dsl::customer_id.eq(pid)).first(conn)
+        let data = dsl::customer_table.filter(dsl::customer_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn add_single(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         obj: &PostCustomer,
-    ) -> Result<Customer, diesel::result::Error> {
-        match diesel::insert_into(dsl::customer_table)
+    ) -> Result<Data<Customer>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::insert_into(dsl::customer_table)
             .values(obj)
             .returning(Customer::as_returning())
-            .get_result(conn)
-        {
-            Ok(inserted_customer) => Ok(inserted_customer),
-            Err(e) => Err(e),
-        }
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Customer, diesel::result::Error> {
-        diesel::delete(dsl::customer_table.filter(dsl::customer_id.eq(pid))).get_result(conn)
+    fn delete_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<Data<Customer>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::delete(dsl::customer_table.filter(dsl::customer_id.eq(pid)))
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn update_by_id(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         pid: i32,
         obj: &PatchCustomer,
-    ) -> Result<Customer, diesel::result::Error> {
-        diesel::update(dsl::customer_table.filter(dsl::customer_id.eq(pid)))
+    ) -> Result<Data<Customer>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::update(dsl::customer_table.filter(dsl::customer_id.eq(pid)))
             .set((
                 dsl::name.eq(&obj.name),
                 dsl::email.eq(&obj.email),
                 dsl::phone.eq(&obj.phone),
                 dsl::address.eq(&obj.address),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<CustomerFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Customer>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -130,7 +141,7 @@ impl MapperCRUD for CustomerMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::customer_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::customer_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -168,8 +179,8 @@ impl MapperCRUD for CustomerMapper {
                 query = query.filter(dsl::address.like(format!("%{}%", address)));
             }
         }
-        let data = query.load::<Customer>(conn)?;
-        let body = Data::new(data, pagination);
+        let data = query.load::<Customer>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
@@ -180,7 +191,7 @@ mod test {
         customer::{PatchCustomer, PostCustomer},
         customer_filter::CustomerFilter,
     };
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use rocket::State;
     #[test]
     fn test_get_all() {
@@ -195,18 +206,13 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CustomerMapper::get_all(&mut conn, &param) {
-                Ok(data) => {
-                    assert!(!data.data().is_empty(), "Customer table should not be empty");
-                    println!("{:#?}", data);
-                }
-                Err(e) => {
-                    panic!("Error fetching all customers: {:?}", e);
-                }
-            },
+        match CustomerMapper::get_all(pool, &param) {
+            Ok(data) => {
+                assert!(!data.data.is_empty(), "Customer table should not be empty");
+                println!("{:#?}", data);
+            }
             Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
+                panic!("Error fetching all customers: {:?}", e);
             }
         }
     }
@@ -216,23 +222,18 @@ mod test {
         let test_id = 1; // 请确保你的数据库中有这个ID的数据
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CustomerMapper::get_by_id(&mut conn, test_id) {
-                Ok(customer) => {
-                    assert_eq!(
-                        customer.customer_id, test_id,
-                        "Fetched customer ID should match the requested ID"
-                    );
-                }
-                Err(diesel::result::Error::NotFound) => {
-                    panic!("Customer with ID {} not found", test_id);
-                }
-                Err(e) => {
-                    panic!("Error fetching customer by ID: {:?}", e);
-                }
-            },
+        match CustomerMapper::get_by_id(pool, test_id) {
+            Ok(customer) => {
+                assert_eq!(
+                    customer.data.customer_id, test_id,
+                    "Fetched customer ID should match the requested ID"
+                );
+            }
+            Err(diesel::result::Error::NotFound) => {
+                panic!("Customer with ID {} not found", test_id);
+            }
             Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
+                panic!("Error fetching customer by ID: {:?}", e);
             }
         }
     }
@@ -248,17 +249,12 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CustomerMapper::add_single(&mut conn, &new_customer) {
-                Ok(customer) => {
-                    assert_eq!(customer.name, "John Doe", "Name should match the added customer");
-                }
-                Err(e) => {
-                    panic!("Error adding customer: {:?}", e);
-                }
-            },
+        match CustomerMapper::add_single(pool, &new_customer) {
+            Ok(customer) => {
+                assert_eq!(customer.data.name, "John Doe", "Name should match the added customer");
+            }
             Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
+                panic!("Error adding customer: {:?}", e);
             }
         }
     }
@@ -268,23 +264,18 @@ mod test {
         let test_id = 3; // 请确保你的数据库中有这个ID的数据
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CustomerMapper::delete_by_id(&mut conn, test_id) {
-                Ok(customer) => {
-                    assert_eq!(
-                        customer.customer_id, test_id,
-                        "Deleted customer ID should match the requested ID"
-                    );
-                }
-                Err(diesel::result::Error::NotFound) => {
-                    panic!("Customer with ID {} not found for deletion", test_id);
-                }
-                Err(e) => {
-                    panic!("Error deleting customer: {:?}", e);
-                }
-            },
+        match CustomerMapper::delete_by_id(pool, test_id) {
+            Ok(customer) => {
+                assert_eq!(
+                    customer.data.customer_id, test_id,
+                    "Deleted customer ID should match the requested ID"
+                );
+            }
+            Err(diesel::result::Error::NotFound) => {
+                panic!("Customer with ID {} not found for deletion", test_id);
+            }
             Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
+                panic!("Error deleting customer: {:?}", e);
             }
         }
     }
@@ -301,22 +292,15 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                match CustomerMapper::update_by_id(&mut conn, test_id, &updated_customer) {
-                    Ok(customer) => {
-                        assert_eq!(customer.name, "Jane Doe", "Name should be updated");
-                    }
-                    Err(diesel::result::Error::NotFound) => {
-                        panic!("Customer with ID {} not found for update", test_id);
-                    }
-                    Err(e) => {
-                        panic!("Error updating customer: {:?}", e);
-                    }
-                }
+        match CustomerMapper::update_by_id(pool, test_id, &updated_customer) {
+            Ok(customer) => {
+                assert_eq!(customer.data.name, "Jane Doe", "Name should be updated");
+            }
+            Err(diesel::result::Error::NotFound) => {
+                panic!("Customer with ID {} not found for update", test_id);
             }
             Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
+                panic!("Error updating customer: {:?}", e);
             }
         }
     }
@@ -334,20 +318,15 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CustomerMapper::filter(&mut conn, &param) {
-                Ok(data) => {
-                    assert!(
-                        data.data().iter().all(|c| c.name.contains("John")),
-                        "Filtered result should contain customers with 'John' in the name"
-                    );
-                }
-                Err(e) => {
-                    panic!("Error filtering customers: {:?}", e);
-                }
-            },
+        match CustomerMapper::filter(pool, &param) {
+            Ok(data) => {
+                assert!(
+                    data.data.iter().all(|c| c.name.contains("John")),
+                    "Filtered result should contain customers with 'John' in the name"
+                );
+            }
             Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
+                panic!("Error filtering customers: {:?}", e);
             }
         }
     }

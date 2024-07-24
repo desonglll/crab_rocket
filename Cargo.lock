@@ -110,15 +110,8 @@ dependencies = [
 name = "auth"
 version = "0.1.0"
 dependencies = [
- "chrono",
- "crab_rocket_schema",
- "crab_rocket_user",
- "crab_rocket_utils",
- "diesel",
- "obj_traits",
- "rocket",
- "serde_json",
- "uuid",
+ "login",
+ "session",
 ]
 
 [[package]]
@@ -331,6 +324,7 @@ dependencies = [
  "diesel",
  "dotenvy",
  "entities",
+ "login",
  "rocket",
  "rocket_cors",
  "schemas",
@@ -1195,6 +1189,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
+name = "login"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "crab_rocket_schema",
+ "crab_rocket_user",
+ "crab_rocket_utils",
+ "diesel",
+ "rocket",
+ "serde_json",
+ "session",
+]
+
+[[package]]
 name = "loom"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1321,6 +1329,7 @@ dependencies = [
  "crab_rocket_schema",
  "diesel",
  "rocket",
+ "session",
  "uuid",
 ]
 
@@ -1950,6 +1959,19 @@ dependencies = [
  "crab_rocket_order",
  "crab_rocket_shipment",
  "rocket",
+]
+
+[[package]]
+name = "session"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "crab_rocket_schema",
+ "crab_rocket_utils",
+ "diesel",
+ "rocket",
+ "serde_json",
+ "uuid",
 ]
 
 [[package]]

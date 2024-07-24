@@ -44,11 +44,11 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new(user_id: i32) -> Self {
+    pub fn new(user_id: i32, days: i64) -> Self {
         Self {
             user_id,
             session_id: Uuid::new_v4(),
-            expires: get_e8_time(),
+            expires: get_e8_time() + Duration::days(days),
             created_at: get_e8_time(),
         }
     }
@@ -137,6 +137,7 @@ impl Session {
     }
 
     pub fn is_valid(&self, pool: &State<DbPool>) -> Result<bool, SessionError> {
+        println!("{:#?}", self);
         match self.is_exists(pool) {
             Ok(_) => match self.is_expires() {
                 Ok(_) => Ok(true),
@@ -156,7 +157,7 @@ mod tests {
 
     #[test]
     fn test_create_session() {
-        let session = Session::new(1);
+        let session = Session::new(1, 1);
         println!("{:#?}", session);
 
         assert_eq!(session.user_id, 1);
@@ -171,7 +172,7 @@ mod tests {
     fn test_add_session() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let session = Session::new(3);
+        let session = Session::new(3, 1);
         println!("{:#?}", session);
         let added_session = session.add_session(pool).unwrap();
         println!("{:#?}", added_session);
@@ -197,7 +198,7 @@ mod tests {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         // First, add a session
-        let session = Session::new(3);
+        let session = Session::new(3, 1);
 
         let added_session = session.add_session(pool).unwrap();
         assert_eq!(added_session.user_id, 3);

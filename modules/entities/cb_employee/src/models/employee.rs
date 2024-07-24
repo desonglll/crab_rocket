@@ -3,7 +3,9 @@ use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Selectable, Insertable, Debug, Serialize, Deserialize, Queryable, ToSchema, Default)]
+#[derive(
+    Selectable, Insertable, Debug, Serialize, Deserialize, Queryable, ToSchema, Default, Clone,
+)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::employee_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -270,6 +272,57 @@ impl PatchEmployee {
             valid: Some(true),
             role_name: Some("Developer".to_string()),
             role_id: Some(1),
+        }
+    }
+}
+impl From<Employee> for PostEmployee {
+    fn from(employee: Employee) -> Self {
+        PostEmployee {
+            employee_name: employee.employee_name,
+            first_name: employee.first_name,
+            last_name: employee.last_name,
+            gender: employee.gender,
+            date_of_birth: employee.date_of_birth,
+            hire_date: employee.hire_date,
+            email: employee.email,
+            phone_number: employee.phone_number,
+            department_id: employee.department_id,
+            job_title: employee.job_title,
+            salary: employee.salary,
+            manager_id: employee.manager_id,
+            address: employee.address,
+            city: employee.city,
+            state: employee.state,
+            postal_code: employee.postal_code,
+            valid: employee.valid,
+            role_name: employee.role_name,
+            role_id: employee.role_id,
+        }
+    }
+}
+
+impl From<Employee> for PatchEmployee {
+    fn from(employee: Employee) -> Self {
+        PatchEmployee {
+            employee_name: employee.employee_name,
+            first_name: employee.first_name,
+            last_name: employee.last_name,
+            gender: employee.gender,
+            date_of_birth: employee.date_of_birth,
+            hire_date: employee.hire_date,
+            email: employee.email,
+            phone_number: employee.phone_number,
+            department_id: employee.department_id,
+            job_title: employee.job_title,
+            salary: employee.salary,
+            manager_id: employee.manager_id,
+            address: employee.address,
+            city: employee.city,
+            state: employee.state,
+            postal_code: employee.postal_code,
+            valid: employee.valid,
+            role_name: employee.role_name,
+            role_id: employee.role_id,
         }
     }
 }

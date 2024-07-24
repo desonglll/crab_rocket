@@ -1,15 +1,8 @@
 use crate::mappers::customer_mapper::CustomerMapper;
 use crate::models::customer::{Customer, PatchCustomer, PostCustomer};
 use crate::models::customer_filter::CustomerFilter;
-use crab_rocket_schema::DbPool;
-use obj_traits::request::request_param::RequestParam;
-use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::{
-    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
-    service_update_by_id, ServiceCRUD,
-};
-use rocket::State;
-use std::error::Error;
+
+use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct CustomerService {}
 
@@ -17,38 +10,8 @@ impl ServiceCRUD for CustomerService {
     type Item = Customer;
     type PostItem = PostCustomer;
     type PatchItem = PatchCustomer;
-    type Param = RequestParam<CustomerFilter>;
-    fn get_all(
-        pool: &State<DbPool>,
-        param: &RequestParam<CustomerFilter>,
-    ) -> Result<Data<Vec<Customer>>, Box<dyn Error>> {
-        service_get_all::<Customer, CustomerMapper, CustomerFilter>(pool, param)
-    }
-    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Customer, Box<dyn Error>> {
-        service_get_by_id::<Customer, CustomerMapper>(pool, pid)
-    }
-
-    fn add_single(pool: &State<DbPool>, obj: &PostCustomer) -> Result<Customer, Box<dyn Error>> {
-        service_add_single::<Customer, CustomerMapper, PostCustomer>(pool, obj)
-    }
-
-    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Customer, Box<dyn Error>> {
-        service_delete_by_id::<Customer, CustomerMapper>(pool, pid)
-    }
-
-    fn update_by_id(
-        pool: &State<DbPool>,
-        pid: i32,
-        obj: &PatchCustomer,
-    ) -> Result<Customer, Box<dyn Error>> {
-        service_update_by_id::<Customer, CustomerMapper, PatchCustomer>(pool, pid, obj)
-    }
-    fn filter(
-        pool: &State<DbPool>,
-        param: &RequestParam<CustomerFilter>,
-    ) -> Result<Data<Vec<Customer>>, Box<dyn std::error::Error>> {
-        service_filter::<Customer, CustomerMapper, CustomerFilter>(pool, param)
-    }
+    type Filter = CustomerFilter;
+    type Mapper = CustomerMapper;
 }
 
 #[cfg(test)]
@@ -67,7 +30,7 @@ mod test {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         match CustomerService::add_single(pool, &customer) {
-            Ok(result) => println!("{result:?}"),
+            Ok(result) => println!("{result}"),
             Err(e) => println!("{e:?}"),
         }
     }

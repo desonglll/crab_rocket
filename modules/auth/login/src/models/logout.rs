@@ -5,9 +5,9 @@ use crab_rocket_user::services::user_service::UserService;
 use diesel::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
+use session::models::session::Session;
 
 use super::log_error::LogError;
-use super::session::Session;
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(crate = "rocket::serde")]
 pub struct Logout {

@@ -1,15 +1,8 @@
 use crate::mappers::task_mapper::TaskMapper;
 use crate::models::task::{PatchTask, PostTask, Task};
 use crate::models::task_filter::TaskFilter;
-use crab_rocket_schema::DbPool;
-use obj_traits::request::request_param::RequestParam;
-use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::{
-    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
-    service_update_by_id, ServiceCRUD,
-};
-use rocket::State;
-use std::error::Error;
+
+use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct TaskService {}
 
@@ -17,38 +10,8 @@ impl ServiceCRUD for TaskService {
     type Item = Task;
     type PostItem = PostTask;
     type PatchItem = PatchTask;
-    type Param = RequestParam<TaskFilter>;
-    fn get_all(
-        pool: &State<DbPool>,
-        param: &RequestParam<TaskFilter>,
-    ) -> Result<Data<Vec<Task>>, Box<dyn Error>> {
-        service_get_all::<Task, TaskMapper, TaskFilter>(pool, param)
-    }
-    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Task, Box<dyn Error>> {
-        service_get_by_id::<Task, TaskMapper>(pool, pid)
-    }
-
-    fn add_single(pool: &State<DbPool>, obj: &PostTask) -> Result<Task, Box<dyn Error>> {
-        service_add_single::<Task, TaskMapper, PostTask>(pool, obj)
-    }
-
-    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Task, Box<dyn Error>> {
-        service_delete_by_id::<Task, TaskMapper>(pool, pid)
-    }
-
-    fn update_by_id(
-        pool: &State<DbPool>,
-        pid: i32,
-        obj: &PatchTask,
-    ) -> Result<Task, Box<dyn Error>> {
-        service_update_by_id::<Task, TaskMapper, PatchTask>(pool, pid, obj)
-    }
-    fn filter(
-        pool: &State<DbPool>,
-        param: &RequestParam<TaskFilter>,
-    ) -> Result<Data<Vec<Task>>, Box<dyn std::error::Error>> {
-        service_filter::<Task, TaskMapper, TaskFilter>(pool, param)
-    }
+    type Filter = TaskFilter;
+    type Mapper = TaskMapper;
 }
 
 #[cfg(test)]

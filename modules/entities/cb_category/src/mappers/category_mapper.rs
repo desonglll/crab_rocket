@@ -4,25 +4,26 @@ use obj_traits::{
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
+use rocket::State;
 
 use crate::models::{
     category::{Category, PatchCategory, PostCategory},
     category_filter::CategoryFilter,
 };
-use crab_rocket_schema::schema::category_table::dsl;
+use crab_rocket_schema::{establish_pg_connection, schema::category_table::dsl, DbPool};
 use diesel::prelude::*;
 
 pub struct CategoryMapper {}
-
 impl MapperCRUD for CategoryMapper {
     type Item = Category;
     type PostItem = PostCategory;
     type PatchItem = PatchCategory;
-    type Param = RequestParam<CategoryFilter>;
+    type Filter = CategoryFilter;
     fn get_all(
-        conn: &mut diesel::PgConnection,
-        param: &Self::Param,
-    ) -> Result<obj_traits::response::data::Data<Vec<Self::Item>>, diesel::result::Error> {
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
+    ) -> Result<Data<Vec<Category>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -43,7 +44,7 @@ impl MapperCRUD for CategoryMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::category_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::category_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -66,39 +67,46 @@ impl MapperCRUD for CategoryMapper {
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<Category>(conn)?;
-        let resp_body = Data::new(data, pagination);
+            .load::<Category>(&mut conn)?;
+        let resp_body = Data::new(data, Some(pagination));
         Ok(resp_body)
     }
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Category, diesel::result::Error> {
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Category>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 配合 use crate::schema::category_table::dsl::*;
-        dsl::category_table.filter(dsl::category_id.eq(pid)).first(conn)
+        let data = dsl::category_table.filter(dsl::category_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn add_single(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         obj: &PostCategory,
-    ) -> Result<Category, diesel::result::Error> {
-        match diesel::insert_into(dsl::category_table)
+    ) -> Result<Data<Category>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::insert_into(dsl::category_table)
             .values(obj)
             .returning(Category::as_returning())
-            .get_result(conn)
-        {
-            Ok(inserted_category) => Ok(inserted_category),
-            Err(e) => Err(e),
-        }
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Category, diesel::result::Error> {
-        diesel::delete(dsl::category_table.filter(dsl::category_id.eq(pid))).get_result(conn)
+    fn delete_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<Data<Category>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::delete(dsl::category_table.filter(dsl::category_id.eq(pid)))
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn update_by_id(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         pid: i32,
         obj: &PatchCategory,
-    ) -> Result<Category, diesel::result::Error> {
-        diesel::update(dsl::category_table.filter(dsl::category_id.eq(pid)))
+    ) -> Result<Data<Category>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::update(dsl::category_table.filter(dsl::category_id.eq(pid)))
             .set((
                 dsl::name.eq(&obj.name),
                 dsl::description.eq(&obj.description),
@@ -106,12 +114,14 @@ impl MapperCRUD for CategoryMapper {
                 dsl::created_at.eq(obj.created_at),
                 dsl::updated_at.eq(get_e8_time()),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<CategoryFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Category>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -132,7 +142,7 @@ impl MapperCRUD for CategoryMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::category_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::category_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -174,8 +184,8 @@ impl MapperCRUD for CategoryMapper {
                 query = query.filter(dsl::updated_at.le(updated_at_max));
             }
         }
-        let data = query.load::<Category>(conn)?;
-        let body = Data::new(data, pagination);
+        let data = query.load::<Category>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
@@ -183,7 +193,7 @@ impl MapperCRUD for CategoryMapper {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
     use rocket::State;
 
@@ -192,17 +202,12 @@ mod test {
         let param = RequestParam::default(); // 預設的請求參數
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CategoryMapper::get_all(&mut conn, &param) {
-                Ok(data) => {
-                    println!("{:#?}", data);
-                }
-                Err(e) => {
-                    eprintln!("Error fetching categories: {:?}", e);
-                }
-            },
+        match CategoryMapper::get_all(pool, &param) {
+            Ok(data) => {
+                println!("{:#?}", data);
+            }
             Err(e) => {
-                eprintln!("Error establishing connection: {:?}", e);
+                eprintln!("Error fetching categories: {:?}", e);
             }
         }
     }
@@ -212,17 +217,12 @@ mod test {
         let test_id = 1; // 測試用的 ID
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CategoryMapper::get_by_id(&mut conn, test_id) {
-                Ok(category) => {
-                    println!("{:#?}", category);
-                }
-                Err(e) => {
-                    eprintln!("Error fetching category by ID: {:?}", e);
-                }
-            },
+        match CategoryMapper::get_by_id(pool, test_id) {
+            Ok(category) => {
+                println!("{:#?}", category);
+            }
             Err(e) => {
-                eprintln!("Error establishing connection: {:?}", e);
+                eprintln!("Error fetching category by ID: {:?}", e);
             }
         }
     }
@@ -238,17 +238,12 @@ mod test {
         };
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CategoryMapper::add_single(&mut conn, &new_category) {
-                Ok(category) => {
-                    println!("Added category: {:#?}", category);
-                }
-                Err(e) => {
-                    eprintln!("Error adding category: {:?}", e);
-                }
-            },
+        match CategoryMapper::add_single(pool, &new_category) {
+            Ok(category) => {
+                println!("Added category: {:#?}", category);
+            }
             Err(e) => {
-                eprintln!("Error establishing connection: {:?}", e);
+                eprintln!("Error adding category: {:?}", e);
             }
         }
     }
@@ -265,19 +260,12 @@ mod test {
         };
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                match CategoryMapper::update_by_id(&mut conn, category_id, &updated_category) {
-                    Ok(category) => {
-                        println!("Updated category: {:#?}", category);
-                    }
-                    Err(e) => {
-                        eprintln!("Error updating category: {:?}", e);
-                    }
-                }
+        match CategoryMapper::update_by_id(pool, category_id, &updated_category) {
+            Ok(category) => {
+                println!("Updated category: {:#?}", category);
             }
             Err(e) => {
-                eprintln!("Error establishing connection: {:?}", e);
+                eprintln!("Error updating category: {:?}", e);
             }
         }
     }
@@ -287,17 +275,12 @@ mod test {
         let category_id = 1; // 測試用的 ID
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CategoryMapper::delete_by_id(&mut conn, category_id) {
-                Ok(category) => {
-                    println!("Deleted category: {:#?}", category);
-                }
-                Err(e) => {
-                    eprintln!("Error deleting category: {:?}", e);
-                }
-            },
+        match CategoryMapper::delete_by_id(pool, category_id) {
+            Ok(category) => {
+                println!("Deleted category: {:#?}", category);
+            }
             Err(e) => {
-                eprintln!("Error establishing connection: {:?}", e);
+                eprintln!("Error deleting category: {:?}", e);
             }
         }
     }
@@ -318,17 +301,12 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match CategoryMapper::filter(&mut conn, &param) {
-                Ok(data) => {
-                    println!("{:#?}", data);
-                }
-                Err(e) => {
-                    eprintln!("Error filtering categories: {:?}", e);
-                }
-            },
+        match CategoryMapper::filter(pool, &param) {
+            Ok(data) => {
+                println!("{:#?}", data);
+            }
             Err(e) => {
-                eprintln!("Error establishing connection: {:?}", e);
+                eprintln!("Error filtering categories: {:?}", e);
             }
         }
     }

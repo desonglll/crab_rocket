@@ -4,13 +4,14 @@ use obj_traits::{
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
+use rocket::State;
 
 use crate::models::{
     supplier::{PatchSupplier, PostSupplier, Supplier},
     supplier_filter::SupplierFilter,
 };
-use crab_rocket_schema::schema::supplier_table::dsl;
-use diesel::prelude::*;
+use crab_rocket_schema::{establish_pg_connection, schema::supplier_table::dsl, DbPool};
+use diesel::{prelude::*, result::Error};
 
 pub struct SupplierMapper {}
 
@@ -18,11 +19,12 @@ impl MapperCRUD for SupplierMapper {
     type Item = Supplier;
     type PostItem = PostSupplier;
     type PatchItem = PatchSupplier;
-    type Param = RequestParam<SupplierFilter>;
+    type Filter = SupplierFilter;
     fn get_all(
-        conn: &mut diesel::PgConnection,
-        param: &Self::Param,
-    ) -> Result<obj_traits::response::data::Data<Vec<Self::Item>>, diesel::result::Error> {
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
+    ) -> Result<Data<Vec<Supplier>>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -43,7 +45,7 @@ impl MapperCRUD for SupplierMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::supplier_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::supplier_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -66,53 +68,64 @@ impl MapperCRUD for SupplierMapper {
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<Supplier>(conn)?;
-        let resp_body = Data::new(data, pagination);
+            .load::<Supplier>(&mut conn)?;
+        let resp_body = Data::new(data, Some(pagination));
         Ok(resp_body)
     }
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Supplier, diesel::result::Error> {
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Supplier>, diesel::result::Error> {
+        let mut conn: diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<PgConnection>,
+        > = establish_pg_connection(pool).expect("msg");
         // 配合 use crate::schema::supplier_table::dsl::*;
-        dsl::supplier_table.filter(dsl::supplier_id.eq(pid)).first(conn)
+        let data: Supplier =
+            dsl::supplier_table.filter(dsl::supplier_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn add_single(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         obj: &PostSupplier,
-    ) -> Result<Supplier, diesel::result::Error> {
-        match diesel::insert_into(dsl::supplier_table)
+    ) -> Result<Data<Supplier>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::insert_into(dsl::supplier_table)
             .values(obj)
             .returning(Supplier::as_returning())
-            .get_result(conn)
-        {
-            Ok(inserted_supplier) => Ok(inserted_supplier),
-            Err(e) => Err(e),
-        }
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Supplier, diesel::result::Error> {
-        diesel::delete(dsl::supplier_table.filter(dsl::supplier_id.eq(pid))).get_result(conn)
+    fn delete_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<Data<Supplier>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data: Supplier = diesel::delete(dsl::supplier_table.filter(dsl::supplier_id.eq(pid)))
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
-
     fn update_by_id(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         pid: i32,
         obj: &PatchSupplier,
-    ) -> Result<Supplier, diesel::result::Error> {
-        diesel::update(dsl::supplier_table.filter(dsl::supplier_id.eq(pid)))
+    ) -> Result<Data<Supplier>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data: Supplier = diesel::update(dsl::supplier_table.filter(dsl::supplier_id.eq(pid)))
             .set((
-                dsl::name.eq(obj.name()),
-                dsl::address.eq(obj.address()),
-                dsl::phone_number.eq(obj.phone_number()),
-                dsl::email.eq(obj.email()),
-                dsl::created_at.eq(obj.created_at()),
+                dsl::name.eq(&obj.name),
+                dsl::address.eq(&obj.address),
+                dsl::phone_number.eq(&obj.phone_number),
+                dsl::email.eq(&obj.email),
+                dsl::created_at.eq(obj.created_at),
                 dsl::updated_at.eq(get_e8_time()),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<SupplierFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Supplier>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -133,7 +146,7 @@ impl MapperCRUD for SupplierMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::supplier_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::supplier_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -178,8 +191,9 @@ impl MapperCRUD for SupplierMapper {
                 query = query.filter(dsl::updated_at.le(updated_at_max));
             }
         }
-        let data = query.load::<Supplier>(conn)?;
-        let body = Data::new(data, pagination);
+
+        let data = query.load::<Supplier>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
@@ -188,29 +202,23 @@ mod tests {
     use super::*;
     use crate::models::supplier::{PatchSupplier, PostSupplier};
     use crate::models::supplier_filter::SupplierFilter;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::request::request_param::RequestParam;
     use rocket::State;
 
     #[test]
     fn test_fetch_all_supplier_table() {
-        let param = RequestParam::<SupplierFilter>::default();
+        let param = RequestParam::<Supplier, SupplierFilter>::default();
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match SupplierMapper::get_all(&mut conn, &param) {
-                Ok(data) => {
-                    println!("{:#?}", data);
-                    assert!(data.data().len() > 0); // Ensure data is fetched
-                }
-                Err(e) => {
-                    println!("{:?}", e);
-                    panic!("Failed to fetch suppliers: {:?}", e);
-                }
-            },
+        match SupplierMapper::get_all(pool, &param) {
+            Ok(data) => {
+                println!("{:#?}", data);
+                assert!(data.data.len() > 0); // Ensure data is fetched
+            }
             Err(e) => {
                 println!("{:?}", e);
-                panic!("Failed to establish database connection: {:?}", e);
+                panic!("Failed to fetch suppliers: {:?}", e);
             }
         }
     }
@@ -220,20 +228,14 @@ mod tests {
         let test_supplier_id = 3; // Replace with an actual ID from your test database
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match SupplierMapper::get_by_id(&mut conn, test_supplier_id) {
-                Ok(supplier) => {
-                    println!("{:#?}", supplier);
-                    assert_eq!(supplier.supplier_id(), test_supplier_id);
-                }
-                Err(e) => {
-                    println!("{:?}", e);
-                    panic!("Failed to get supplier by ID: {:?}", e);
-                }
-            },
+        match SupplierMapper::get_by_id(pool, test_supplier_id) {
+            Ok(supplier) => {
+                println!("{:#?}", supplier);
+                assert_eq!(supplier.data.supplier_id, test_supplier_id);
+            }
             Err(e) => {
                 println!("{:?}", e);
-                panic!("Failed to establish database connection: {:?}", e);
+                panic!("Failed to get supplier by ID: {:?}", e);
             }
         }
     }
@@ -243,20 +245,14 @@ mod tests {
         let new_supplier = PostSupplier::demo(); // Using demo data for testing
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match SupplierMapper::add_single(&mut conn, &new_supplier) {
-                Ok(supplier) => {
-                    println!("{:#?}", supplier);
-                    assert_eq!(supplier.name(), new_supplier.name);
-                }
-                Err(e) => {
-                    println!("{:?}", e);
-                    panic!("Failed to add new supplier: {:?}", e);
-                }
-            },
+        match SupplierMapper::add_single(pool, &new_supplier) {
+            Ok(supplier) => {
+                println!("{:#?}", supplier);
+                assert_eq!(supplier.data.name, new_supplier.name);
+            }
             Err(e) => {
                 println!("{:?}", e);
-                panic!("Failed to establish database connection: {:?}", e);
+                panic!("Failed to add new supplier: {:?}", e);
             }
         }
     }
@@ -266,20 +262,14 @@ mod tests {
         let test_supplier_id = 1; // Replace with an actual ID from your test database
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match SupplierMapper::delete_by_id(&mut conn, test_supplier_id) {
-                Ok(supplier) => {
-                    println!("{:#?}", supplier);
-                    assert_eq!(supplier.supplier_id(), test_supplier_id);
-                }
-                Err(e) => {
-                    println!("{:?}", e);
-                    panic!("Failed to delete supplier by ID: {:?}", e);
-                }
-            },
+        match SupplierMapper::delete_by_id(pool, test_supplier_id) {
+            Ok(supplier) => {
+                println!("{:#?}", supplier);
+                assert_eq!(supplier.data.supplier_id, test_supplier_id);
+            }
             Err(e) => {
                 println!("{:?}", e);
-                panic!("Failed to establish database connection: {:?}", e);
+                panic!("Failed to delete supplier by ID: {:?}", e);
             }
         }
     }
@@ -297,22 +287,14 @@ mod tests {
         };
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                match SupplierMapper::update_by_id(&mut conn, test_supplier_id, &updated_supplier) {
-                    Ok(supplier) => {
-                        println!("{:#?}", supplier);
-                        assert_eq!(supplier.name(), updated_supplier.name());
-                    }
-                    Err(e) => {
-                        println!("{:?}", e);
-                        panic!("Failed to update supplier by ID: {:?}", e);
-                    }
-                }
+        match SupplierMapper::update_by_id(pool, test_supplier_id, &updated_supplier) {
+            Ok(supplier) => {
+                println!("{:#?}", supplier);
+                assert_eq!(supplier.data.name, updated_supplier.name);
             }
             Err(e) => {
                 println!("{:?}", e);
-                panic!("Failed to establish database connection: {:?}", e);
+                panic!("Failed to update supplier by ID: {:?}", e);
             }
         }
     }

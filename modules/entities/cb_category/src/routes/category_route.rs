@@ -6,7 +6,7 @@ use rocket::State;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::category_controller::CategoryController;
-use crate::models::category::{PatchCategory, PostCategory};
+use crate::models::category::Category;
 use crate::models::category_filter::CategoryFilter;
 
 #[get("/category?<limit>&<offset>")]
@@ -31,8 +31,8 @@ pub fn get_categorys(
 
 #[post("/category/filter", data = "<param>")]
 pub fn filter_categorys(
+    param: Option<Json<RequestParam<Category, CategoryFilter>>>,
     pool: &State<DbPool>,
-    param: Option<Json<RequestParam<CategoryFilter>>>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
     let param = param.unwrap_or(Json(RequestParam::default()));
@@ -43,40 +43,53 @@ pub fn filter_categorys(
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[get("/category/<id>")]
-pub fn get_category_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
+#[post("/category/<id>", data = "<param>")]
+pub fn get_category_by_id(
+    param: Option<Json<RequestParam<Category, CategoryFilter>>>,
+    pool: &State<DbPool>,
+    id: i32,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default()));
+    let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count(pool);
-    let resp = CategoryController::get_by_id(pool, id).unwrap();
+    let resp = CategoryController::get_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/category", data = "<category>")]
+#[post("/category", data = "<param>")]
 pub fn insert_single_category(
     pool: &State<DbPool>,
-    category: Json<PostCategory>,
+    param: Option<Json<RequestParam<Category, CategoryFilter>>>,
 ) -> Json<serde_json::Value> {
-    let mut obj: PostCategory = category.into_inner();
-
-    let resp = CategoryController::add_single(pool, &mut obj).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = CategoryController::add_single(pool, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[delete("/category/<id>")]
-pub fn delete_category_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
-    let resp = CategoryController::delete_by_id(pool, id).unwrap();
+#[delete("/category/<id>", data = "<param>")]
+pub fn delete_category_by_id(
+    pool: &State<DbPool>,
+    id: i32,
+    param: Option<Json<RequestParam<Category, CategoryFilter>>>,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let resp = CategoryController::delete_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[patch("/category/<id>", data = "<task>")]
+#[patch("/category/<id>", data = "<param>")]
 pub fn update_category_by_id(
     pool: &State<DbPool>,
     id: i32,
-    task: Json<PatchCategory>,
+    param: Option<Json<RequestParam<Category, CategoryFilter>>>,
 ) -> Json<serde_json::Value> {
-    let resp = CategoryController::update_by_id(pool, id, &task).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = CategoryController::update_by_id(pool, id, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

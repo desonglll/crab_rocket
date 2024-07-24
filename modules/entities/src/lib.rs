@@ -80,7 +80,7 @@ pub fn entities_routes() -> Vec<Route> {
         delete_permission_by_id,
         update_permission_by_id,
         options_permission,
-        //supplier routes
+        // supplier routes
         get_suppliers,
         filter_suppliers,
         get_supplier_by_id,

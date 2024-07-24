@@ -88,3 +88,22 @@ impl PatchFollow {
         }
     }
 }
+impl From<Follow> for PostFollow {
+    fn from(follow: Follow) -> Self {
+        PostFollow {
+            following_user_id: follow.following_user_id,
+            followed_user_id: follow.followed_user_id,
+            created_at: follow.created_at,
+        }
+    }
+}
+
+impl From<Follow> for PatchFollow {
+    fn from(follow: Follow) -> Self {
+        PatchFollow {
+            following_user_id: follow.following_user_id,
+            followed_user_id: follow.followed_user_id,
+            created_at: follow.created_at,
+        }
+    }
+}

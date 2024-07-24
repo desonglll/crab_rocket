@@ -10,13 +10,13 @@ use utoipa::ToSchema;
 #[diesel(table_name = crab_rocket_schema::schema::supplier_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Supplier {
-    supplier_id: i32,
-    name: String,
-    address: Option<String>,
-    phone_number: Option<String>,
-    email: Option<String>,
-    created_at: Option<chrono::NaiveDateTime>,
-    updated_at: Option<chrono::NaiveDateTime>,
+    pub supplier_id: i32,
+    pub name: String,
+    pub address: Option<String>,
+    pub phone_number: Option<String>,
+    pub email: Option<String>,
+    pub created_at: Option<chrono::NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
 impl Supplier {
@@ -38,62 +38,6 @@ impl Supplier {
             created_at,
             updated_at,
         }
-    }
-
-    pub fn supplier_id(&self) -> i32 {
-        self.supplier_id
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn address(&self) -> &Option<String> {
-        &self.address
-    }
-
-    pub fn phone_number(&self) -> &Option<String> {
-        &self.phone_number
-    }
-
-    pub fn email(&self) -> &Option<String> {
-        &self.email
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.updated_at
-    }
-
-    pub fn set_supplier_id(&mut self, supplier_id: i32) {
-        self.supplier_id = supplier_id;
-    }
-
-    pub fn set_name(&mut self, name: String) {
-        self.name = name;
-    }
-
-    pub fn set_address(&mut self, address: Option<String>) {
-        self.address = address;
-    }
-
-    pub fn set_phone_number(&mut self, phone_number: Option<String>) {
-        self.phone_number = phone_number;
-    }
-
-    pub fn set_email(&mut self, email: Option<String>) {
-        self.email = email;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
-        self.updated_at = updated_at;
     }
 }
 
@@ -172,52 +116,28 @@ impl PatchSupplier {
             updated_at,
         }
     }
-
-    pub fn name(&self) -> &str {
-        &self.name
+}
+impl From<Supplier> for PatchSupplier {
+    fn from(supplier: Supplier) -> Self {
+        PatchSupplier {
+            name: supplier.name,
+            address: supplier.address,
+            phone_number: supplier.phone_number,
+            email: supplier.email,
+            created_at: supplier.created_at,
+            updated_at: supplier.updated_at,
+        }
     }
-
-    pub fn address(&self) -> &Option<String> {
-        &self.address
-    }
-
-    pub fn phone_number(&self) -> &Option<String> {
-        &self.phone_number
-    }
-
-    pub fn email(&self) -> &Option<String> {
-        &self.email
-    }
-
-    pub fn created_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.created_at
-    }
-
-    pub fn updated_at(&self) -> Option<chrono::NaiveDateTime> {
-        self.updated_at
-    }
-
-    pub fn set_name(&mut self, name: String) {
-        self.name = name;
-    }
-
-    pub fn set_address(&mut self, address: Option<String>) {
-        self.address = address;
-    }
-
-    pub fn set_phone_number(&mut self, phone_number: Option<String>) {
-        self.phone_number = phone_number;
-    }
-
-    pub fn set_email(&mut self, email: Option<String>) {
-        self.email = email;
-    }
-
-    pub fn set_created_at(&mut self, created_at: Option<chrono::NaiveDateTime>) {
-        self.created_at = created_at;
-    }
-
-    pub fn set_updated_at(&mut self, updated_at: Option<chrono::NaiveDateTime>) {
-        self.updated_at = updated_at;
+}
+impl From<Supplier> for PostSupplier {
+    fn from(supplier: Supplier) -> Self {
+        PostSupplier {
+            name: supplier.name,
+            address: supplier.address,
+            phone_number: supplier.phone_number,
+            email: supplier.email,
+            created_at: supplier.created_at,
+            updated_at: supplier.updated_at,
+        }
     }
 }

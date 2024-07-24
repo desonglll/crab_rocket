@@ -37,6 +37,7 @@ pub struct Product {
 #[diesel(table_name = crab_rocket_schema::schema::product_table)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PostProduct {
+    pub user_id: Option<i32>,
     pub name: String,
     pub description: Option<String>,
     pub sku: String,
@@ -58,6 +59,7 @@ pub struct PostProduct {
 impl PostProduct {
     pub fn demo() -> Self {
         Self {
+            user_id: Some(1),
             name: "Demo Product".to_string(),
             description: Some("This is a demo product.".to_string()),
             sku: "DEMO123".to_string(),
@@ -102,4 +104,53 @@ pub struct PatchProduct {
     pub dimensions: Option<String>,
     pub status: Option<String>,
     pub public: Option<bool>,
+}
+impl From<Product> for PostProduct {
+    fn from(product: Product) -> Self {
+        PostProduct {
+            user_id: product.user_id,
+            name: product.name,
+            description: product.description,
+            sku: product.sku,
+            image: product.image,
+            price: product.price,
+            discount_price: product.discount_price,
+            is_discounted: product.is_discounted,
+            is_valid: product.is_valid,
+            inventory: product.inventory,
+            is_in_stock: product.is_in_stock,
+            created_at: product.created_at,
+            updated_at: product.updated_at,
+            supplier_id: product.supplier_id,
+            weight: product.weight,
+            dimensions: product.dimensions,
+            status: product.status,
+            public: product.public,
+        }
+    }
+}
+
+impl From<Product> for PatchProduct {
+    fn from(product: Product) -> Self {
+        PatchProduct {
+            user_id: product.user_id,
+            name: product.name,
+            description: product.description,
+            sku: product.sku,
+            image: product.image,
+            price: product.price,
+            discount_price: product.discount_price,
+            is_discounted: product.is_discounted,
+            is_valid: product.is_valid,
+            inventory: product.inventory,
+            is_in_stock: product.is_in_stock,
+            created_at: product.created_at,
+            updated_at: product.updated_at,
+            supplier_id: product.supplier_id,
+            weight: product.weight,
+            dimensions: product.dimensions,
+            status: product.status,
+            public: product.public,
+        }
+    }
 }

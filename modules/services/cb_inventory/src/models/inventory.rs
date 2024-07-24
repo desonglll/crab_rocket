@@ -50,3 +50,24 @@ pub struct PatchInventory {
     pub quantity: Option<i32>,
     pub last_updated: Option<NaiveDateTime>,
 }
+impl From<Inventory> for PostInventory {
+    fn from(inventory: Inventory) -> Self {
+        PostInventory {
+            product_id: inventory.product_id,
+            location: inventory.location,
+            quantity: inventory.quantity,
+            last_updated: inventory.last_updated,
+        }
+    }
+}
+
+impl From<Inventory> for PatchInventory {
+    fn from(inventory: Inventory) -> Self {
+        PatchInventory {
+            product_id: inventory.product_id,
+            location: inventory.location,
+            quantity: inventory.quantity,
+            last_updated: inventory.last_updated,
+        }
+    }
+}

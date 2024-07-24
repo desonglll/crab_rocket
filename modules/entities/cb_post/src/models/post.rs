@@ -131,15 +131,28 @@ impl PatchPost {
     }
 }
 
-impl Into<PatchPost> for PostPost {
-    fn into(self) -> PatchPost {
+impl From<Post> for PostPost {
+    fn from(post: Post) -> Self {
+        PostPost {
+            title: post.title,
+            body: post.body,
+            user_id: post.user_id,
+            status: post.status,
+            created_at: post.created_at,
+            updated_at: post.updated_at,
+        }
+    }
+}
+
+impl From<Post> for PatchPost {
+    fn from(post_post: Post) -> Self {
         PatchPost {
-            title: self.title,
-            body: self.body,
-            user_id: self.user_id,
-            status: self.status,
-            created_at: self.created_at,
-            updated_at: self.updated_at,
+            title: post_post.title,
+            body: post_post.body,
+            user_id: post_post.user_id,
+            status: post_post.status,
+            created_at: post_post.created_at,
+            updated_at: post_post.updated_at,
         }
     }
 }

@@ -178,7 +178,39 @@ impl PatchUser {
         }
     }
 }
+impl From<User> for PostUser {
+    fn from(user: User) -> Self {
+        PostUser {
+            username: user.username,
+            role_id: user.role_id,
+            created_at: user.created_at,
+            email: user.email,
+            password: user.password,
+            full_name: user.full_name,
+            avatar_url: user.avatar_url,
+            bio: user.bio,
+            updated_at: user.updated_at,
+            mobile_phone: user.mobile_phone,
+        }
+    }
+}
 
+impl From<User> for PatchUser {
+    fn from(user: User) -> Self {
+        PatchUser {
+            username: user.username,
+            role_id: user.role_id,
+            created_at: user.created_at,
+            email: user.email,
+            password: user.password,
+            full_name: user.full_name,
+            avatar_url: user.avatar_url,
+            bio: user.bio,
+            updated_at: user.updated_at,
+            mobile_phone: user.mobile_phone,
+        }
+    }
+}
 #[cfg(test)]
 mod test {
     #[test]

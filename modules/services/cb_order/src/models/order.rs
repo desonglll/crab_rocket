@@ -52,3 +52,24 @@ pub struct PatchOrder {
     pub total_amount: Option<f64>,
     pub status: Option<String>,
 }
+impl From<Order> for PostOrder {
+    fn from(order: Order) -> Self {
+        PostOrder {
+            customer_id: order.customer_id,
+            order_date: order.order_date,
+            total_amount: order.total_amount,
+            status: order.status,
+        }
+    }
+}
+
+impl From<Order> for PatchOrder {
+    fn from(order: Order) -> Self {
+        PatchOrder {
+            customer_id: order.customer_id,
+            order_date: order.order_date,
+            total_amount: order.total_amount,
+            status: order.status,
+        }
+    }
+}

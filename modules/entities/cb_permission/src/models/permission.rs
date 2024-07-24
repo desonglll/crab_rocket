@@ -166,3 +166,36 @@ impl PatchPermission {
         }
     }
 }
+impl From<Permission> for PostPermission {
+    fn from(permission: Permission) -> Self {
+        PostPermission {
+            permission_name: permission.permission_name,
+            permission_description: permission.permission_description,
+            resource: permission.resource,
+            action: permission.action,
+            is_active: permission.is_active,
+            created_at: permission.created_at,
+            updated_at: permission.updated_at,
+            created_by: permission.created_by,
+            updated_by: permission.updated_by,
+            notes: permission.notes,
+        }
+    }
+}
+
+impl From<Permission> for PatchPermission {
+    fn from(permission: Permission) -> Self {
+        PatchPermission {
+            permission_name: permission.permission_name,
+            permission_description: permission.permission_description,
+            resource: permission.resource,
+            action: permission.action,
+            is_active: permission.is_active,
+            created_at: permission.created_at,
+            updated_at: permission.updated_at,
+            created_by: permission.created_by,
+            updated_by: permission.updated_by,
+            notes: permission.notes,
+        }
+    }
+}

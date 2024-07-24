@@ -2,14 +2,14 @@ use crate::models::role::{PatchRole, PostRole, Role};
 use crate::models::role_filter::RoleFilter;
 use crab_rocket_schema::schema::role_table::dsl; //配合下面的 `posts.filter()`
 use crab_rocket_schema::schema::role_table::{self};
+use crab_rocket_schema::{establish_pg_connection, DbPool};
 use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
-use diesel::result::Error;
-use diesel::PgConnection;
 use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
+use rocket::State;
 
 pub struct RoleMapper {}
 
@@ -17,11 +17,12 @@ impl MapperCRUD for RoleMapper {
     type Item = Role;
     type PostItem = PostRole;
     type PatchItem = PatchRole;
-    type Param = RequestParam<RoleFilter>;
+    type Filter = RoleFilter;
     fn get_all(
-        conn: &mut PgConnection,
-        param: &RequestParam<RoleFilter>,
-    ) -> Result<Data<Vec<Role>>, Error> {
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
+    ) -> Result<Data<Vec<Role>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -42,7 +43,7 @@ impl MapperCRUD for RoleMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::role_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::role_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -62,37 +63,44 @@ impl MapperCRUD for RoleMapper {
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<Role>(conn)?;
-        let body = Data::new(data, pagination);
+            .load::<Role>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         println!("{body}");
         Ok(body)
     }
 
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Role, Error> {
-        // 配合 use crate::schema::posts::dsl::*;
-        dsl::role_table.filter(dsl::role_id.eq(pid)).first(conn)
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Role>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg"); // 配合 use crate::schema::posts::dsl::*;
+        let data: Role = dsl::role_table.filter(dsl::role_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn add_single(conn: &mut PgConnection, obj: &PostRole) -> Result<Role, Error> {
-        match diesel::insert_into(role_table::table)
+    fn add_single(
+        pool: &State<DbPool>,
+        obj: &PostRole,
+    ) -> Result<Data<Role>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data: Role = diesel::insert_into(role_table::table)
             .values(obj)
             .returning(Role::as_returning())
-            .get_result(conn)
-        {
-            Ok(inserted_role) => Ok(inserted_role),
-            Err(e) => {
-                println!("{e:?}");
-                Err(e)
-            }
-        }
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Role, Error> {
-        diesel::delete(dsl::role_table.filter(dsl::role_id.eq(pid))).get_result(conn)
+    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Role>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data: Role =
+            diesel::delete(dsl::role_table.filter(dsl::role_id.eq(pid))).get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn update_by_id(conn: &mut PgConnection, pid: i32, obj: &PatchRole) -> Result<Role, Error> {
-        diesel::update(dsl::role_table.filter(dsl::role_id.eq(pid)))
+    fn update_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+        obj: &PatchRole,
+    ) -> Result<Data<Role>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data: Role = diesel::update(dsl::role_table.filter(dsl::role_id.eq(pid)))
             .set((
                 role_table::role_name.eq(&obj.role_name),
                 role_table::description.eq(&obj.description),
@@ -100,12 +108,14 @@ impl MapperCRUD for RoleMapper {
                 role_table::created_at.eq(obj.created_at),
                 role_table::updated_at.eq(get_e8_time()),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<RoleFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Role>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -126,7 +136,7 @@ impl MapperCRUD for RoleMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::role_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::role_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -176,8 +186,8 @@ impl MapperCRUD for RoleMapper {
                 query = query.filter(dsl::updated_at.le(updated_at_max));
             }
         }
-        let data = query.load::<Role>(conn)?;
-        let body = Data::new(data, pagination);
+        let data = query.load::<Role>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
@@ -186,7 +196,7 @@ mod tests {
     use super::*;
     use crate::models::role::{PatchRole, PostRole};
     use crate::models::role_filter::RoleFilter;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::PaginationParam;
     use obj_traits::request::request_param::RequestParam;
     use rocket::State;
@@ -196,11 +206,11 @@ mod tests {
         let new_role = PostRole::demo();
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
-        let result = RoleMapper::add_single(&mut conn, &new_role);
+
+        let result = RoleMapper::add_single(pool, &new_role);
         assert!(result.is_ok());
         let inserted_role = result.unwrap();
-        assert_eq!(inserted_role.role_name, new_role.role_name);
+        assert_eq!(inserted_role.data.role_name, new_role.role_name);
     }
 
     #[test]
@@ -208,39 +218,38 @@ mod tests {
         let param = RequestParam::new(None, None);
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
-        let result = RoleMapper::get_all(&mut conn, &param);
+
+        let result = RoleMapper::get_all(pool, &param);
         assert!(result.is_ok());
         let data = result.unwrap();
-        assert!(data.data().len() > 0);
+        assert!(data.data.len() > 0);
     }
 
     #[test]
     fn test_get_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
-        let result = RoleMapper::get_by_id(&mut conn, 2);
+
+        let result = RoleMapper::get_by_id(pool, 2);
         assert!(result.is_ok());
         let role = result.unwrap();
-        assert_eq!(role.role_id, 2);
+        assert_eq!(role.data.role_id, 2);
     }
 
     #[test]
     fn test_delete_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
-        let new_role = PostRole::new("DeleteUser".to_owned(), Some(String::new()), None);
-        let inserted_role =
-            RoleMapper::add_single(&mut conn, &new_role).expect("Failed to insert role");
 
-        let delete_result = RoleMapper::delete_by_id(&mut conn, inserted_role.role_id);
+        let new_role = PostRole::new("DeleteUser".to_owned(), Some(String::new()), None);
+        let inserted_role = RoleMapper::add_single(pool, &new_role).expect("Failed to insert role");
+
+        let delete_result = RoleMapper::delete_by_id(pool, inserted_role.data.role_id);
         assert!(delete_result.is_ok());
         let deleted_role = delete_result.unwrap();
-        assert_eq!(deleted_role.role_id, inserted_role.role_id);
+        assert_eq!(deleted_role.data.role_id, inserted_role.data.role_id);
 
-        let get_result = RoleMapper::get_by_id(&mut conn, inserted_role.role_id);
+        let get_result = RoleMapper::get_by_id(pool, inserted_role.data.role_id);
         assert!(get_result.is_err());
     }
 
@@ -248,23 +257,22 @@ mod tests {
     fn test_update_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
+
         let new_role = PostRole::new("UpdatedUser".to_owned(), None, None);
-        let inserted_role =
-            RoleMapper::add_single(&mut conn, &new_role).expect("Failed to insert role");
+        let inserted_role = RoleMapper::add_single(pool, &new_role).expect("Failed to insert role");
 
         let updated_role = PatchRole {
             role_name: String::from("updated_role"),
             description: Some(String::from("Updated description")),
             permissions: Some(String::from("updated:permissions")),
-            created_at: inserted_role.created_at,
+            created_at: inserted_role.data.created_at,
             updated_at: Some(get_e8_time()),
         };
 
-        let result = RoleMapper::update_by_id(&mut conn, inserted_role.role_id, &updated_role);
+        let result = RoleMapper::update_by_id(pool, inserted_role.data.role_id, &updated_role);
         assert!(result.is_ok());
         let updated_role_result = result.unwrap();
-        assert_eq!(updated_role_result.role_name, updated_role.role_name);
+        assert_eq!(updated_role_result.data.role_name, updated_role.role_name);
     }
 
     #[test]
@@ -282,14 +290,15 @@ mod tests {
                 updated_at_min: None,
                 updated_at_max: None,
             }),
+            data: None,
         };
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
-        let result = RoleMapper::filter(&mut conn, &param);
+
+        let result = RoleMapper::filter(pool, &param);
         assert!(result.is_ok());
         let data = result.unwrap();
-        assert!(data.data().len() > 0);
+        assert!(data.data.len() > 0);
     }
 }

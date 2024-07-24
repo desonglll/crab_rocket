@@ -8,7 +8,7 @@ pub trait FollowControllerTrait<P> {
     fn delete_follow_specifically(
         pool: &State<DbPool>,
         obj: &PostFollow,
-    ) -> Result<ApiResponse<Follow>, Box<dyn std::error::Error>>;
+    ) -> Result<ApiResponse<Data<Follow>>, Box<dyn std::error::Error>>;
 
     fn get_followings_by_user_id(
         pool: &State<DbPool>,

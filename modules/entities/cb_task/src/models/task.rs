@@ -52,7 +52,26 @@ impl Display for Task {
         )
     }
 }
-
+impl From<Task> for PostTask {
+    fn from(task: Task) -> Self {
+        PostTask {
+            title: task.title,
+            content: task.content,
+            created_at: task.created_at,
+            updated_at: task.updated_at,
+            user_id: task.user_id,
+        }
+    }
+}
+impl From<Task> for PatchTask {
+    fn from(task: Task) -> Self {
+        PatchTask {
+            title: task.title,
+            content: task.content,
+            user_id: task.user_id,
+        }
+    }
+}
 pub struct TaskList(Vec<Task>);
 
 impl From<Vec<Task>> for TaskList {
@@ -68,7 +87,7 @@ impl Display for TaskList {
     }
 }
 
-#[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
+#[derive(Insertable, Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::task_table)]
 pub struct PostTask {
@@ -108,7 +127,7 @@ impl PostTask {
     }
 }
 
-#[derive(Insertable, Debug, Clone, Serialize, Deserialize)]
+#[derive(Insertable, Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::task_table)]
 pub struct PatchTask {

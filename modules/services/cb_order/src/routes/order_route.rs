@@ -6,7 +6,7 @@ use rocket::State;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::order_controller::OrderController;
-use crate::models::order::{PatchOrder, PostOrder};
+use crate::models::order::Order;
 use crate::models::order_filter::OrderFilter;
 
 #[get("/order?<limit>&<offset>")]
@@ -31,8 +31,8 @@ pub fn get_orders(
 
 #[post("/order/filter", data = "<param>")]
 pub fn filter_orders(
+    param: Option<Json<RequestParam<Order, OrderFilter>>>,
     pool: &State<DbPool>,
-    param: Option<Json<RequestParam<OrderFilter>>>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
     let param = param.unwrap_or(Json(RequestParam::default()));
@@ -43,40 +43,53 @@ pub fn filter_orders(
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[get("/order/<id>")]
-pub fn get_order_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
+#[post("/order/<id>", data = "<param>")]
+pub fn get_order_by_id(
+    param: Option<Json<RequestParam<Order, OrderFilter>>>,
+    pool: &State<DbPool>,
+    id: i32,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default()));
+    let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count(pool);
-    let resp = OrderController::get_by_id(pool, id).unwrap();
+    let resp = OrderController::get_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/order", data = "<order>")]
+#[post("/order", data = "<param>")]
 pub fn insert_single_order(
     pool: &State<DbPool>,
-    order: Json<PostOrder>,
+    param: Option<Json<RequestParam<Order, OrderFilter>>>,
 ) -> Json<serde_json::Value> {
-    let mut obj: PostOrder = order.into_inner();
-
-    let resp = OrderController::add_single(pool, &mut obj).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = OrderController::add_single(pool, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[delete("/order/<id>")]
-pub fn delete_order_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
-    let resp = OrderController::delete_by_id(pool, id).unwrap();
+#[delete("/order/<id>", data = "<param>")]
+pub fn delete_order_by_id(
+    pool: &State<DbPool>,
+    id: i32,
+    param: Option<Json<RequestParam<Order, OrderFilter>>>,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let resp = OrderController::delete_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[patch("/order/<id>", data = "<task>")]
+#[patch("/order/<id>", data = "<param>")]
 pub fn update_order_by_id(
     pool: &State<DbPool>,
     id: i32,
-    task: Json<PatchOrder>,
+    param: Option<Json<RequestParam<Order, OrderFilter>>>,
 ) -> Json<serde_json::Value> {
-    let resp = OrderController::update_by_id(pool, id, &task).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = OrderController::update_by_id(pool, id, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

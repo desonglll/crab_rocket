@@ -2,13 +2,14 @@ use crate::models::{
     permission::{PatchPermission, Permission, PostPermission},
     permission_filter::PermissionFilter,
 };
-use crab_rocket_schema::schema::permission_table::dsl;
+use crab_rocket_schema::{establish_pg_connection, schema::permission_table::dsl, DbPool};
 use diesel::{prelude::*, result::Error};
 use obj_traits::{
     mapper::mapper_crud::MapperCRUD,
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
+use rocket::State;
 
 pub struct PermissionMapper {}
 
@@ -16,11 +17,12 @@ impl MapperCRUD for PermissionMapper {
     type Item = Permission;
     type PostItem = PostPermission;
     type PatchItem = PatchPermission;
-    type Param = RequestParam<PermissionFilter>;
+    type Filter = PermissionFilter;
     fn get_all(
-        conn: &mut PgConnection,
-        param: &RequestParam<PermissionFilter>,
-    ) -> Result<Data<Vec<Permission>>, Error> {
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
+    ) -> Result<Data<Vec<Permission>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -41,7 +43,7 @@ impl MapperCRUD for PermissionMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::permission_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::permission_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -61,41 +63,42 @@ impl MapperCRUD for PermissionMapper {
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<Permission>(conn)?;
-        let body = Data::new(data, pagination);
+            .load::<Permission>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         println!("{body}");
         Ok(body)
     }
 
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Permission, Error> {
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Permission>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 配合 use crate::schema::posts::dsl::*;
-        dsl::permission_table.filter(dsl::permission_id.eq(pid)).first(conn)
+        let data = dsl::permission_table.filter(dsl::permission_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn add_single(conn: &mut PgConnection, obj: &PostPermission) -> Result<Permission, Error> {
-        match diesel::insert_into(dsl::permission_table)
+    fn add_single(pool: &State<DbPool>, obj: &PostPermission) -> Result<Data<Permission>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::insert_into(dsl::permission_table)
             .values(obj)
             .returning(Permission::as_returning())
-            .get_result(conn)
-        {
-            Ok(inserted_role) => Ok(inserted_role),
-            Err(e) => {
-                println!("{e:?}");
-                Err(e)
-            }
-        }
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Permission, Error> {
-        diesel::delete(dsl::permission_table.filter(dsl::permission_id.eq(pid))).get_result(conn)
+    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Permission>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::delete(dsl::permission_table.filter(dsl::permission_id.eq(pid)))
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn update_by_id(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         pid: i32,
         obj: &PatchPermission,
-    ) -> Result<Permission, Error> {
-        diesel::update(dsl::permission_table.filter(dsl::permission_id.eq(pid)))
+    ) -> Result<Data<Permission>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::update(dsl::permission_table.filter(dsl::permission_id.eq(pid)))
             .set((
                 dsl::permission_name.eq(obj.permission_name.clone()), // 確保 PatchPermission 中的方法與這裡的字段名稱匹配
                 dsl::permission_description.eq(obj.permission_description.clone()),
@@ -107,12 +110,14 @@ impl MapperCRUD for PermissionMapper {
                 dsl::created_at.eq(obj.created_at),
                 dsl::updated_at.eq(obj.updated_at),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<PermissionFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Permission>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -133,7 +138,7 @@ impl MapperCRUD for PermissionMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::permission_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::permission_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -197,103 +202,100 @@ impl MapperCRUD for PermissionMapper {
                 query = query.filter(dsl::updated_at.le(updated_at_max));
             }
         }
-        let data = query.load::<Permission>(conn)?;
-        let body = Data::new(data, pagination);
+        let data = query.load::<Permission>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use rocket::State;
 
     #[test]
     fn test_get_all() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let param = RequestParam::demo();
-        let result = PermissionMapper::get_all(&mut conn, &param);
+        let result = PermissionMapper::get_all(pool, &param);
         assert!(result.is_ok());
         let data = result.unwrap();
-        assert!(data.data().len() > 0); // Ensure there's data or at least an empty vector
+        assert!(data.data.len() > 0); // Ensure there's data or at least an empty vector
     }
     #[test]
     fn test_get_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
-        let permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
-        let result = PermissionMapper::get_by_id(&mut conn, permission.permission_id);
+        let permission = PermissionMapper::add_single(pool, &new_permission).unwrap();
+        let result = PermissionMapper::get_by_id(pool, permission.data.permission_id);
         assert!(result.is_ok());
         let fetched_permission = result.unwrap();
-        assert_eq!(fetched_permission.permission_id, permission.permission_id);
+        assert_eq!(fetched_permission.data.permission_id, permission.data.permission_id);
     }
     #[test]
     fn test_add_single() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
-        let result = PermissionMapper::add_single(&mut conn, &new_permission);
+        let result = PermissionMapper::add_single(pool, &new_permission);
         assert!(result.is_ok());
         let inserted_permission = result.unwrap();
-        assert_eq!(inserted_permission.permission_name, new_permission.permission_name);
+        assert_eq!(inserted_permission.data.permission_name, new_permission.permission_name);
     }
     #[test]
     fn test_delete_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
-        let inserted_permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
-        let result = PermissionMapper::delete_by_id(&mut conn, inserted_permission.permission_id);
+        let inserted_permission = PermissionMapper::add_single(pool, &new_permission).unwrap();
+        let result = PermissionMapper::delete_by_id(pool, inserted_permission.data.permission_id);
         assert!(result.is_ok());
         let deleted_permission = result.unwrap();
-        assert_eq!(deleted_permission.permission_id, inserted_permission.permission_id);
+        assert_eq!(deleted_permission.data.permission_id, inserted_permission.data.permission_id);
     }
     #[test]
     fn test_update_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let new_permission = PostPermission::demo();
-        let inserted_permission = PermissionMapper::add_single(&mut conn, &new_permission).unwrap();
+        let inserted_permission = PermissionMapper::add_single(pool, &new_permission).unwrap();
         // Create a PatchPermission manually
         let updated_permission = PatchPermission {
             permission_name: "updated_name".to_string(),
-            permission_description: inserted_permission.permission_description.clone(),
-            resource: inserted_permission.resource.clone(),
-            action: inserted_permission.action.clone(),
-            is_active: inserted_permission.is_active,
-            created_at: inserted_permission.created_at,
-            updated_at: inserted_permission.updated_at,
-            created_by: inserted_permission.created_by.clone(),
-            updated_by: inserted_permission.updated_by.clone(),
-            notes: inserted_permission.notes.clone(),
+            permission_description: inserted_permission.data.permission_description.clone(),
+            resource: inserted_permission.data.resource.clone(),
+            action: inserted_permission.data.action.clone(),
+            is_active: inserted_permission.data.is_active,
+            created_at: inserted_permission.data.created_at,
+            updated_at: inserted_permission.data.updated_at,
+            created_by: inserted_permission.data.created_by.clone(),
+            updated_by: inserted_permission.data.updated_by.clone(),
+            notes: inserted_permission.data.notes.clone(),
         };
 
         let result = PermissionMapper::update_by_id(
-            &mut conn,
-            inserted_permission.permission_id,
+            pool,
+            inserted_permission.data.permission_id,
             &updated_permission,
         );
         assert!(result.is_ok());
         let updated_permission_result = result.unwrap();
-        assert_eq!(updated_permission_result.permission_name, updated_permission.permission_name);
+        assert_eq!(
+            updated_permission_result.data.permission_name,
+            updated_permission.permission_name
+        );
     }
 
     #[test]
     fn test_filter() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        let mut conn = establish_pg_connection(pool).expect("Failed to establish connection");
         let param = RequestParam::demo();
-        let result = PermissionMapper::filter(&mut conn, &param);
+        let result = PermissionMapper::filter(pool, &param);
         assert!(result.is_ok());
         let data = result.unwrap();
-        assert!(data.data().len() >= 1); // Ensure at least one record matches the filter
+        assert!(data.data.len() >= 1); // Ensure at least one record matches the filter
     }
 }

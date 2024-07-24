@@ -1,21 +1,15 @@
 use crate::mappers::user_mapper::UserMapper;
 use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
-use crab_rocket_schema::{establish_pg_connection, DbPool};
-use obj_traits::request::request_param::RequestParam;
-use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::{
-    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
-    service_update_by_id, ServiceCRUD,
-};
+use crab_rocket_schema::DbPool;
+use obj_traits::service::service_crud::ServiceCRUD;
 use rocket::State;
 use std::error::Error;
 
 pub struct UserService {}
 impl UserService {
     pub fn get_by_username(pool: &State<DbPool>, username: String) -> Result<User, Box<dyn Error>> {
-        let mut conn = establish_pg_connection(pool).expect("Error establish_pg_connection");
-        match UserMapper::get_by_username(&mut conn, username) {
+        match UserMapper::get_by_username(pool, username) {
             Ok(user) => Ok(user),
             Err(err) => Err(Box::new(err)),
         }
@@ -26,38 +20,8 @@ impl ServiceCRUD for UserService {
     type Item = User;
     type PostItem = PostUser;
     type PatchItem = PatchUser;
-    type Param = RequestParam<UserFilter>;
-    fn get_all(
-        pool: &State<DbPool>,
-        param: &RequestParam<UserFilter>,
-    ) -> Result<Data<Vec<User>>, Box<dyn Error>> {
-        service_get_all::<User, UserMapper, UserFilter>(pool, param)
-    }
-    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<User, Box<dyn Error>> {
-        service_get_by_id::<User, UserMapper>(pool, pid)
-    }
-
-    fn add_single(pool: &State<DbPool>, obj: &PostUser) -> Result<User, Box<dyn Error>> {
-        service_add_single::<User, UserMapper, PostUser>(pool, obj)
-    }
-
-    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<User, Box<dyn Error>> {
-        service_delete_by_id::<User, UserMapper>(pool, pid)
-    }
-
-    fn update_by_id(
-        pool: &State<DbPool>,
-        pid: i32,
-        obj: &PatchUser,
-    ) -> Result<User, Box<dyn Error>> {
-        service_update_by_id::<User, UserMapper, PatchUser>(pool, pid, obj)
-    }
-    fn filter(
-        pool: &State<DbPool>,
-        param: &RequestParam<UserFilter>,
-    ) -> Result<Data<Vec<User>>, Box<dyn std::error::Error>> {
-        service_filter::<User, UserMapper, UserFilter>(pool, param)
-    }
+    type Filter = UserFilter;
+    type Mapper = UserMapper;
 }
 
 #[cfg(test)]

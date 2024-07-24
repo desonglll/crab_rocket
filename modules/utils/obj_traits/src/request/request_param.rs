@@ -13,25 +13,28 @@ use super::pagination_request_param::PaginationParam;
 /// ```
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 #[serde(crate = "rocket::serde")]
-pub struct RequestParam<FilterParamGeneric> {
+pub struct RequestParam<Obj: Default, FilterParamGeneric> {
     pub auth: Option<AuthParam>,
     pub pagination: Option<PaginationParam>,
     pub filter: Option<FilterParamGeneric>,
+    pub data: Option<Obj>,
 }
 
-impl<T> RequestParam<T> {
-    pub fn new(pagination: Option<PaginationParam>, filter: Option<T>) -> Self {
+impl<T: Default, U> RequestParam<T, U> {
+    pub fn new(pagination: Option<PaginationParam>, filter: Option<U>) -> Self {
         if pagination.is_none() {
             Self {
                 auth: Some(AuthParam::new()),
                 pagination: Some(PaginationParam::default()),
                 filter,
+                data: Some(T::default()),
             }
         } else {
             Self {
                 auth: Some(AuthParam::new()),
                 pagination,
                 filter,
+                data: Some(T::default()),
             }
         }
     }
@@ -41,15 +44,17 @@ impl<T> RequestParam<T> {
             auth: Some(AuthParam::new()),
             pagination: Some(PaginationParam::default()),
             filter: None,
+            data: Some(T::default()),
         }
     }
 }
-impl<T> Default for RequestParam<T> {
+impl<T: Default, U> Default for RequestParam<T, U> {
     fn default() -> Self {
         Self {
             auth: Some(AuthParam::new()),
             pagination: Some(PaginationParam::default()),
             filter: None,
+            data: Some(T::default()),
         }
     }
 }

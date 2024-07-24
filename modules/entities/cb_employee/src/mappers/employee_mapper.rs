@@ -4,12 +4,13 @@ use obj_traits::{
     request::{pagination_request_param::Pagination, request_param::RequestParam},
     response::data::Data,
 };
+use rocket::State;
 
 use crate::models::{
     employee::{Employee, PatchEmployee, PostEmployee},
     employee_filter::EmployeeFilter,
 };
-use crab_rocket_schema::schema::employee_table::dsl;
+use crab_rocket_schema::{establish_pg_connection, schema::employee_table::dsl, DbPool};
 use diesel::{prelude::*, result::Error};
 pub struct EmployeeMapper {}
 
@@ -17,11 +18,12 @@ impl MapperCRUD for EmployeeMapper {
     type Item = Employee;
     type PostItem = PostEmployee;
     type PatchItem = PatchEmployee;
-    type Param = RequestParam<EmployeeFilter>;
+    type Filter = EmployeeFilter;
     fn get_all(
-        conn: &mut PgConnection,
-        param: &RequestParam<EmployeeFilter>,
-    ) -> Result<obj_traits::response::data::Data<Vec<Employee>>, diesel::result::Error> {
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
+    ) -> Result<Data<Vec<Employee>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -42,7 +44,7 @@ impl MapperCRUD for EmployeeMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::employee_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::employee_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -62,28 +64,36 @@ impl MapperCRUD for EmployeeMapper {
             .order(dsl::last_update.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<Employee>(conn)?;
-        let body = Data::new(data, pagination);
+            .load::<Employee>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Employee, Error> {
-        dsl::employee_table.filter(dsl::employee_id.eq(pid)).first(conn)
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Employee>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = dsl::employee_table.filter(dsl::employee_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
-    fn add_single(conn: &mut PgConnection, obj: &PostEmployee) -> Result<Employee, Error> {
-        diesel::insert_into(dsl::employee_table)
+    fn add_single(pool: &State<DbPool>, obj: &PostEmployee) -> Result<Data<Employee>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::insert_into(dsl::employee_table)
             .values(obj)
             .returning(Employee::as_returning())
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Employee, Error> {
-        diesel::delete(dsl::employee_table.filter(dsl::employee_id.eq(pid))).get_result(conn)
+    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Employee>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::delete(dsl::employee_table.filter(dsl::employee_id.eq(pid)))
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn update_by_id(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         pid: i32,
         obj: &PatchEmployee,
-    ) -> Result<Employee, Error> {
-        diesel::update(dsl::employee_table.filter(dsl::employee_id.eq(pid)))
+    ) -> Result<Data<Employee>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::update(dsl::employee_table.filter(dsl::employee_id.eq(pid)))
             .set((
                 dsl::first_name.eq(&obj.first_name),
                 dsl::last_name.eq(&obj.last_name),
@@ -106,12 +116,14 @@ impl MapperCRUD for EmployeeMapper {
                 dsl::role_name.eq(&obj.role_name),
                 dsl::role_id.eq(obj.role_id),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<EmployeeFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Employee>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -134,7 +146,7 @@ impl MapperCRUD for EmployeeMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::employee_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::employee_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -222,8 +234,8 @@ impl MapperCRUD for EmployeeMapper {
                 query = query.filter(dsl::role_id.eq(role_id));
             }
         }
-        let data = query.load::<Employee>(conn)?;
-        let body = Data::new(data, pagination);
+        let data = query.load::<Employee>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
@@ -234,7 +246,7 @@ mod test {
         employee::{PatchEmployee, PostEmployee},
         employee_filter::EmployeeFilter,
     };
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::{mapper::mapper_crud::MapperCRUD, request::request_param::RequestParam};
     use rocket::State;
 
@@ -264,12 +276,9 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match EmployeeMapper::add_single(&mut conn, &new_employee) {
-                Ok(inserted_employee) => println!("{:?}", inserted_employee),
-                Err(e) => eprintln!("Error inserting employee: {:?}", e),
-            },
-            Err(e) => eprintln!("Error establishing connection: {:?}", e),
+        match EmployeeMapper::add_single(pool, &new_employee) {
+            Ok(inserted_employee) => println!("{:?}", inserted_employee),
+            Err(e) => eprintln!("Error inserting employee: {:?}", e),
         }
     }
 
@@ -279,12 +288,9 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match EmployeeMapper::delete_by_id(&mut conn, employee_id) {
-                Ok(deleted_employee) => println!("{:?}", deleted_employee),
-                Err(e) => eprintln!("Error deleting employee: {:?}", e),
-            },
-            Err(e) => eprintln!("Error establishing connection: {:?}", e),
+        match EmployeeMapper::delete_by_id(pool, employee_id) {
+            Ok(deleted_employee) => println!("{:?}", deleted_employee),
+            Err(e) => eprintln!("Error deleting employee: {:?}", e),
         }
     }
 
@@ -300,12 +306,9 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match EmployeeMapper::get_all(&mut conn, &params) {
-                Ok(result) => println!("{:?}", result),
-                Err(e) => eprintln!("Error fetching employees: {:?}", e),
-            },
-            Err(e) => eprintln!("Error establishing connection: {:?}", e),
+        match EmployeeMapper::get_all(pool, &params) {
+            Ok(result) => println!("{:?}", result),
+            Err(e) => eprintln!("Error fetching employees: {:?}", e),
         }
     }
 
@@ -337,14 +340,9 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                match EmployeeMapper::update_by_id(&mut conn, employee_id, &updated_emp) {
-                    Ok(updated_employee) => println!("{:?}", updated_employee),
-                    Err(e) => eprintln!("Error updating employee: {:?}", e),
-                }
-            }
-            Err(e) => eprintln!("Error establishing connection: {:?}", e),
+        match EmployeeMapper::update_by_id(pool, employee_id, &updated_emp) {
+            Ok(updated_employee) => println!("{:?}", updated_employee),
+            Err(e) => eprintln!("Error updating employee: {:?}", e),
         }
     }
 
@@ -361,12 +359,9 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match EmployeeMapper::filter(&mut conn, &params) {
-                Ok(result) => println!("{:?}", result),
-                Err(e) => eprintln!("Error filtering employees: {:?}", e),
-            },
-            Err(e) => eprintln!("Error establishing connection: {:?}", e),
+        match EmployeeMapper::filter(pool, &params) {
+            Ok(result) => println!("{:?}", result),
+            Err(e) => eprintln!("Error filtering employees: {:?}", e),
         }
     }
 }

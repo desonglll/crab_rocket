@@ -47,3 +47,24 @@ pub struct PatchCustomer {
     pub phone: Option<String>,
     pub address: Option<String>,
 }
+impl From<Customer> for PostCustomer {
+    fn from(customer: Customer) -> Self {
+        PostCustomer {
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone,
+            address: customer.address,
+        }
+    }
+}
+
+impl From<Customer> for PatchCustomer {
+    fn from(customer: Customer) -> Self {
+        PatchCustomer {
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone,
+            address: customer.address,
+        }
+    }
+}

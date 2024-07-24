@@ -49,3 +49,24 @@ pub struct PatchShipment {
     pub delivery_address: Option<String>,
     pub status: Option<String>,
 }
+impl From<Shipment> for PostShipment {
+    fn from(shipment: Shipment) -> Self {
+        PostShipment {
+            order_id: shipment.order_id,
+            shipment_date: shipment.shipment_date,
+            delivery_address: shipment.delivery_address,
+            status: shipment.status,
+        }
+    }
+}
+
+impl From<Shipment> for PatchShipment {
+    fn from(shipment: Shipment) -> Self {
+        PatchShipment {
+            order_id: shipment.order_id,
+            shipment_date: shipment.shipment_date,
+            delivery_address: shipment.delivery_address,
+            status: shipment.status,
+        }
+    }
+}

@@ -6,7 +6,7 @@ use rocket::State;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::task_controller::TaskController;
-use crate::models::task::{PatchTask, PostTask};
+use crate::models::task::Task;
 use crate::models::task_filter::TaskFilter;
 
 #[get("/task?<limit>&<offset>")]
@@ -31,7 +31,7 @@ pub fn get_tasks(
 
 #[post("/task/filter", data = "<param>")]
 pub fn filter_tasks(
-    param: Option<Json<RequestParam<TaskFilter>>>,
+    param: Option<Json<RequestParam<Task, TaskFilter>>>,
     pool: &State<DbPool>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
@@ -43,37 +43,53 @@ pub fn filter_tasks(
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[get("/task/<id>")]
-pub fn get_task_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
+#[post("/task/<id>", data = "<param>")]
+pub fn get_task_by_id(
+    param: Option<Json<RequestParam<Task, TaskFilter>>>,
+    pool: &State<DbPool>,
+    id: i32,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default()));
+    let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count(pool);
-    let resp = TaskController::get_by_id(pool, id).unwrap();
+    let resp = TaskController::get_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/task", data = "<task>")]
-pub fn insert_single_task(pool: &State<DbPool>, task: Json<PostTask>) -> Json<serde_json::Value> {
-    let mut obj: PostTask = task.into_inner();
-
-    let resp = TaskController::add_single(pool, &mut obj).unwrap();
+#[post("/task", data = "<param>")]
+pub fn insert_single_task(
+    pool: &State<DbPool>,
+    param: Option<Json<RequestParam<Task, TaskFilter>>>,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = TaskController::add_single(pool, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[delete("/task/<id>")]
-pub fn delete_task_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
-    let resp = TaskController::delete_by_id(pool, id).unwrap();
+#[delete("/task/<id>", data = "<param>")]
+pub fn delete_task_by_id(
+    pool: &State<DbPool>,
+    id: i32,
+    param: Option<Json<RequestParam<Task, TaskFilter>>>,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let resp = TaskController::delete_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[patch("/task/<id>", data = "<task>")]
+#[patch("/task/<id>", data = "<param>")]
 pub fn update_task_by_id(
     pool: &State<DbPool>,
     id: i32,
-    task: Json<PatchTask>,
+    param: Option<Json<RequestParam<Task, TaskFilter>>>,
 ) -> Json<serde_json::Value> {
-    let resp = TaskController::update_by_id(pool, id, &task).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = TaskController::update_by_id(pool, id, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

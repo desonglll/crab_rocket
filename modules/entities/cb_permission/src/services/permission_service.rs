@@ -1,15 +1,8 @@
 use crate::mappers::permission_mapper::PermissionMapper;
 use crate::models::permission::{PatchPermission, Permission, PostPermission};
 use crate::models::permission_filter::PermissionFilter;
-use crab_rocket_schema::DbPool;
-use obj_traits::request::request_param::RequestParam;
-use obj_traits::response::data::Data;
-use obj_traits::service::service_crud::{
-    service_add_single, service_delete_by_id, service_filter, service_get_all, service_get_by_id,
-    service_update_by_id, ServiceCRUD,
-};
-use rocket::State;
-use std::error::Error;
+
+use obj_traits::service::service_crud::ServiceCRUD;
 
 pub struct PermissionService {}
 
@@ -17,41 +10,8 @@ impl ServiceCRUD for PermissionService {
     type Item = Permission;
     type PostItem = PostPermission;
     type PatchItem = PatchPermission;
-    type Param = RequestParam<PermissionFilter>;
-    fn get_all(
-        pool: &State<DbPool>,
-        param: &RequestParam<PermissionFilter>,
-    ) -> Result<Data<Vec<Permission>>, Box<dyn Error>> {
-        service_get_all::<Permission, PermissionMapper, PermissionFilter>(pool, param)
-    }
-    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Permission, Box<dyn Error>> {
-        service_get_by_id::<Permission, PermissionMapper>(pool, pid)
-    }
-
-    fn add_single(
-        pool: &State<DbPool>,
-        obj: &PostPermission,
-    ) -> Result<Permission, Box<dyn Error>> {
-        service_add_single::<Permission, PermissionMapper, PostPermission>(pool, obj)
-    }
-
-    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Permission, Box<dyn Error>> {
-        service_delete_by_id::<Permission, PermissionMapper>(pool, pid)
-    }
-
-    fn update_by_id(
-        pool: &State<DbPool>,
-        pid: i32,
-        obj: &PatchPermission,
-    ) -> Result<Permission, Box<dyn Error>> {
-        service_update_by_id::<Permission, PermissionMapper, PatchPermission>(pool, pid, obj)
-    }
-    fn filter(
-        pool: &State<DbPool>,
-        param: &RequestParam<PermissionFilter>,
-    ) -> Result<Data<Vec<Permission>>, Box<dyn std::error::Error>> {
-        service_filter::<Permission, PermissionMapper, PermissionFilter>(pool, param)
-    }
+    type Filter = PermissionFilter;
+    type Mapper = PermissionMapper;
 }
 
 #[cfg(test)]
@@ -70,7 +30,7 @@ mod test {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
         match PermissionService::add_single(pool, &permission) {
-            Ok(result) => println!("{result:?}"),
+            Ok(result) => println!("{result}"),
             Err(e) => println!("{e:?}"),
         }
     }

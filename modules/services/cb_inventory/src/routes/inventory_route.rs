@@ -6,7 +6,7 @@ use rocket::State;
 use rocket::{delete, get, http::Status, options, patch, post, serde::json::Json};
 
 use crate::controllers::inventory_controller::InventoryController;
-use crate::models::inventory::{PatchInventory, PostInventory};
+use crate::models::inventory::Inventory;
 use crate::models::inventory_filter::InventoryFilter;
 
 #[get("/inventory?<limit>&<offset>")]
@@ -31,8 +31,8 @@ pub fn get_inventorys(
 
 #[post("/inventory/filter", data = "<param>")]
 pub fn filter_inventorys(
+    param: Option<Json<RequestParam<Inventory, InventoryFilter>>>,
     pool: &State<DbPool>,
-    param: Option<Json<RequestParam<InventoryFilter>>>,
 ) -> Json<serde_json::Value> {
     println!("{:?}", param);
     let param = param.unwrap_or(Json(RequestParam::default()));
@@ -43,40 +43,53 @@ pub fn filter_inventorys(
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[get("/inventory/<id>")]
-pub fn get_inventory_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
+#[post("/inventory/<id>", data = "<param>")]
+pub fn get_inventory_by_id(
+    param: Option<Json<RequestParam<Inventory, InventoryFilter>>>,
+    pool: &State<DbPool>,
+    id: i32,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default()));
+    let param = param.into_inner();
     crab_rocket_schema::update_reload::update_reload_count(pool);
-    let resp = InventoryController::get_by_id(pool, id).unwrap();
+    let resp = InventoryController::get_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[post("/inventory", data = "<inventory>")]
+#[post("/inventory", data = "<param>")]
 pub fn insert_single_inventory(
     pool: &State<DbPool>,
-    inventory: Json<PostInventory>,
+    param: Option<Json<RequestParam<Inventory, InventoryFilter>>>,
 ) -> Json<serde_json::Value> {
-    let mut obj: PostInventory = inventory.into_inner();
-
-    let resp = InventoryController::add_single(pool, &mut obj).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = InventoryController::add_single(pool, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[delete("/inventory/<id>")]
-pub fn delete_inventory_by_id(pool: &State<DbPool>, id: i32) -> Json<serde_json::Value> {
-    let resp = InventoryController::delete_by_id(pool, id).unwrap();
+#[delete("/inventory/<id>", data = "<param>")]
+pub fn delete_inventory_by_id(
+    pool: &State<DbPool>,
+    id: i32,
+    param: Option<Json<RequestParam<Inventory, InventoryFilter>>>,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let resp = InventoryController::delete_by_id(pool, id, &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[patch("/inventory/<id>", data = "<task>")]
+#[patch("/inventory/<id>", data = "<param>")]
 pub fn update_inventory_by_id(
     pool: &State<DbPool>,
     id: i32,
-    task: Json<PatchInventory>,
+    param: Option<Json<RequestParam<Inventory, InventoryFilter>>>,
 ) -> Json<serde_json::Value> {
-    let resp = InventoryController::update_by_id(pool, id, &task).unwrap();
+    let param = param.unwrap_or(Json(RequestParam::default())).into_inner();
+    let data = param.data.clone().unwrap();
+    let resp = InventoryController::update_by_id(pool, id, &mut data.into(), &param).unwrap();
     let json_value = serde_json::to_value(&resp).unwrap();
     Json(serde_json::from_value(json_value).unwrap())
 }

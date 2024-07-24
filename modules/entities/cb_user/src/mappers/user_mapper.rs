@@ -2,6 +2,7 @@ use crate::models::user::{PatchUser, PostUser, User};
 use crate::models::user_filter::UserFilter;
 use crab_rocket_schema::schema::user_table::dsl;
 use crab_rocket_schema::schema::user_table::{self};
+use crab_rocket_schema::{establish_pg_connection, DbPool};
 use crab_rocket_utils::time::get_e8_time;
 use diesel::prelude::*;
 use diesel::result::Error;
@@ -9,6 +10,7 @@ use obj_traits::mapper::mapper_crud::MapperCRUD;
 use obj_traits::request::pagination_request_param::Pagination;
 use obj_traits::request::request_param::RequestParam;
 use obj_traits::response::data::Data;
+use rocket::State;
 
 pub struct UserMapper {}
 
@@ -16,11 +18,12 @@ impl MapperCRUD for UserMapper {
     type Item = User;
     type PostItem = PostUser;
     type PatchItem = PatchUser;
-    type Param = RequestParam<UserFilter>;
+    type Filter = UserFilter;
     fn get_all(
-        conn: &mut PgConnection,
-        param: &RequestParam<UserFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<User>>, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -41,7 +44,7 @@ impl MapperCRUD for UserMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::user_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::user_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -61,24 +64,41 @@ impl MapperCRUD for UserMapper {
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<User>(conn)?;
-        let body = Data::new(data, pagination);
+            .load::<User>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<User, Error> {
-        dsl::user_table.filter(dsl::user_id.eq(pid)).first(conn)
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<User>, diesel::result::Error> {
+        let mut conn: diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<PgConnection>,
+        > = establish_pg_connection(pool).expect("msg");
+        let data: User = dsl::user_table.filter(dsl::user_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
-    fn add_single(conn: &mut PgConnection, obj: &PostUser) -> Result<User, Error> {
-        diesel::insert_into(dsl::user_table)
+    fn add_single(
+        pool: &State<DbPool>,
+        obj: &PostUser,
+    ) -> Result<Data<User>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::insert_into(dsl::user_table)
             .values(obj)
             .returning(User::as_returning())
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<User, Error> {
-        diesel::delete(dsl::user_table.filter(dsl::user_id.eq(pid))).get_result(conn)
+    fn delete_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<User>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data: User =
+            diesel::delete(dsl::user_table.filter(dsl::user_id.eq(pid))).get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
-    fn update_by_id(conn: &mut PgConnection, pid: i32, obj: &PatchUser) -> Result<User, Error> {
-        diesel::update(dsl::user_table.filter(dsl::user_id.eq(pid)))
+    fn update_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+        obj: &PatchUser,
+    ) -> Result<Data<User>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data: User = diesel::update(dsl::user_table.filter(dsl::user_id.eq(pid)))
             .set((
                 user_table::username.eq(&obj.username),
                 user_table::password.eq(&obj.password),
@@ -91,12 +111,14 @@ impl MapperCRUD for UserMapper {
                 user_table::mobile_phone.eq(&obj.mobile_phone),
                 user_table::created_at.eq(obj.created_at),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<UserFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<User>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -119,7 +141,7 @@ impl MapperCRUD for UserMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::user_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::user_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -172,14 +194,15 @@ impl MapperCRUD for UserMapper {
             }
         }
 
-        let data = query.load::<User>(conn)?;
-        let body = Data::new(data, pagination);
+        let data = query.load::<User>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
 impl UserMapper {
-    pub fn get_by_username(conn: &mut PgConnection, uname: String) -> Result<User, Error> {
-        dsl::user_table.filter(dsl::username.eq(uname)).first(conn)
+    pub fn get_by_username(pool: &State<DbPool>, uname: String) -> Result<User, Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        dsl::user_table.filter(dsl::username.eq(uname)).first(&mut conn)
     }
 }
 #[cfg(test)]
@@ -187,7 +210,7 @@ mod test {
     use super::*;
     use crate::mappers::user_mapper::UserMapper;
     use crate::models::user::{PatchUser, PostUser};
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::request::request_param::RequestParam;
     use rocket::State;
 
@@ -197,12 +220,9 @@ mod test {
         println!("{user:?}");
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match UserMapper::add_single(&mut conn, &user) {
-                Ok(result) => println!("{result}"),
-                Err(e) => println!("Error inserting user: {:?}", e),
-            },
-            Err(e) => println!("establish_pg_connection error: {:?}", e),
+        match UserMapper::add_single(pool, &user) {
+            Ok(result) => println!("{result}"),
+            Err(e) => println!("Error inserting user: {:?}", e),
         }
     }
 
@@ -212,12 +232,9 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match UserMapper::get_all(&mut conn, &param) {
-                Ok(res) => println!("{res}"),
-                Err(e) => println!("Error fetching all users: {:?}", e),
-            },
-            Err(e) => println!("establish_pg_connection error: {:?}", e),
+        match UserMapper::get_all(pool, &param) {
+            Ok(res) => println!("{res}"),
+            Err(e) => println!("Error fetching all users: {:?}", e),
         }
     }
 
@@ -227,18 +244,15 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match UserMapper::get_by_id(&mut conn, id) {
-                Ok(res) => println!("{res}"),
-                Err(e) => println!("Error fetching user by ID: {:?}", e),
-            },
-            Err(e) => println!("establish_pg_connection error: {:?}", e),
+        match UserMapper::get_by_id(pool, id) {
+            Ok(res) => println!("{res}"),
+            Err(e) => println!("Error fetching user by ID: {:?}", e),
         }
     }
 
     #[test]
     fn test_update_user_by_id() {
-        let id = 1; // Adjust this ID based on your test data
+        let id = 4; // Adjust this ID based on your test data
         let user = PatchUser {
             username: "updated_username".to_string(),
             role_id: Some(2),
@@ -254,27 +268,21 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match UserMapper::update_by_id(&mut conn, id, &user) {
-                Ok(res) => println!("{res}"),
-                Err(e) => println!("Error updating user by ID: {:?}", e),
-            },
-            Err(e) => println!("establish_pg_connection error: {:?}", e),
+        match UserMapper::update_by_id(pool, id, &user) {
+            Ok(res) => println!("{res}"),
+            Err(e) => println!("Error updating user by ID: {:?}", e),
         }
     }
 
     #[test]
     fn test_delete_user_by_id() {
-        let id = 1; // Adjust this ID based on your test data
+        let id = 5; // Adjust this ID based on your test data
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match UserMapper::delete_by_id(&mut conn, id) {
-                Ok(res) => println!("{res}"),
-                Err(e) => println!("Error deleting user by ID: {:?}", e),
-            },
-            Err(e) => println!("establish_pg_connection error: {:?}", e),
+        match UserMapper::delete_by_id(pool, id) {
+            Ok(res) => println!("{res}"),
+            Err(e) => println!("Error deleting user by ID: {:?}", e),
         }
     }
 
@@ -299,12 +307,9 @@ mod test {
 
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match UserMapper::filter(&mut conn, &param) {
-                Ok(res) => println!("{res}"),
-                Err(e) => println!("Error filtering users: {:?}", e),
-            },
-            Err(e) => println!("establish_pg_connection error: {:?}", e),
+        match UserMapper::filter(pool, &param) {
+            Ok(res) => println!("{res}"),
+            Err(e) => println!("Error filtering users: {:?}", e),
         }
     }
 }

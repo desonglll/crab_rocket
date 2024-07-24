@@ -1,5 +1,6 @@
-use crate::response::data::Data;
-use diesel::PgConnection;
+use crate::{request::request_param::RequestParam, response::data::Data};
+use crab_rocket_schema::DbPool;
+use rocket::State;
 
 /// ## Construct
 /// T is for the fully fields object.
@@ -8,28 +9,31 @@ use diesel::PgConnection;
 ///
 /// V is for the updated object, typically for no id.
 pub trait MapperCRUD {
-    type Item;
+    type Item: Default;
     type PostItem;
     type PatchItem;
-    type Param;
+    type Filter;
     fn get_all(
-        conn: &mut PgConnection,
-        param: &Self::Param,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Self::Item>>, diesel::result::Error>;
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Self::Item, diesel::result::Error>;
+    fn get_by_id(pool: &State<DbPool>, pid: i32)
+        -> Result<Data<Self::Item>, diesel::result::Error>;
     fn add_single(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         obj: &Self::PostItem,
-    ) -> Result<Self::Item, diesel::result::Error>;
-    fn delete_by_id(conn: &mut PgConnection, pid: i32)
-        -> Result<Self::Item, diesel::result::Error>;
+    ) -> Result<Data<Self::Item>, diesel::result::Error>;
+    fn delete_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<Data<Self::Item>, diesel::result::Error>;
     fn update_by_id(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         pid: i32,
         obj: &Self::PatchItem,
-    ) -> Result<Self::Item, diesel::result::Error>;
+    ) -> Result<Data<Self::Item>, diesel::result::Error>;
     fn filter(
-        conn: &mut PgConnection,
-        param: &Self::Param,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Self::Item>>, diesel::result::Error>;
 }

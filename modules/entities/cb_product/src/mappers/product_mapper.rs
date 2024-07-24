@@ -1,28 +1,27 @@
+use crate::models::product::{PatchProduct, PostProduct, Product};
+use crate::models::product_filter::ProductFilter;
+use crab_rocket_schema::schema::product_table::dsl; //配合下面的 `products.filter()`
+use crab_rocket_schema::schema::product_table::{self};
+use crab_rocket_schema::{establish_pg_connection, DbPool};
 use crab_rocket_utils::time::get_e8_time;
-use obj_traits::{
-    mapper::mapper_crud::MapperCRUD,
-    request::{pagination_request_param::Pagination, request_param::RequestParam},
-    response::data::Data,
-};
-
-use crate::models::{
-    product::{PatchProduct, PostProduct, Product},
-    product_filter::ProductFilter,
-};
-use crab_rocket_schema::schema::product_table::dsl;
 use diesel::prelude::*;
+use obj_traits::mapper::mapper_crud::MapperCRUD;
+use obj_traits::request::pagination_request_param::Pagination;
+use obj_traits::request::request_param::RequestParam;
+use obj_traits::response::data::Data;
+use rocket::State;
 
 pub struct ProductMapper {}
-
 impl MapperCRUD for ProductMapper {
     type Item = Product;
     type PostItem = PostProduct;
     type PatchItem = PatchProduct;
-    type Param = RequestParam<ProductFilter>;
+    type Filter = ProductFilter;
     fn get_all(
-        conn: &mut diesel::PgConnection,
-        param: &Self::Param,
-    ) -> Result<obj_traits::response::data::Data<Vec<Self::Item>>, diesel::result::Error> {
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
+    ) -> Result<Data<Vec<Product>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -39,11 +38,10 @@ impl MapperCRUD for ProductMapper {
         // limit 始终为 per_page
         // 计算分页相关
         let pagination = param.pagination.unwrap_or_default().clone();
-
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::product_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::product_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -57,48 +55,53 @@ impl MapperCRUD for ProductMapper {
             Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
             Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
         );
-        // need to add macro QueryableByName to struct.
-        // let custom: Vec<Product> =
-        //     diesel::sql_query("SELECT * FROM product_table").load::<Product>(conn)?;
 
         // 分页查询
         let data = dsl::product_table
             .order(dsl::updated_at.desc())
             .limit(per_page as i64)
             .offset(((page - 1) * per_page) as i64)
-            .load::<Product>(conn)?;
-        let resp_body = Data::new(data, pagination);
-        Ok(resp_body)
+            .load::<Product>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
+        println!("Getting products successfully.");
+        Ok(body)
     }
-    fn get_by_id(conn: &mut PgConnection, pid: i32) -> Result<Product, diesel::result::Error> {
-        // 配合 use crate::schema::product_table::dsl::*;
-        dsl::product_table.filter(dsl::product_id.eq(pid)).first(conn)
+
+    fn get_by_id(pool: &State<DbPool>, pid: i32) -> Result<Data<Product>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = dsl::product_table.filter(product_table::product_id.eq(pid)).first(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn add_single(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         obj: &PostProduct,
-    ) -> Result<Product, diesel::result::Error> {
-        match diesel::insert_into(dsl::product_table)
+    ) -> Result<Data<Product>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::insert_into(product_table::table)
             .values(obj)
             .returning(Product::as_returning())
-            .get_result(conn)
-        {
-            Ok(inserted_product) => Ok(inserted_product),
-            Err(e) => Err(e),
-        }
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
-    fn delete_by_id(conn: &mut PgConnection, pid: i32) -> Result<Product, diesel::result::Error> {
-        diesel::delete(dsl::product_table.filter(dsl::product_id.eq(pid))).get_result(conn)
+    fn delete_by_id(
+        pool: &State<DbPool>,
+        pid: i32,
+    ) -> Result<Data<Product>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::delete(dsl::product_table.filter(product_table::product_id.eq(pid)))
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
 
     fn update_by_id(
-        conn: &mut PgConnection,
+        pool: &State<DbPool>,
         pid: i32,
         obj: &PatchProduct,
-    ) -> Result<Product, diesel::result::Error> {
-        diesel::update(dsl::product_table.filter(dsl::product_id.eq(pid)))
+    ) -> Result<Data<Product>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
+        let data = diesel::update(dsl::product_table.filter(dsl::product_id.eq(pid)))
             .set((
                 dsl::user_id.eq(obj.user_id),
                 dsl::name.eq(&obj.name),
@@ -116,12 +119,14 @@ impl MapperCRUD for ProductMapper {
                 dsl::status.eq(&obj.status),
                 dsl::public.eq(obj.public),
             ))
-            .get_result(conn)
+            .get_result(&mut conn)?;
+        Ok(Data::new(data, None))
     }
     fn filter(
-        conn: &mut PgConnection,
-        param: &RequestParam<ProductFilter>,
+        pool: &State<DbPool>,
+        param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<Data<Vec<Product>>, diesel::result::Error> {
+        let mut conn = establish_pg_connection(pool).expect("msg");
         // 当前页码（page）
         // 每页条目数（per_page）
         //
@@ -142,7 +147,7 @@ impl MapperCRUD for ProductMapper {
         let page = (pagination.offset.unwrap() / pagination.limit.unwrap()) + 1;
         let per_page = pagination.limit.unwrap();
         // 获取总记录数
-        let total_count = dsl::product_table.count().get_result::<i64>(conn)? as i32;
+        let total_count = dsl::product_table.count().get_result::<i64>(&mut conn)? as i32;
         // 计算总页数
         let total_pages = (total_count + per_page - 1) / per_page;
 
@@ -156,7 +161,15 @@ impl MapperCRUD for ProductMapper {
             Some(format!("?limit={}&offset={}", per_page, next_page_offset)),
             Some(format!("?limit={}&offset={}", per_page, previous_page_offset)),
         );
+
         let mut query = dsl::product_table.into_boxed();
+
+        // 分页查询
+        query = query
+            .order(dsl::created_at.desc())
+            .limit(per_page as i64)
+            .offset(((page - 1) * per_page) as i64);
+
         let filter = &param.filter;
         if let Some(f) = filter {
             // 篩選條件
@@ -260,235 +273,149 @@ impl MapperCRUD for ProductMapper {
                 query = query.filter(dsl::public.eq(public));
             }
         }
-        let data = query.load::<Product>(conn)?;
-        let body = Data::new(data, pagination);
+        let data = query.load::<Product>(&mut conn)?;
+        let body = Data::new(data, Some(pagination));
         Ok(body)
     }
 }
-
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
-    use crab_rocket_schema::{establish_pg_connection, establish_pool, DbPool};
+    use crab_rocket_schema::{establish_pool, DbPool};
     use obj_traits::request::pagination_request_param::{PaginationParam, PaginationParamTrait};
+    use obj_traits::request::request_param::RequestParam;
     use rocket::State;
-
     #[test]
-    fn test_fetch_all_product_table() {
-        let param = RequestParam::default();
+    fn test_get_all_products() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => match ProductMapper::get_all(&mut conn, &param) {
-                Ok(data) => {
-                    assert!(!data.data().is_empty(), "Product table should not be empty");
-                }
-                Err(e) => {
-                    panic!("Error fetching all products: {:?}", e);
-                }
-            },
-            Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
-            }
-        }
+
+        let param = RequestParam::new(Some(PaginationParam::demo()), None);
+
+        let result = ProductMapper::get_all(pool, &param);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        println!("{:#?}", data);
+        assert!(data.data.len() > 0); // Assuming there are products in the database
     }
 
     #[test]
-    fn test_get_by_id() {
+    fn test_add_single_product() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let pid = 2; // 假设ID为1的记录存在
-                match ProductMapper::get_by_id(&mut conn, pid) {
-                    Ok(data) => {
-                        assert_eq!(
-                            data.product_id, pid,
-                            "Fetched product ID should match requested ID"
-                        );
-                    }
-                    Err(diesel::result::Error::NotFound) => {
-                        panic!("Product with ID {} not found", pid);
-                    }
-                    Err(e) => {
-                        panic!("Error fetching product by ID: {:?}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
-            }
-        }
+
+        let product = PostProduct {
+            user_id: Some(4),
+            name: "Test Product".to_string(),
+            description: Some("This is a test product".to_string()),
+            sku: "TEST123a".to_string(),
+            image: Some("test_image.jpg".to_string()),
+            price: Some(100.0),
+            discount_price: Some(90.0),
+            is_discounted: Some(true),
+            is_valid: Some(true),
+            inventory: Some(10),
+            is_in_stock: Some(true),
+            created_at: Some(get_e8_time()),
+            updated_at: Some(get_e8_time()),
+            supplier_id: Some(4),
+            weight: Some(1.5),
+            dimensions: Some("10x10x10".to_string()),
+            status: Some("available".to_string()),
+            public: Some(true),
+        };
+
+        let result = ProductMapper::add_single(pool, &product);
+        assert!(result.is_ok());
+        let inserted_product = result.unwrap();
+        assert_eq!(inserted_product.data.name, "Test Product");
+    }
+    #[test]
+    fn test_get_product_by_id() {
+        let binding = establish_pool();
+        let pool = State::<DbPool>::from(&binding);
+
+        // Assuming a product with ID 1 exists in the database
+        let product_id = 1;
+        let result = ProductMapper::get_by_id(pool, product_id);
+        assert!(result.is_ok());
+        let product = result.unwrap();
+        assert_eq!(product.data.product_id, product_id);
     }
 
     #[test]
-    fn test_add_single() {
+    fn test_update_product_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let new_product = PostProduct {
-                    name: "Test Product".to_string(),
-                    description: Some("This is a test product".to_string()),
-                    sku: "TEST123".to_string(),
-                    image: Some("test_image.jpg".to_string()),
-                    price: Some(100.0),
-                    discount_price: Some(90.0),
-                    is_discounted: Some(true),
-                    is_valid: Some(true),
-                    inventory: Some(10),
-                    is_in_stock: Some(true),
-                    created_at: Some(get_e8_time()),
-                    updated_at: Some(get_e8_time()),
-                    supplier_id: Some(1),
-                    weight: Some(1.5),
-                    dimensions: Some("10x10x10".to_string()),
-                    status: Some("available".to_string()),
-                    public: Some(true),
-                };
-                match ProductMapper::add_single(&mut conn, &new_product) {
-                    Ok(data) => {
-                        assert_eq!(
-                            data.name, "Test Product",
-                            "Name should match the added product"
-                        );
-                    }
-                    Err(e) => {
-                        panic!("Error adding product: {:?}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
-            }
-        }
+
+        let patch_product = PatchProduct {
+            user_id: Some(4),
+            name: "Updated Product".to_string(),
+            description: Some("This is an updated product description".to_string()),
+            sku: "UPDATED123".to_string(),
+            image: Some("updated_image.jpg".to_string()),
+            price: Some(150.0),
+            discount_price: Some(140.0),
+            is_discounted: Some(true),
+            is_valid: Some(true),
+            inventory: Some(20),
+            is_in_stock: Some(true),
+            updated_at: Some(get_e8_time()),
+            created_at: Some(get_e8_time()),
+            supplier_id: Some(4),
+            weight: Some(2.0),
+            dimensions: Some("20x20x20".to_string()),
+            status: Some("updated".to_string()),
+            public: Some(false),
+        };
+
+        // Assuming a product with ID 1 exists in the database
+        let product_id = 1;
+        let result = ProductMapper::update_by_id(pool, product_id, &patch_product);
+        println!("{:#?}", result);
+        assert!(result.is_ok());
+        let updated_product = result.unwrap();
+        assert_eq!(updated_product.data.name, "Updated Product");
     }
 
     #[test]
-    fn test_update_by_id() {
+    fn test_delete_product_by_id() {
         let binding = establish_pool();
         let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let pid = 2; // 假设ID为1的记录存在
-                let updated_product = PatchProduct {
-                    user_id: Some(2),
-                    name: "Updated Product".to_string(),
-                    description: Some("This is an updated product description".to_string()),
-                    sku: "UPDATED123".to_string(),
-                    image: Some("updated_image.jpg".to_string()),
-                    price: Some(150.0),
-                    discount_price: Some(140.0),
-                    is_discounted: Some(true),
-                    is_valid: Some(true),
-                    inventory: Some(20),
-                    is_in_stock: Some(true),
-                    updated_at: Some(get_e8_time()),
-                    created_at: Some(get_e8_time()),
-                    supplier_id: Some(2),
-                    weight: Some(2.0),
-                    dimensions: Some("20x20x20".to_string()),
-                    status: Some("updated".to_string()),
-                    public: Some(false),
-                };
-                match ProductMapper::update_by_id(&mut conn, pid, &updated_product) {
-                    Ok(data) => {
-                        assert_eq!(data.name, "Updated Product", "Name should be updated");
-                    }
-                    Err(diesel::result::Error::NotFound) => {
-                        panic!("Product with ID {} not found for update", pid);
-                    }
-                    Err(e) => {
-                        panic!("Error updating product: {:?}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
-            }
-        }
-    }
 
-    #[test]
-    fn test_delete_by_id() {
-        let binding = establish_pool();
-        let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let pid = 1; // 假设ID为1的记录存在
-                match ProductMapper::delete_by_id(&mut conn, pid) {
-                    Ok(data) => {
-                        assert_eq!(
-                            data.product_id, pid,
-                            "Deleted product ID should match requested ID"
-                        );
-                    }
-                    Err(diesel::result::Error::NotFound) => {
-                        panic!("Product with ID {} not found for deletion", pid);
-                    }
-                    Err(e) => {
-                        panic!("Error deleting product: {:?}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
-            }
-        }
-    }
+        // Add a product to delete
+        let product = PostProduct {
+            user_id: Some(1),
+            name: "Updated Product".to_string(),
+            description: Some("This is an updated product description".to_string()),
+            sku: "UPDATED123".to_string(),
+            image: Some("updated_image.jpg".to_string()),
+            price: Some(150.0),
+            discount_price: Some(140.0),
+            is_discounted: Some(true),
+            is_valid: Some(true),
+            inventory: Some(20),
+            is_in_stock: Some(true),
+            updated_at: Some(get_e8_time()),
+            created_at: Some(get_e8_time()),
+            supplier_id: Some(2),
+            weight: Some(2.0),
+            dimensions: Some("20x20x20".to_string()),
+            status: Some("updated".to_string()),
+            public: Some(false),
+        };
+        let inserted_product =
+            ProductMapper::add_single(pool, &product).expect("Failed to insert product");
+        let product_id = inserted_product.data.product_id;
 
-    #[test]
-    fn test_filter() {
-        let binding = establish_pool();
-        let pool = State::<DbPool>::from(&binding);
-        match establish_pg_connection(pool) {
-            Ok(mut conn) => {
-                let param = RequestParam {
-                    auth: None,
-                    pagination: Some(PaginationParam::demo()),
-                    filter: Some(ProductFilter {
-                        product_id: Some(1),
-                        user_id: None,
-                        name: None,
-                        description: None,
-                        sku: None,
-                        image: None,
-                        price_min: None,
-                        price_max: None,
-                        discount_price_min: None,
-                        discount_price_max: None,
-                        is_discounted: None,
-                        is_valid: None,
-                        inventory_min: None,
-                        inventory_max: None,
-                        is_in_stock: None,
-                        created_at_min: None,
-                        created_at_max: None,
-                        updated_at_min: None,
-                        updated_at_max: None,
-                        supplier_id: None,
-                        weight_min: None,
-                        weight_max: None,
-                        dimensions: None,
-                        status: None,
-                        public: None,
-                    }),
-                };
-                match ProductMapper::filter(&mut conn, &param) {
-                    Ok(data) => {
-                        assert!(
-                            data.data().iter().all(|item| item.product_id == 1),
-                            "Filtered result should have product_id 1"
-                        );
-                    }
-                    Err(e) => {
-                        panic!("Error filtering products: {:?}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                panic!("Error establishing connection: {:?}", e);
-            }
-        }
+        // Delete the product
+        let result = ProductMapper::delete_by_id(pool, product_id);
+        assert!(result.is_ok());
+        let deleted_product = result.unwrap();
+        assert_eq!(deleted_product.data.product_id, product_id);
+
+        // Verify deletion
+        let result = ProductMapper::get_by_id(pool, product_id);
+        assert!(result.is_err());
     }
 }

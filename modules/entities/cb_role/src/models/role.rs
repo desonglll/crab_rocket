@@ -99,3 +99,23 @@ impl PatchRole {
         }
     }
 }
+impl From<Role> for PostRole {
+    fn from(role: Role) -> Self {
+        PostRole {
+            role_name: role.role_name,
+            description: role.description,
+            permissions: role.permissions,
+        }
+    }
+}
+impl From<Role> for PatchRole {
+    fn from(role: Role) -> Self {
+        PatchRole {
+            role_name: role.role_name,
+            description: role.description,
+            permissions: role.permissions,
+            created_at: role.created_at,
+            updated_at: role.updated_at,
+        }
+    }
+}

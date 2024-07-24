@@ -109,3 +109,26 @@ impl PatchCategory {
         }
     }
 }
+impl From<Category> for PostCategory {
+    fn from(category: Category) -> Self {
+        PostCategory {
+            name: category.name,
+            description: category.description,
+            parent_id: category.parent_id,
+            created_at: category.created_at,
+            updated_at: category.updated_at,
+        }
+    }
+}
+
+impl From<Category> for PatchCategory {
+    fn from(category: Category) -> Self {
+        PatchCategory {
+            name: category.name,
+            description: category.description,
+            parent_id: category.parent_id,
+            created_at: category.created_at,
+            updated_at: category.updated_at,
+        }
+    }
+}
