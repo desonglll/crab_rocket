@@ -15,10 +15,9 @@ use crab_rocket_schema::DbPool;
 use crate::controllers::file_controller::{
     self, download_file_controller, retrieve_file_controller,
 };
-use crate::models::file::File;
+use crate::mappers::file_mapper::retrieve_file_url_by_uuid;
 use crate::models::file_response::{FileDownloadResponse, FileRetrieveResponse};
 use crate::models::upload::{AvatarUpload, Upload};
-use crate::services::file_service::GetFile;
 
 #[post("/upload", data = "<upload>")]
 pub async fn upload(pool: &State<DbPool>, upload: Form<Upload<'_>>) -> Json<serde_json::Value> {
@@ -34,9 +33,10 @@ pub async fn upload(pool: &State<DbPool>, upload: Form<Upload<'_>>) -> Json<serd
         "message":message,
         "data":paths
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
+
 #[options("/upload")]
 pub fn options_upload() -> Status {
     Status::Ok
@@ -65,7 +65,7 @@ pub async fn upload_avatar(
     let mime_type: mime::Mime = mime_guess::from_path(Path::new(
         upload_data.file.raw_name().unwrap().dangerous_unsafe_unsanitized_raw().as_str(),
     ))
-    .first_or_octet_stream(); // 假设有文件名可以检查
+        .first_or_octet_stream(); // 假设有文件名可以检查
     println!("{:?}", upload_data.file.raw_name().unwrap().as_str());
     println!(
         "{:?}",
@@ -101,14 +101,14 @@ pub fn get_all_files(pool: &State<DbPool>) -> Json<serde_json::Value> {
         "message":message,
         "data":result
     }))
-    .unwrap();
+        .unwrap();
     Json(response)
 }
 
 /// ## 字节流下载文件
 #[get("/byte/stream/<uuid>")]
 pub async fn file_stream(pool: &State<DbPool>, uuid: Uuid) -> Option<ByteStream![Vec<u8>]> {
-    match File::retrieve_file_url_by_uuid(&pool, uuid) {
+    match retrieve_file_url_by_uuid(&pool, uuid) {
         Ok(path) => {
             let mut file = match rocket::tokio::fs::File::open(path).await {
                 Ok(f) => f,

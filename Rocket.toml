@@ -6,3 +6,8 @@ forms = 10485760000
 form = 10485760000
 file = 10485760000
 data-form = 10485760000
+[debug]
+log_level = "debug"
+
+[release]
+log_level = "critical"
