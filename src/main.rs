@@ -19,12 +19,15 @@ use services::services_routes;
 fn rocket() -> _ {
     // Clear environment variable before running.
     // env::remove_var("DATABASE_URL");
+
+    // Running preload.
+    crab_rocket_utils::run_preload();
+
     // Load env
     env_variables::load_env();
     dotenv().ok();
-    let pool = establish_pool();
 
-    crab_rocket_utils::run_preload();
+    let pool = establish_pool();
 
     let allowed_origins = AllowedOrigins::All;
     // You can also deserialize this
@@ -37,9 +40,9 @@ fn rocket() -> _ {
             Method::Put,
             Method::Delete,
         ]
-            .into_iter()
-            .map(From::from)
-            .collect(),
+        .into_iter()
+        .map(From::from)
+        .collect(),
         allowed_headers: AllowedHeaders::some(&[
             "Content-Type",
             "Authorization",
@@ -53,8 +56,8 @@ fn rocket() -> _ {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()
-        .unwrap();
+    .to_cors()
+    .unwrap();
 
     let mut routes = Vec::<Route>::new();
 

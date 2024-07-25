@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 // 添加这一行
 
-#[derive(Insertable, Serialize, Deserialize, Selectable, Debug, Queryable, Default)]
+#[derive(Insertable, Serialize, Deserialize, Selectable, Debug, Queryable, Default, Clone)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = crab_rocket_schema::schema::file_table)]
 pub struct File {

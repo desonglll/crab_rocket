@@ -1,12 +1,13 @@
 use std::path::Path;
 
 use mime_guess::mime;
-use rocket::{get, options, post, State};
+use obj_traits::request::request_param::RequestParam;
 use rocket::form::Form;
 use rocket::http::Status;
 use rocket::response::stream::ByteStream;
 use rocket::serde::json::Json;
 use rocket::tokio::io::AsyncReadExt;
+use rocket::{get, options, post, State};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -16,6 +17,8 @@ use crate::controllers::file_controller::{
     self, download_file_controller, retrieve_file_controller,
 };
 use crate::mappers::file_mapper::retrieve_file_url_by_uuid;
+use crate::models::file::File;
+use crate::models::file_filter::FileFilter;
 use crate::models::file_response::{FileDownloadResponse, FileRetrieveResponse};
 use crate::models::upload::{AvatarUpload, Upload};
 
@@ -26,15 +29,9 @@ pub async fn upload(pool: &State<DbPool>, upload: Form<Upload<'_>>) -> Json<serd
     // 如果 save 字段为 true，保存文件
     // 在这里处理上传的文件，例如将其保存到磁盘或进行其他操作
     // 例如：
-    let (code, message, paths) =
-        file_controller::insert_file_controller(pool, upload_data.file).await;
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":paths
-    }))
-        .unwrap();
-    Json(response)
+    let resp = file_controller::insert_file_controller(pool, upload_data.file).await.unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 #[options("/upload")]
@@ -65,7 +62,7 @@ pub async fn upload_avatar(
     let mime_type: mime::Mime = mime_guess::from_path(Path::new(
         upload_data.file.raw_name().unwrap().dangerous_unsafe_unsanitized_raw().as_str(),
     ))
-        .first_or_octet_stream(); // 假设有文件名可以检查
+    .first_or_octet_stream(); // 假设有文件名可以检查
     println!("{:?}", upload_data.file.raw_name().unwrap().as_str());
     println!(
         "{:?}",
@@ -81,28 +78,22 @@ pub async fn upload_avatar(
         }));
     }
 
-    // 如果 save 字段为 true，保存文件
-    let (code, message, paths) =
-        file_controller::insert_avatar_file_controller(pool, upload_data.file).await;
-    let response = serde_json::json!({
-        "code": code,
-        "message": message,
-        "data": paths
-    });
-
-    Json(response)
+    let resp =
+        file_controller::insert_avatar_file_controller(pool, upload_data.file).await.unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
-#[get("/files")]
-pub fn get_all_files(pool: &State<DbPool>) -> Json<serde_json::Value> {
-    let (code, message, result) = file_controller::get_all_files_controller(pool);
-    let response = serde_json::from_value(json!({
-        "code":code,
-        "message":message,
-        "data":result
-    }))
-        .unwrap();
-    Json(response)
+#[get("/files", data = "<param>")]
+pub fn get_all_files(
+    pool: &State<DbPool>,
+    param: Option<Json<RequestParam<File, FileFilter>>>,
+) -> Json<serde_json::Value> {
+    let param = param.unwrap_or(Json(RequestParam::default()));
+    let param = param.into_inner();
+    let resp = file_controller::get_all_files_controller(pool, &param).unwrap();
+    let json_value = serde_json::to_value(&resp).unwrap();
+    Json(serde_json::from_value(json_value).unwrap())
 }
 
 /// ## 字节流下载文件
