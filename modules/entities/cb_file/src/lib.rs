@@ -16,9 +16,9 @@ pub mod routes {
     pub mod bin_file_route;
     pub mod form_file_route;
 }
+
 pub mod services {
     pub mod file_service;
-    pub mod r#impl {
-        pub mod file_impl;
-    }
+    pub mod file_service_trait;
+    // pub mod image_service;
 }

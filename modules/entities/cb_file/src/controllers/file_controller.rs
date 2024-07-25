@@ -15,23 +15,24 @@ use crate::{
         file::File,
         file_response::{FileDownloadResponse, FileRetrieveResponse},
     },
-    services::file_service::GetFile,
 };
+use crate::services::file_service::FileService;
 
 pub async fn insert_file_controller(
     pool: &State<DbPool>,
     files: Vec<TempFile<'_>>,
 ) -> (i32, String, Vec<String>) {
-    match File::insert_file(pool, files).await {
+    match FileService::insert_file(pool, files).await {
         Ok(result) => (200, String::from("INSERT FILES OK"), result),
         Err(e) => (204, e.to_string(), Vec::new()),
     }
 }
+
 pub async fn insert_avatar_file_controller(
     pool: &State<DbPool>,
     file: TempFile<'_>,
 ) -> (i32, String, String) {
-    match File::insert_avatar_file(pool, file).await {
+    match FileService::insert_avatar_file(pool, file).await {
         Ok(result) => (200, String::from("INSERT FILES OK"), result),
         Err(e) => (204, e.to_string(), String::new()),
     }
@@ -41,7 +42,7 @@ pub async fn retrieve_file_controller(
     pool: &State<DbPool>,
     uuid: Uuid,
 ) -> Option<FileRetrieveResponse> {
-    match File::retrieve_file_url_by_uuid(pool, uuid) {
+    match FileService::retrieve_file_url_by_uuid(pool, uuid) {
         Ok(path) => {
             println!("File Path: {}", path);
             let named_file = rocket::fs::NamedFile::open(&path).await.ok()?;
@@ -66,11 +67,12 @@ pub async fn retrieve_file_controller(
         }
     }
 }
+
 pub async fn download_file_controller(
     pool: &State<DbPool>,
     uuid: Uuid,
 ) -> Option<models::file_response::FileDownloadResponse> {
-    match File::retrieve_file_url_by_uuid(pool, uuid) {
+    match FileService::retrieve_file_url_by_uuid(pool, uuid) {
         Ok(path) => {
             println!("File Path: {}", path);
             let file = rocket::fs::NamedFile::open(path.clone()).await.ok();
@@ -100,7 +102,7 @@ pub async fn download_file_controller(
 // }
 
 pub fn get_all_files_controller(pool: &State<DbPool>) -> (i32, String, Vec<File>) {
-    match File::get_all_files(pool) {
+    match FileService::get_all_files(pool) {
         Ok(all_files) => (200, String::from("GET ALL FILES OK"), all_files),
         Err(e) => (204, e.to_string(), Vec::new()),
     }
