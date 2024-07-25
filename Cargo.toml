@@ -25,6 +25,7 @@ auth = { path = "./modules/auth" }
 login = { path = "./modules/auth/login" }
 crab_rocket_utils = { path = "./modules/utils/cb_utils" }
 crab_rocket_schema = { path = "./modules/schemas/cb_schema" }
+# diesel_cli = "2.2.1"
 
 [profile.dev]
 opt-level = 0
