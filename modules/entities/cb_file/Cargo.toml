@@ -17,5 +17,6 @@ uuid = { version = "1.0", features = ["serde", "v4"] }
 mime_guess = { version = "2.0.5" }
 crab_rocket_schema = { path = "../../schemas/cb_schema" }
 crab_rocket_utils = { path = "../../utils/cb_utils" }
+obj_traits = { path = "../../utils/obj_traits" }
 image = "0.25.2"
 imageproc = "0.25.0"

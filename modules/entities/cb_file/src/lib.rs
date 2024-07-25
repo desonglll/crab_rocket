@@ -1,5 +1,6 @@
 pub mod models {
     pub mod file;
+    pub mod file_filter;
     pub mod file_response;
     pub mod upload;
 }
