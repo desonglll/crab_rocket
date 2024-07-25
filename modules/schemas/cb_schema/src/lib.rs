@@ -14,6 +14,7 @@ pub mod models;
 pub mod routes;
 pub mod schema;
 pub mod update_reload;
+
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 pub fn establish_pool() -> DbPool {
@@ -39,7 +40,7 @@ pub fn establish_pool() -> DbPool {
 pub fn establish_pg_connection(
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> Result<PooledConnection<ConnectionManager<PgConnection>>, r2d2::Error> {
-    println!("{}", "using pool".green());
+    println!("{}", "Using Database Pool".green());
     pool.get()
 }
 // pub fn establish_test_pg_connection() -> State<Pool<ConnectionManager<PgConnection>>> {

@@ -1,7 +1,8 @@
 use rocket::State;
+use rocket::yansi::Paint;
 
 use crab_rocket_schema::DbPool;
-use session::models::session::Session;
+use session::models::session::{Session};
 
 use crate::request::request_param::RequestParam;
 use crate::response::api_response::ApiResponse;
@@ -23,24 +24,31 @@ pub trait ControllerCRUD {
         pool: &State<DbPool>,
         param: &RequestParam<Self::Item, Self::Filter>,
     ) -> Result<ApiResponse<Data<Vec<Self::Item>>>, Box<dyn std::error::Error>> {
-        let session_id = param.auth.unwrap().session_id;
-        println!("Get Session ID: {}.", session_id);
-        let session = Session::get_session_by_id(pool, session_id);
-        match session {
-            Ok(existing_session) => {
-                println!("Session Exists.");
-                match existing_session.is_valid(pool) {
-                    Ok(_) => {
-                        println!("Session Valid.");
-                        match Self::Service::get_all(pool, param) {
-                            Ok(data) => Ok(ApiResponse::success(data)),
-                            Err(err) => Ok(ApiResponse::error(err)),
+        if let Some(auth) = param.auth {
+            let session_id = auth.session_id;
+            println!("Get Session ID: {}.", session_id);
+            let session = Session::get_session_by_id(pool, session_id);
+            match session {
+                Ok(existing_session) => {
+                    println!("Session Exists.");
+                    match existing_session.is_valid(pool) {
+                        Ok(_) => {
+                            println!("Session Valid.");
+                            match Self::Service::get_all(pool, param) {
+                                Ok(data) => Ok(ApiResponse::success(data)),
+                                Err(err) => Ok(ApiResponse::error(err)),
+                            }
                         }
+                        Err(e) => Ok(ApiResponse::error(Box::new(e))),
                     }
-                    Err(e) => Ok(ApiResponse::error(Box::new(e))),
+                }
+                Err(_) => {
+                    println!("{}", "Session Not Valid.".red());
+                    Ok(ApiResponse::new(4001, "Session Not Valid.".to_owned(), Data::default()))
                 }
             }
-            Err(_) => Ok(ApiResponse::new(4001, "Session Not Found".to_owned(), Data::default())),
+        } else {
+            Ok(ApiResponse::new(4003, "Fetch param.auth Error.".to_owned(), Data::default()))
         }
     }
 

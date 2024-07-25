@@ -2,7 +2,6 @@
 extern crate rocket;
 
 // use services::services_routes;
-use std::env;
 
 use dotenvy::dotenv;
 use rocket::{http::Method, Route};
@@ -19,7 +18,7 @@ use services::services_routes;
 #[launch]
 fn rocket() -> _ {
     // Clear environment variable before running.
-    env::remove_var("DATABASE_URL");
+    // env::remove_var("DATABASE_URL");
     // Load env
     env_variables::load_env();
     dotenv().ok();
@@ -38,9 +37,9 @@ fn rocket() -> _ {
             Method::Put,
             Method::Delete,
         ]
-        .into_iter()
-        .map(From::from)
-        .collect(),
+            .into_iter()
+            .map(From::from)
+            .collect(),
         allowed_headers: AllowedHeaders::some(&[
             "Content-Type",
             "Authorization",
@@ -54,8 +53,8 @@ fn rocket() -> _ {
         allow_credentials: true,
         ..Default::default()
     }
-    .to_cors()
-    .unwrap();
+        .to_cors()
+        .unwrap();
 
     let mut routes = Vec::<Route>::new();
 
