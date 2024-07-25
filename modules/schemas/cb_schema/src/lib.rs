@@ -19,12 +19,14 @@ pub mod update_reload;
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 pub fn establish_pool() -> DbPool {
-    println!("{}", "establishing pool".yellow());
+    println!("{}", "Establishing Pool".blue());
     dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     let manager = ConnectionManager::<PgConnection>::new(database_url);
-    Pool::builder().build(manager).expect("Failed to create pool.")
+    let pool = Pool::builder().build(manager).expect("Failed to create pool.");
+    println!("{}", "Establishing Pool Successfully.".blue());
+    pool
 }
 
 // pub fn establish_pg_connection() -> Result<PgConnection, diesel::result::ConnectionError> {

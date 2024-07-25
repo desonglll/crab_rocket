@@ -1,7 +1,7 @@
 use rocket::{
     http::{ContentType, Header},
-    Request,
-    Response, response::Responder,
+    response::Responder,
+    Request, Response,
 };
 
 pub struct FileDownloadResponse {
