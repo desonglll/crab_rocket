@@ -1,0 +1,364 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Main Change Log</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li><li class="chapter-item expanded "><a href="../changelog/index.html"><strong aria-hidden="true">2.</strong> Change Log</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../changelog/CHANGELOG.html" class="active"><strong aria-hidden="true">2.1.</strong> Main Change Log</a></li></ol></li><li class="chapter-item expanded "><a href="../building/index.html"><strong aria-hidden="true">3.</strong> Building</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../building/build-on-ubuntu.html"><strong aria-hidden="true">3.1.</strong> Building on Ubuntu</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h2 id="change-log"><a class="header" href="#change-log">Change Log</a></h2>
+<ul>
+<li>2024.04.04:
+<ul>
+<li><code>058525fee31c1c4a56a48c795e015c86d76a4143</code>
+<ul>
+<li>Initiate project, and finish project structure building.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>2024.04.05:
+<ul>
+<li><code>16e7b5e52d3808252a392be375d9df6ee77a1fc7</code>
+<ul>
+<li>Finish <code>GET</code>, <code>POST</code>, <code>PATCH</code>, <code>DELETE</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>2024.04.06:
+<ul>
+<li><code>daaa418b093be85ae2c99f03b8d4e038cabfc575</code>
+<ul>
+<li>Finish <code>Task</code> CRUD.</li>
+</ul>
+</li>
+<li><code>7c76dac6b5e34ae2d710555ed1fc5a40195b82ac</code>
+<ul>
+<li>Add <code>users, follows, posts</code> table, finish <code>User</code> structure and implemented some <code>GET</code> and <code>POST</code> for <code>User</code>.</li>
+</ul>
+</li>
+<li><code>3dc550964f18eb0cd0841d318d2df8cf8d3ae568</code>
+<ul>
+<li>Finish <code>CRUD</code> for <code>User</code></li>
+</ul>
+</li>
+<li><code>12eb9752c308816175737f4221b869cfe7df01cd</code>
+<ul>
+<li>Finish <code>Post</code> structure and make test more strong.</li>
+</ul>
+</li>
+<li><code>b57067207387523b6153bf880075f1c5c52bb568</code>
+<ul>
+<li>Make <code>establish_pg_connection</code> more strong.</li>
+</ul>
+</li>
+<li><code>84a29814ff7b3f82e5f841cf59a057510369a156</code>
+<ul>
+<li>Fix <code>test_insert_single_user</code> for <code>cargo run</code> in github workflow.</li>
+</ul>
+</li>
+<li><code>f7292ed2924d8580f4c74f5e2adf29c849605455</code>
+<ul>
+<li>Finish <code>post_route::insert_single_post</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>2024.04.07:
+<ul>
+<li><code>12c2762dbc54542d549c7db8d9e5567d516e08e8</code>
+<ul>
+<li>Fix database foreign key to <code>CASCADE</code>.</li>
+<li>Finish <code>CRUD</code> for <code>Post</code>.</li>
+<li>Make <code>Error</code> stuff more strong.</li>
+</ul>
+</li>
+<li><code>05daeae984034e8a4965a79f67c82007745b7e49</code>
+<ul>
+<li>Finish <code>get_follows_by_id</code></li>
+<li>Finish <code>CRUD</code> for <code>Follow</code>.</li>
+</ul>
+</li>
+<li><code>12f58c948e720434ab53bc690ab40ef135d02d86</code>
+<ul>
+<li>Add follow filter to route.</li>
+<li>Rebuild mapper for follow.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>2024.04.08:
+<ul>
+<li><code>b9a4b132a061fe4acb16f206d0657c7807bf4a72</code>
+<ul>
+<li>Add task filter to route.</li>
+<li>Rename filter stuff to filter_*.</li>
+</ul>
+</li>
+<li><code>cb6e3c3f007ae7bafb138b462a3249167aaf3ffb</code>
+<ul>
+<li>Change <code>cors</code> strategy.</li>
+<li>Connect to frontend.</li>
+<li>Change model <code>PatchPost</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>2024.04.10:
+<ul>
+<li><code>bbb02994e65590d2890d57233d6a9c234f68455c</code>
+<ul>
+<li>BBBBBig change.</li>
+<li>Make params more flexible.</li>
+<li>Change return type to tuple in service level.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>2024.04.16:
+<ul>
+<li>`
+<ul>
+<li>Change response format of controllers.</li>
+<li>Add some trigger.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../changelog/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../building/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../changelog/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../building/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
