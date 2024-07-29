@@ -1,8 +1,8 @@
-use rocket::State;
 use rocket::yansi::Paint;
+use rocket::State;
 
 use crab_rocket_schema::DbPool;
-use session::models::session::{Session};
+use session::models::session::Session;
 
 use crate::request::request_param::RequestParam;
 use crate::response::api_response::ApiResponse;
@@ -15,10 +15,10 @@ pub trait ControllerCRUD {
     type PatchItem;
     type Filter;
     type Service: ServiceCRUD<
-        Item=Self::Item,
-        PostItem=Self::PostItem,
-        PatchItem=Self::PatchItem,
-        Filter=Self::Filter,
+        Item = Self::Item,
+        PostItem = Self::PostItem,
+        PatchItem = Self::PatchItem,
+        Filter = Self::Filter,
     >;
     fn get_all(
         pool: &State<DbPool>,
