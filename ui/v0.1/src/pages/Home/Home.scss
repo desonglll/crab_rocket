@@ -55,3 +55,8 @@
     display: inline-block !important;
   }
 }
+.resize-handle {
+  width: 5px;
+  cursor: ew-resize;
+  background-color: #ddd;
+}

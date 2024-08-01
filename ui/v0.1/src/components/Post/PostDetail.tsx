@@ -1,15 +1,15 @@
 import axios from "axios";
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {Button, DatePicker, Form, Input, message} from "antd";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Button, DatePicker, Form, Input, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone"; // 引入时区插件
 import utc from "dayjs/plugin/utc"; // 引入 UTC 插件
-import {Fade} from "@mui/material";
-import {SelectUser} from "../Common/SelectUser.tsx";
-import {BackButton} from "../Common/BackButton.tsx";
-import {PatchPost, Post} from "../../models/models.ts";
+import { Fade } from "@mui/material";
+import { SelectUser } from "../Common/SelectUser.tsx";
+import { BackButton } from "../Common/BackButton.tsx";
+import type { PatchPost, Post } from "../../models/models.ts";
 
 // 添加时区和 UTC 插件
 dayjs.extend(timezone);
@@ -33,7 +33,7 @@ function PostDetail() {
     fetchPost().then(() => {
       setLoading(!loading);
     });
-  }, []);
+  }, [post_id, loading]);
 
   const handleSubmit = async (data: PatchPost) => {
     try {

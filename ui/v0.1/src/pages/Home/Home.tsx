@@ -1,14 +1,18 @@
-import {Route, Routes} from "react-router-dom";
-import {Greet} from "../../components/Common/Greet.tsx";
+import { Route, Routes } from "react-router-dom";
+import { Greet } from "../../components/Common/Greet.tsx";
 import EmployeeRoutes from "../../routes/EmployeeRoutes.tsx";
 import PostRoutes from "../../routes/PostRoutes.tsx";
 import UserRoutes from "../../routes/UserRoutes.tsx";
 import TaskRoutes from "../../routes/TaskRoutes.tsx";
 import FileRoutes from "../../routes/FileRoutes.tsx";
 import RoleRoutes from "../../routes/RoleRoutes.tsx";
-import {useEffect, useState} from "react";
-import {Button, Divider, Flex, Layout, MenuTheme} from "antd";
-import {MenuFoldOutlined, MenuUnfoldOutlined, SunOutlined,} from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import { Button, Divider, Flex, Layout, type MenuTheme } from "antd";
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SunOutlined,
+} from "@ant-design/icons";
 import TopMenu from "../../components/Common/TopMenu.tsx";
 import SideMenu from "../../components/Common/SideMenu.tsx";
 import "./Home.scss";
@@ -21,11 +25,14 @@ export function Home() {
   );
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState<MenuTheme>("light");
+  const [width, setWidth] = useState(300); // 初始宽度为300px
+  const [isResizing, setIsResizing] = useState(false);
+
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.matchMedia("(max-width: 767px)").matches;
       setIsMobile(isMobile);
-      setCollapsed(isMobile ? true : false);
+      setCollapsed(isMobile);
     };
 
     // 初始調用以設置狀態
@@ -34,10 +41,31 @@ export function Home() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  const handleMouseDown = () => {
+    document.body.style.userSelect = "none"; // 禁止文本选择
+    document.body.style.cursor = "ew-resize"; // 改变鼠标样式
+    setIsResizing(true);
+  };
 
+  const handleMouseMove = (e) => {
+    if (isResizing) {
+      setWidth(e.clientX);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+    document.body.style.userSelect = ""; // 重新启用文本选择
+    document.body.style.cursor = ""; // 恢复默认鼠标样式
+  };
   return (
     <>
-      <Flex vertical={false} style={{ height: "100%", width: "100%" }}>
+      <Flex
+        vertical={false}
+        style={{ height: "100%", width: "100%" }}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
         <Flex style={{ height: "100%", width: "auto" }}>
           <Layout
             style={{
@@ -50,15 +78,15 @@ export function Home() {
                 className="sider"
                 collapsed={collapsed}
                 theme={theme}
-                width={"10vw"}
+                width={width}
               >
-                <Button className="demo-logo-vertical"></Button>
+                <Button className="demo-logo-vertical" />
                 <SideMenu themeMode={theme} />
               </Sider>
             </Flex>
           </Layout>
         </Flex>
-
+        <div className="resize-handle" onMouseDown={handleMouseDown} />
         <Flex
           style={{
             width: "auto",
@@ -69,9 +97,7 @@ export function Home() {
         >
           <Layout style={{ minWidth: "20px", width: "100%" }}>
             {isMobile ? (
-              <Header
-                style={{ height: "3vh", backgroundColor: "#ffffff" }}
-              ></Header>
+              <Header style={{ height: "3vh", backgroundColor: "#ffffff" }} />
             ) : (
               <Header
                 className="header"
@@ -108,7 +134,7 @@ export function Home() {
 
                 <TopMenu themeMode={theme} />
 
-                <Button className="demo-avatar"></Button>
+                <Button className="demo-avatar" />
               </Header>
             )}
 
